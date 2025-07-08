@@ -1,0 +1,198 @@
+/* ===== Base Styles ===== */
+:root {
+  --primary-color: #1A1A1A;
+  --secondary-color: #666;
+  --accent-blue: #0070f3;
+  --hover-blue: #005bb5;
+  --background: #ffffff;
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell;
+  background: var(--background);
+  line-height: 1.6;
+}
+
+/* ===== Header ===== */
+.custom-header {
+  position: relative;
+  padding: 2rem 0;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.custom-header::before {
+  content: "9:41";
+  position: absolute;
+  right: 20px;
+  top: 10px;
+  font-size: 0.9rem;
+  color: var(--primary-color);
+}
+
+.custom-header h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  color: var(--primary-color);
+}
+
+.custom-header p.subtitle {
+  color: var(--secondary-color);
+  font-size: 1.1rem;
+  margin: 0 auto;
+  max-width: 500px;
+}
+
+/* ===== Card Layout ===== */
+.script-templates {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ===== List Items ===== */
+ul {
+  display: grid;
+  gap: 1.2rem;
+  padding: 0;
+  margin: 2rem 0;
+}
+
+li {
+  list-style: none;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+li:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+li::before {
+  content: "";
+  width: 40px;
+  height: 40px;
+  background: var(--accent-blue);
+  border-radius: 8px;
+  flex-shrink: 0;
+  /* Add icon using background-image */
+}
+
+/* ===== Social Auth Buttons ===== */
+.social-auth {
+  display: grid;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.auth-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.auth-button:hover {
+  border-color: var(--accent-blue);
+  background: #f8f9ff;
+}
+
+/* ===== Legal Text ===== */
+.legal-text {
+  color: #666;
+  font-size: 0.875rem;
+  text-align: center;
+  margin: 2rem 0;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.legal-text a {
+  color: var(--accent-blue);
+  text-decoration: none;
+}
+
+/* ===== Animations ===== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.script-templates {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@media (max-width: 600px) {
+  /* Override root colors */
+  :root {
+    --primary-color: #333333;
+    --secondary-color: #999999;
+    --background: #f0f0f0;
+  }
+
+  body {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  /* Header smaller padding and font sizes */
+  .custom-header {
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+  }
+
+  .custom-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .custom-header p.subtitle {
+    font-size: 1rem;
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+
+  /* Card Layout padding */
+  .script-templates {
+    padding: 0 1rem;
+    max-width: 100%;
+  }
+
+  /* List Items: smaller padding and font */
+  li {
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+
+  li::before {
+    width: 30px;
+    height: 30px;
+  }
+
+  /* Social Auth buttons: smaller padding */
+  .auth-button {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  /* Legal text smaller font */
+  .legal-text {
+    font-size: 0.75rem;
+    margin: 1rem 0;
+  }
+}

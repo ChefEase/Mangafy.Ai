@@ -1,0 +1,17 @@
+.loading-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-size: 1.2rem;
+    color: #666;
+  }
+
+  @media (max-width: 950px) {
+    .loading-screen {
+      font-size: 1rem;      /* Smaller font on mobile */
+      height: 80vh;         /* Shorter height if you want */
+      padding: 1rem;        /* Optional: Add some spacing */
+    }
+  }
+  

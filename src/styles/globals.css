@@ -1,0 +1,83 @@
+@import url("https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css");
+@import "quill/dist/quill.snow.css";
+
+:root {
+  --primary-color: #0070f3;
+  --background-color: #f9f9f9;
+  --text-color: #333;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Main Layout */
+.script-writing-page {
+  display: flex;
+  height: calc(100vh - 60px); /* Adjust for header height */
+}
+
+/* Characters Sidebar */
+.characters-sidebar {
+  position: relative;
+  background: #f5f5f5;
+  border-right: 1px solid #ddd;
+  transition: width 0.3s ease;
+  overflow: hidden;
+}
+
+.characters-sidebar.closed {
+  width: 0;
+}
+
+.characters-sidebar.open {
+  width: 300px; /* Default width */
+}
+
+.toggle-button {
+  position: absolute;
+  top: 50%;
+  right: -20px;
+  background: #0070f3;
+  color: white;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+.resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 5px;
+  height: 100%;
+  background: #ddd;
+  cursor: ew-resize;
+}
+
+/* Script Editor */
+.script-editor-container {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+}

@@ -1,0 +1,130 @@
+.character-card {
+  background: white;
+  border-radius: 16px; /* Increased from 12px */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); /* Softer shadow */
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  margin: 12px;
+}
+
+.character-card:hover {
+  transform: translateY(-8px); /* Increased lift */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12); /* Deeper shadow on hover */
+}
+
+.character-image {
+  width: 100%;
+  height: 240px; /* Increased height */
+  object-fit: cover;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08); /* Subtle separation */
+  position: relative;
+}
+
+/* Gradient overlay for image */
+.character-image::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.05));
+}
+
+.character-card h3 {
+  font-size: 1.4rem; /* Slightly reduced size */
+  margin: 20px 16px 12px; /* Adjusted spacing */
+  color: #1a1a1a; /* Darker text */
+  font-weight: 600; /* Semi-bold */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  letter-spacing: -0.2px;
+}
+
+.actions {
+  display: flex;
+  gap: 12px; /* Modern gap instead of space-between */
+  padding: 0 16px 20px;
+}
+
+.actions button {
+  flex: 1;
+  padding: 12px 16px; /* Increased padding */
+  background-color: #ffffff;
+  color: #1a1a1a;
+  border: 1px solid rgba(0, 0, 0, 0.12); /* Subtle border */
+  border-radius: 10px; /* Matching card radius */
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* For potential icons */
+}
+
+/* Primary action button */
+.actions button:first-child {
+  background-color: #0071e3; /* Apple-like blue from images */
+  color: white;
+  border: none;
+}
+
+.actions button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  background-color: #0071e3; /* Hover state */
+  color: white;
+}
+
+/* Card footer similar to "curated by" */
+.character-card::after {
+  content: 'curated by Marvel';
+  display: block;
+  padding: 16px;
+  font-size: 0.85rem;
+  color: #666;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  text-align: center;
+  letter-spacing: 0.4px;
+}
+
+@media (max-width: 768px) {
+  .character-card {
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    margin: 8px;
+  }
+
+  .character-card:hover {
+    transform: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  }
+
+  .character-image {
+    height: 180px;
+  }
+
+  .character-card h3 {
+    font-size: 1.1rem;
+    margin: 16px 12px 8px;
+  }
+
+  .actions {
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 12px 16px;
+  }
+
+  .actions button {
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    gap: 6px;
+  }
+
+  .character-card::after {
+    font-size: 0.75rem;
+    padding: 12px;
+  }
+}

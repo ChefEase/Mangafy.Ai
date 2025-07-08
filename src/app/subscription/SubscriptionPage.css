@@ -1,0 +1,277 @@
+.subscription-page {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2rem;
+  text-align: center;
+  background: #f8f9fc;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.subscription-page h1 {
+  font-size: 2.8rem;
+  margin-bottom: 1.5rem;
+  color: #1a1a1a;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  animation: fadeInUp 0.6s ease;
+}
+
+.plans-container {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  padding: 2rem 0;
+}
+
+.plan-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  padding: 2.5rem;
+  width: 320px;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  position: relative;
+  opacity: 0;
+  animation: cardEntrance 0.6s ease forwards;
+}
+
+.plan-card:nth-child(1) { animation-delay: 0.2s; }
+.plan-card:nth-child(2) { animation-delay: 0.4s; }
+.plan-card:nth-child(3) { animation-delay: 0.6s; }
+
+.plan-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+}
+
+.plan-card h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1.2rem;
+  color: #1a1a1a;
+  font-weight: 700;
+}
+
+.plan-card .price {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 1.8rem;
+  color: #0070f3;
+  position: relative;
+  display: inline-block;
+}
+
+.plan-card .price::before {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 3px;
+  background: #0070f3;
+  border-radius: 2px;
+}
+
+.plan-card ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 2.5rem;
+  text-align: left;
+}
+
+.plan-card ul li {
+  margin-bottom: 1rem;
+  color: #666;
+  padding-left: 28px;
+  position: relative;
+  font-size: 0.95rem;
+}
+
+.plan-card ul li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #0070f3;
+  font-weight: 700;
+}
+
+.plan-card button {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, #0070f3, #0062cc);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.plan-card button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 112, 243, 0.3);
+}
+
+.plan-card button.disabled {
+  background: #e9ecef;
+  color: #868e96;
+  cursor: not-allowed;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+      opacity: 0;
+      transform: translateY(20px);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+
+@keyframes cardEntrance {
+  from {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+  }
+}
+
+/* Popular Badge */
+.popular-badge {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0070f3;
+  color: white;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 112, 243, 0.2);
+}
+
+.subscription-page section {
+  margin-bottom: 2rem;
+}
+
+.subscription-page h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.invite-section {
+  background-color: #f5f5f5;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.invite-section h3 {
+  margin-bottom: 8px;
+}
+
+.referral-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.referral-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  max-width: 400px;
+}
+
+.copy-button {
+  padding: 8px 16px;
+  background-color: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.copy-button:hover {
+  background-color: #4f46e5;
+}
+
+@media (max-width: 768px) {
+  .subscription-page {
+    max-width: 100%;
+    margin: 1rem;
+    padding: 1rem;
+    font-size: 14px; /* smaller base font */
+  }
+
+  .subscription-page h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .plans-container {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem 0;
+  }
+
+  .plan-card {
+    width: 100%;
+    padding: 1.5rem;
+  }
+
+  .plan-card h2 {
+    font-size: 1.5rem;
+  }
+
+  .plan-card .price {
+    font-size: 1.8rem;
+  }
+
+  .plan-card ul li {
+    font-size: 0.9rem;
+    padding-left: 20px;
+  }
+
+  .plan-card button {
+    font-size: 1rem;
+    padding: 0.75rem;
+  }
+
+  .invite-section {
+    padding: 12px;
+  }
+
+  .referral-container {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .referral-input {
+    max-width: 100%;
+  }
+
+  .copy-button {
+    width: 100%;
+  }
+}

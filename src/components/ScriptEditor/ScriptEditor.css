@@ -1,0 +1,91 @@
+.script-editor {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transition: border-color 0.3s ease;
+}
+
+.script-editor:focus-within {
+  border-color: #0070f3;
+  box-shadow: 0 4px 16px rgba(0, 112, 243, 0.15);
+}
+
+.ql-editor {
+  min-height: 300px;
+  font-size: 16px;
+  color: #333;
+  line-height: 1.6;
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.ql-toolbar {
+  border: 1px solid #e6e6e6 !important;
+  border-radius: 8px 8px 0 0;
+  padding: 0.8rem !important;
+  background: #f9f9f9;
+}
+
+.ql-container {
+  border: 1px solid #e6e6e6 !important;
+  border-radius: 0 0 8px 8px !important;
+  border-top: none !important;
+}
+
+.ql-toolbar button {
+  transition: all 0.2s ease !important;
+  border-radius: 6px !important;
+}
+
+.ql-toolbar button:hover {
+  background: #f0f5ff !important;
+}
+
+.ql-toolbar button.ql-active {
+  background: #0070f3 !important;
+  color: white !important;
+}
+
+/* Custom scrollbar */
+.ql-editor::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ql-editor::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 4px;
+}
+
+@media (max-width: 950px) {
+  .script-editor {
+    max-width: 100%;   /* Full width on small screens */
+    padding: 1rem;     /* Less padding */
+    border-radius: 8px;
+    box-shadow: none;  /* Remove shadow for simplicity */
+  }
+
+  .ql-editor {
+    min-height: 200px; /* Smaller height */
+    font-size: 14px;   /* Smaller font */
+    padding: 1rem;     /* Less padding */
+    border-radius: 6px;
+  }
+
+  .ql-toolbar {
+    padding: 0.5rem !important; /* Smaller padding */
+    border-radius: 6px 6px 0 0;
+  }
+
+  .ql-container {
+    border-radius: 0 0 6px 6px !important;
+  }
+
+  .ql-toolbar button {
+    border-radius: 4px !important;
+  }
+}

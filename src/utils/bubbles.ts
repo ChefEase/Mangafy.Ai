@@ -1,0 +1,6 @@
+// utils/bubbles.ts
+export const BUBBLE_SHAPES = {
+    standard: 'M20,20 Q100,50 180,20 T340,20 L320,100 L300,80 L280,100 Z',
+    thought: 'M50,50 C20,100,80,100,50,150 S100,200,150,150 S200,100,170,50 Z',
+    scream: 'M30,30 L170,30 L200,100 L170,170 L30,170 L0,100 Z',
+  };

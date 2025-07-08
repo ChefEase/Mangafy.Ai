@@ -1,0 +1,75 @@
+.character-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+  padding: 1.5rem;
+  margin: 0 auto;
+  max-width: 1200px;
+}
+
+/* Card Enhancements */
+.character-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+}
+
+.character-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.character-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.character-card:hover::after {
+  opacity: 1;
+}
+
+.character-image {
+  height: 240px;
+  object-fit: cover;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .character-list {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+    gap: 1rem;
+    max-width: 100%;
+  }
+
+  .character-card {
+    border-radius: 12px;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .character-card:hover {
+    transform: none;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .character-card::after {
+    display: none; /* Remove the extra hover effect on mobile for simplicity */
+  }
+
+  .character-image {
+    height: 180px;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
+}

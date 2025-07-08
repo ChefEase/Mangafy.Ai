@@ -1,0 +1,131 @@
+.manga-page {
+    background: white;
+    margin: 20px auto;
+    padding: 40px;
+    border: 10px solid black;
+    max-width: 2480px;
+  }
+  
+  .manga-panel {
+    width: 100%;
+    background: white;
+    margin-bottom: 40px;
+    box-sizing: border-box;
+    border: 5px solid black;
+  }
+  /* Preview container styling */
+.manga-page-preview {
+  margin: 20px 200;
+  max-width: 800px; /* Control maximum preview size */
+  overflow: hidden;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  aspect-ratio: 2480 / 3508; 
+}
+
+.preview-container {
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 2480 / 3508; /* A4 page ratio */
+  overflow: hidden;
+  margin: 0 auto;
+  position: relative;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+}
+
+.full-page-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  image-rendering: crisp-edges;
+}
+
+/* Optional hover effect for better preview */
+.preview-container {
+  transition: transform 0.3s ease;
+  cursor: zoom-in;
+  /* remove transform/scale from here completely */
+}
+
+.full-page-image {
+  transition: transform 0.3s ease;
+}
+
+.preview-container:hover .full-page-image {
+  transform: scale(1.05); /* Small zoom on image only */
+}
+
+.page-number {
+  text-align: center;
+  padding: 10px;
+  background: #f5f5f5;
+  border-top: 1px solid #ddd;
+}
+
+.zoom-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  cursor: zoom-out;
+}
+
+.zoomed-image {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+}
+
+.panel-type-selector {
+  margin: 15px 0;
+}
+
+.panel-type-selector select {
+  padding: 8px 12px;
+  border: 2px solid #333;
+  border-radius: 4px;
+  background: white;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .manga-page {
+    margin: 10px auto;
+    padding: 20px;
+    border-width: 5px;
+    max-width: 100%; /* allow full width on smaller screens */
+  }
+
+  .manga-panel {
+    margin-bottom: 20px;
+    border-width: 2px;
+  }
+
+  .manga-page-preview {
+    margin: 10px 20px;
+    max-width: 100%; /* full width on mobile */
+  }
+
+  .preview-container {
+    max-width: 100%; /* use full available width */
+    border-width: 1px;
+  }
+
+  .page-number {
+    padding: 5px;
+    font-size: 12px;
+  }
+
+  .panel-type-selector select {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+}

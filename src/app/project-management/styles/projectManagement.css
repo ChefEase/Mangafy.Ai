@@ -1,0 +1,471 @@
+/* src/styles/projectManagement.css */
+.project-management-page {
+    display: flex;
+    height: 100vh;
+    background-color: #f8f9fa;
+  }
+  
+  .project-sidebar {
+    width: 250px;
+    background: #ffffff;
+    padding: 1rem;
+    border-right: 1px solid #e9ecef;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .sidebar-section {
+    margin-bottom: 1.5rem;
+  }
+  
+  .sidebar-section h3 {
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+  
+  .main-content {
+    flex: 1;
+    padding: 1.5rem;
+    background-color: #ffffff;
+    margin: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 200fr));
+    gap: 1rem;
+  }
+  
+  .project-card {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 0.75rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    background-color: #ffffff;
+  }
+  
+  .project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .project-card img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    width: 400px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .add-chapter {
+    margin-top: 1rem;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: #0070f3;
+    color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .logo a {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+  }
+  
+  .nav {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .nav a:hover {
+    text-decoration: underline;
+  }
+  
+  .user-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .user-profile img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    width: 400px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+  
+  .modal-input,
+  .modal-textarea,
+  .modal-select {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  .modal-file-input {
+    margin-bottom: 1rem;
+  }
+  
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+  
+  .modal-button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  
+  .modal-button.primary {
+    background: #0070f3;
+    color: white;
+  }
+  
+  .modal-button.secondary {
+    background: #f5f5f5;
+    color: #333;
+  }
+
+  /* General Button Styles */
+.button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+/* Share Button */
+.share-button {
+  background: #4caf50;
+  color: white;
+}
+
+.share-button:hover {
+  background: #45a049;
+}
+
+/* Add Project Button */
+.add-project-button {
+  background: #0070f3;
+  color: white;
+}
+
+.add-project-button:hover {
+  background: #005bb5;
+}
+
+/* Add Chapter Button */
+.add-chapter-button {
+  background: #ff9800;
+  color: white;
+}
+
+.add-chapter-button:hover {
+  background: #e68900;
+}
+
+/* Edit Button */
+.edit-button {
+  background: #2196f3;
+  color: white;
+}
+
+.edit-button:hover {
+  background: #1e88e5;
+}
+
+/* Delete Button */
+.delete-button {
+  background: #f44336;
+  color: white;
+}
+
+.delete-button:hover {
+  background: #e53935;
+}
+
+.back-button {
+  background: #6c757d;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.back-button:hover {
+  background: #5a6268;
+}
+
+.context-menu {
+  position: fixed;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.context-menu button {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.context-menu button:hover {
+  background: #f5f5f5;
+}
+
+/* Modern project list style */
+.project-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.project-list-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333;
+  background-color: #f9fafc;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.15s;
+}
+
+.project-list-item:hover {
+  background-color: #e3eefe;
+  transform: translateX(2px);
+}
+
+.project-icon {
+  font-size: 1.1rem;
+  color: #4a6cf7;
+}
+
+.project-title {
+  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+.chapter-list-container {
+  list-style: none;
+  padding: 0;
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chapter-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background-color: #f9fafc;
+  border: 1px solid #e9ecef;
+  transition: background-color 0.2s, transform 0.15s;
+}
+
+.chapter-list-item:hover {
+  background-color: #eaf3ff;
+  transform: translateY(-1px);
+}
+
+.chapter-title {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333;
+  font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+.chapter-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.chapter-edit,
+.chapter-delete {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.chapter-edit:hover {
+  background-color: rgba(74, 108, 247, 0.1);
+  color: #4a6cf7;
+}
+
+.chapter-delete:hover {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #f44336;
+}
+
+@media (max-width: 950px) {
+
+  .project-management-page {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .project-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e9ecef;
+    box-shadow: none;
+    padding: 0.75rem;
+  }
+
+  .main-content {
+    margin: 0;
+    border-radius: 0;
+    padding: 1rem;
+    box-shadow: none;
+  }
+
+  .project-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.75rem;
+  }
+
+  .nav {
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .user-profile {
+    margin-top: 0.5rem;
+  }
+
+  .modal {
+    width: 90%;
+    padding: 1rem;
+  }
+
+  .chapter-list-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .chapter-actions {
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+  }
+
+  .project-card img {
+    height: 80px;
+  }
+
+  .project-list-item {
+    padding: 8px;
+  }
+
+  .project-icon {
+    font-size: 1rem;
+  }
+
+}

@@ -1,0 +1,55 @@
+.generation-status {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: white;
+    padding: 1rem;
+    border: 2px solid #000;
+    z-index: 1000;
+  }
+  
+  .generation-status progress {
+    width: 200px;
+    height: 20px;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .generation-status:after {
+    content: " ";
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin-left: 0.5em;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    border-color: #000 transparent #000 transparent;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  @media (max-width: 600px) {
+    .generation-status {
+      bottom: 10px;      /* moves it up a bit */
+      right: 10px;       /* moves it left a bit */
+      padding: 0.5rem;   /* less padding */
+      border-width: 1px; /* thinner border */
+      background: #f0f0f0; /* change background color */
+    }
+  
+    .generation-status progress {
+      width: 150px;      /* smaller progress bar */
+      height: 15px;
+    }
+  
+    .generation-status:after {
+      width: 0.8em;
+      height: 0.8em;
+      border-width: 1.5px;
+    }
+  }
+  

@@ -1,0 +1,31 @@
+.art-style-dropdown {
+    padding: 8px 12px;
+    border: 2px solid #2c3e50;
+    border-radius: 4px;
+    background: #f8f9fa;
+    font-size: 1rem;
+    margin-left: 10px;
+    width: 250px;
+  }
+  
+  .style-selector {
+    margin: 15px 0;
+    display: flex;
+    align-items: center;
+  }
+
+  @media (max-width: 768px) {
+    .art-style-dropdown {
+      width: 100%; /* Full width on mobile */
+      font-size: 0.9rem; /* Smaller text */
+      margin-left: 0; /* Remove side margin */
+      padding: 6px 10px; /* Smaller padding */
+    }
+  
+    .style-selector {
+      flex-direction: column; /* Stack items vertically on mobile */
+      align-items: flex-start; /* Align items to the left */
+      margin: 10px 0;
+    }
+  }
+  
