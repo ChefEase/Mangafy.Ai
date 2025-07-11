@@ -174,7 +174,7 @@ export class AIService {
     seed?:number;
     num_inference_steps?: number; 
   }): Promise<Blob> {
-    const response = await fetch("https://80f2-34-139-48-54.ngrok-free.app/generate-image", {
+    const response = await fetch("https://e549ffe90377.ngrok-free.app/generate-image", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -337,7 +337,7 @@ async generatePanel(payload: {
         seed: randomSeed,
         sampler: "Euler a",
         aspect_ratio: this.mapToClosestAspectRatio(payload.width!, payload.height!),
-        num_inference_steps: 30,
+        num_inference_steps: 35,
         style: payload.gradioStyle,
         quality: "Standard v3.1",
         use_upscaler: true,
@@ -490,6 +490,10 @@ private validateModel(model: string) {
   }
 
   async generateScenesFromOutline(outline: string, panelCount: number, retries=3 ) {
+    if (typeof outline !== 'string') {
+      console.error("Invalid outline type:", typeof outline);
+      throw new Error("Outline must be a string");
+    }
     console.log("Sending outline to backend:", outline);
     try {
       const response = await fetch("http://localhost:4000/app/script-writing", {

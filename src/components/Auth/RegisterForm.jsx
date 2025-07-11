@@ -49,7 +49,6 @@ export const RegisterForm = ({ referrerId }) => {
         })
       );
 
-      router.push("/project-management"); // Redirect after registration
     } catch (error) {
       console.error(error);
       alert(error.message || "Registration failed.");

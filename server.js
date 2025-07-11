@@ -1,3 +1,5 @@
+const { InferenceClient } = require("@huggingface/inference");
+
 const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
@@ -10,6 +12,7 @@ const PORT = 4000; // Choose any port that isn't in use
 const path = require('path');
 app.use(express.static(path.join(__dirname, '.next')));
 app.use(express.static(path.join(__dirname, 'public')));
+const hf = new InferenceClient(process.env.HF_API_KEY);
 
 // Handle client-side routing
 app.use(cors({
@@ -68,7 +71,7 @@ app.post('/proxy/huggingface', async (req, res) => {
 app.post("/app/script-writing", async (req, res) => {
   try {
     const { outline, panelCount, panelType } = req.body;
-    const HF_API_KEY = process.env.HF_API_KEY;
+    const HF_API_KEY = process.env.HF_API_KEY || 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;
     console.log("HF API Key (Backend):", process.env.HF_API_KEY);
     console.log("Processing outline:", outline);
     
@@ -155,30 +158,35 @@ IF Characters are mentioned in story, u MUST include them in the story and visua
 
 Outline: ${cleanOutline}`;
 
-    const response = await axios.post(
-      "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1",
-      {
-        inputs: prompt,
-        parameters: {
-          max_new_tokens: 1500,
-          temperature: 0.5,
-          return_full_text: false
-        }
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${HF_API_KEY}`, // Make sure to store this in .env
-          "Content-Type": "application/json",
-        },
-        timeout: 900000
-      }
-    );
-    const generatedText = response.data[0]?.generated_text;
-    if (!generatedText) {
-      throw new Error("No valid text generated from AI");
-    }
-   
-    const cleanText = generatedText
+const response = await hf.chatCompletion({
+  model: "mistralai/Mixtral-8x7B-Instruct-v0.1",
+  messages: [
+      { role: "user", content: prompt }
+  ],
+  parameters: {
+      max_new_tokens: 1500,
+      temperature: 0.5
+  }
+});
+const choice = response?.choices?.[0];
+const generatedTextRaw = 
+  (choice?.message?.content && typeof choice.message.content === 'string') ? choice.message.content :
+  (choice?.text && typeof choice.text === 'string') ? choice.text :
+  (response?.generated_text && typeof response.generated_text === 'string') ? response.generated_text :
+  null;
+
+const generatedText = generatedTextRaw?.trim();
+console.log("Raw response text:", generatedTextRaw);
+console.log("Cleaned text after trim:", generatedTextRaw?.trim());
+console.log("Length:", generatedTextRaw?.trim()?.length);
+console.log("Raw HF response object:", JSON.stringify(response, null, 2));
+
+if (!generatedText || generatedText.length < 10) {
+  console.error("Generated text is too short or missing.");
+  throw new Error("No valid text generated from AI");
+}
+
+const cleanText = generatedText
     .replace(/\[([0-9]+)\]/g, 'Panel $1') // ✅ convert [1] to Panel 1
     .replace(/:\s*\n/g, '\n')            // ✅ normalize "Panel 1:\n" to "Panel 1\n"
     .replace(/```/g, '')                 // remove markdown blocks
@@ -186,8 +194,6 @@ Outline: ${cleanOutline}`;
     .replace(/[^\x00-\x7F]/g, '')        // remove emojis
   .replace(/```/g, '')  // Remove markdown code blocks
   .replace(/\*\*/g, '')  // Remove bold markers
-  .replace(/^[^{]*/, '') // Remove any preamble text
-  .replace(/[^\x00-\x7F]/g, '') // Remove non-ASCII characters (e.g., ❤️)
   .replace(/\d+\.\s*\d+\./g, '') // Remove duplicate numbering (e.g., 6. 6.)
   .replace(/.*PANEL 1:/s, 'PANEL 1:') // Remove everything before the first panel
   .replace(/\[Panel/g, 'PANEL')
@@ -204,7 +210,7 @@ if (!fs.existsSync(logDir)) {
 }
 fs.writeFileSync(path.join(logDir, 'last_response.txt'), generatedText);
       // In server.js
-let panelRegex = /Panel\s*\d+\s*\n\s*Scene\s*:\s*((?:.|\n)+?)\s*\n\s*Camera\s*:\s*((?:.|\n)+?)\s*\n\s*Dialogue\s*:\s*"?(.+?)"?\s*(?=\n\s*Panel|$)/gis;
+      let panelRegex = /Panel\s*\d+\s*\n\s*Scene:\s*(.+?)\s*\n\s*Camera:\s*(.+?)\s*\n\s*Dialogue:\s*(.+?)(?=\n\s*Panel|\s*$)/gis;
        let matches = [...cleanText.matchAll(panelRegex)];
        console.log(`Panels detected: ${matches.length}, Expected: ${panelCount}`);
 
@@ -249,7 +255,11 @@ if (matches.length === 0) {
     };
     });
 
-    if (!response.data || !response.data[0]?.generated_text) {
+    if (
+      !response ||
+      !response.choices ||
+      !response.choices[0]?.message?.content
+    ) {
       throw new Error("No text generated from AI");
     }
 

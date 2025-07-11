@@ -1,11 +1,14 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
-import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import "./ScriptEditor.css";
 import mammoth from "mammoth";
 import { validateScript } from "../../utils/scriptValidation";
+import type * as QuillNamespace from "quill";
+
+type Delta = QuillNamespace.Delta;
+type Sources = "user" | "api" | "silent";
 
 interface ScriptEditorProps {
   content: string;
@@ -22,16 +25,25 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({
   onSave,
   initialContent = "",
 }) => {
-  const quillRef = useRef<Quill | null>(null);
+  const [Quill, setQuill] = useState<any>(null);
+  const quillRef = useRef<any>(null);
   const editorRef = useRef<HTMLDivElement | null>(null);
-  const [message, setMessage] = useState("");
-  const isQuillInitialized = useRef(false); // Track Quill initialization
-  const isInitialContentSet = useRef(false); // Add this ref
-
+  const isQuillInitialized = useRef(false);
+  const isInitialContentSet = useRef(false);
+  const [message, setMessage] = useState("");  
+  // Dynamically import Quill on client-side only
   useEffect(() => {
-    if (editorRef.current && !isQuillInitialized.current) {
-      console.log("Initializing Quill"); // Debugging
-      isQuillInitialized.current = true; // Mark Quill as initialized
+    import("quill").then((module) => {
+      console.log("Quill module loaded:", module);
+      const QuillConstructor = module?.default ?? module;
+      setQuill(() => QuillConstructor);
+    });
+  }, []);
+
+  // Initialize Quill when Quill module is loaded
+  useEffect(() => {
+    if (Quill && editorRef.current && !isQuillInitialized.current) {
+      isQuillInitialized.current = true;
 
       quillRef.current = new Quill(editorRef.current, {
         theme: "snow",
@@ -46,44 +58,36 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({
         placeholder: "Write your script here...",
       });
 
-      // Load saved content or selected template
+      // Your existing content loading and event setup goes here
       const savedScript = localStorage.getItem(LOCAL_STORAGE_KEY);
       const selectedTemplate = localStorage.getItem("selected-template");
       const initialHtml = selectedTemplate || savedScript || initialContent;
 
-       
       if (initialHtml) {
         const delta = quillRef.current.clipboard.convert({ html: initialHtml });
-        quillRef.current.setContents(delta, 'silent');
+        quillRef.current.setContents(delta, "silent");
         isInitialContentSet.current = true;
       }
 
       if (selectedTemplate) {
         quillRef.current.clipboard.dangerouslyPasteHTML(selectedTemplate);
-        localStorage.removeItem("selected-template"); // Clear the template after loading
+        localStorage.removeItem("selected-template");
       } else if (savedScript) {
         quillRef.current.clipboard.dangerouslyPasteHTML(savedScript);
       } else if (initialContent) {
         quillRef.current.clipboard.dangerouslyPasteHTML(initialContent);
       }
 
-      // Handle content changes
-      const handleTextChange = () => {
-        const newContent = quillRef.current?.root.innerHTML || "";
-        onContentChange(newContent);
-      };
-
-      quillRef.current.on('text-change', (delta, oldDelta, source) => {
-        if (source === 'user') {
-          const newContent = quillRef.current?.root.innerHTML || '';
+      quillRef.current.on("text-change", (delta: Delta, oldDelta: Delta, source: Sources) => {
+        if (source === "user") {
+          const newContent = quillRef.current?.root.innerHTML || "";
           onContentChange(newContent);
         }
       });
 
-      // Cleanup Quill instance on unmount
       return () => {
         if (quillRef.current) {
-          quillRef.current.off('text-change');
+          quillRef.current.off("text-change");
           quillRef.current = null;
           isQuillInitialized.current = false;
           const toolbar = document.querySelector(".ql-toolbar");
@@ -91,32 +95,31 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({
         }
       };
     }
-  }, []); // Empty dependency array ensures this runs only once
+  }, [Quill]);
 
-  // Update Quill content when initialContent changes
+  // Update Quill content when `content` changes externally
   useEffect(() => {
     if (quillRef.current && content !== quillRef.current.root.innerHTML) {
       const delta = quillRef.current.clipboard.convert({ html: content });
-      quillRef.current.setContents(delta, 'silent');
+      quillRef.current.setContents(delta, "silent");
     }
   }, [content]);
-  
+
+  // Your save and file import handlers stay the same...
+
   const handleSave = () => {
     if (quillRef.current) {
       const currentContent = quillRef.current.root.innerHTML.trim();
 
-      // Validate the script
       const errors = validateScript(currentContent);
       if (errors.length > 0) {
-        setMessage(errors[0]); // Show validation error
-        return; // Stop save if script is too short
+        setMessage(errors[0]);
+        return;
       }
 
-      // Save content to localStorage
       localStorage.setItem(LOCAL_STORAGE_KEY, currentContent);
-      setMessage("Script saved successfully!"); // Show success message
+      setMessage("Script saved successfully!");
 
-      // Clear message after 2 seconds
       setTimeout(() => setMessage(""), 2000);
     }
     onSave();
@@ -128,8 +131,6 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({
 
     const reader = new FileReader();
     reader.onload = async (e) => {
-      const fileContent = e.target?.result as string;
-
       if (file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
         const result = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
         const text = result.value;

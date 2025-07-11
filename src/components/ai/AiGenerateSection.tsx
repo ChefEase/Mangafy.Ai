@@ -25,31 +25,41 @@ export default function AIGenerateSection({ onGenerate }: AIGenerateSectionProps
       setError("Please enter a description.");
       return;
     }
-
+  
     if (credits < SCRIPT_COST) {
       setError(`You need ${SCRIPT_COST} credits to generate a script`);
       return;
     }
-
+  
     setIsLoading(true);
     setError("");
-
+  
     try {
-      const deductionSuccess = await deductCredits(SCRIPT_COST);
-      if (!deductionSuccess) throw new Error("Credit deduction failed");
+      const script = await generateScript(prompt);  
+      let cleanedScript = script
+      .replace(/^#+\s*/gm, "")  // Remove markdown headers like ####
+      .replace(/\*\*/g, "")     // Remove bold markers
+      .replace(/\*/g, "")       // Remove italics/SFX stars
+      .trim();            // ✅ Generate first
 
-      const script = await generateScript(prompt);
-      await onGenerate(script);
-      setGeneratedScript(script);
+      cleanedScript = cleanedScript
+      .split(/\n{1,}/)        // Split on one or more newlines (paragraphs)
+      .map(paragraph => paragraph.trim()) // Trim each paragraph
+      .filter(paragraph => paragraph.length > 0) // Remove empty paragraphs
+      .join("\n\n");          // Join with double newline for paragraph spacing
+  
+      await onGenerate(cleanedScript);                                 // ✅ Pass to parent
+      const deductionSuccess = await deductCredits(SCRIPT_COST); // ✅ Deduct only if success
+      if (!deductionSuccess) throw new Error("Deduction failed"); // Just in case
+      setGeneratedScript(cleanedScript);                               // ✅ Save locally
     } catch (error) {
-      await addCredits(SCRIPT_COST);
-      setError("Failed to generate script. Credits have been refunded.");
+      setError("Failed to generate script. No credits were deducted.");
       console.error(error);
     } finally {
       setIsLoading(false);
     }
   };
-
+  
   const handleApply = () => {
     localStorage.setItem("script-content", generatedScript);
     router.push("/script-writing");

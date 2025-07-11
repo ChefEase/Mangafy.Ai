@@ -27,7 +27,7 @@ export const GoogleLoginButton = () => {
     localStorage.setItem("referrerId", referrerId);
   }
 
-  const initializeUserCredits = async (userId, email, referrerId) => {
+  const initializeUserCredits = async (userId, email) => {
     try {
       console.log("🚀 Starting credit initialization for:", email || "unknown");
   
@@ -36,7 +36,7 @@ export const GoogleLoginButton = () => {
         .from("users")
         .select("credits_initialized")
         .eq("id", userId)
-        .single();
+        .maybeSingle();
   
       if (userError && userError.code === "406") {
         console.warn("Supabase header issue, retrying with custom headers");
@@ -83,15 +83,11 @@ export const GoogleLoginButton = () => {
       }
   
       // 6. Save user with correct credit value
-      
-const referredBy = existingUser?.referred_by || referrerId || null;
-
       await supabase.from("users").upsert({
         id: userId,
         email,
         credits: initialCredits,
-        credits_initialized: true,
-        referred_by: referredBy,
+        credits_initialized: true
       });
   
       // 7. Cache in localStorage
@@ -109,85 +105,86 @@ const referredBy = existingUser?.referred_by || referrerId || null;
     }
   };
   
+// Helper functions
+const generateDeviceFingerprint = () => {
+  const data = [
+    navigator.userAgent,
+    navigator.hardwareConcurrency,
+    navigator.deviceMemory,
+    `${screen.width}x${screen.height}`,
+    new Date().getTimezoneOffset()
+  ].join('|');
   
-  // Helper functions
-  const generateDeviceFingerprint = () => {
-    const data = [
-      navigator.userAgent,
-      navigator.hardwareConcurrency,
-      navigator.deviceMemory,
-      `${screen.width}x${screen.height}`,
-      new Date().getTimezoneOffset()
-    ].join('|');
+  let hash = 0;
+  for (let i = 0; i < data.length; i++) {
+    hash = (hash << 5) - hash + data.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash).toString(16);
+};
+
+const updateUserCredits = async (userId, email, credits) => {
+  await supabase.from("users").upsert({
+    id: userId,
+    email: email || "unknown@example.com",
+    credits: isFirst1015 ? 375 : 295,
+    credits_initialized: true
+  });
+  
+  // Cache in localStorage
+  localStorage.setItem(`user-${userId}-credits`, credits.toString());
+};
+
+const getUserCount = async () => {
+  try {
+    const { count } = await supabase
+      .from("users")
+      .select("*", { count: "exact", head: true });
+    return count || 0;
+  } catch {
+    return 0;
+  }
+};
+
+const initializeWithCustomHeaders = async (userId, email) => {
+  try {
+    console.log("🔄 Retrying with custom headers");
     
-    let hash = 0;
-    for (let i = 0; i < data.length; i++) {
-      hash = (hash << 5) - hash + data.charCodeAt(i);
-      hash |= 0;
-    }
-    return Math.abs(hash).toString(16);
-  };
-  
-  const updateUserCredits = async (userId, email, credits) => {
-    await supabase.from("users").upsert({
-      id: userId,
-      email: email || "unknown@example.com",
-      credits,
-      credits_initialized: true
-    });
-    
-    // Cache in localStorage
-    localStorage.setItem(`user-${userId}-credits`, credits.toString());
-  };
-  
-  const getUserCount = async () => {
-    try {
-      const { count } = await supabase
-        .from("users")
-        .select("*", { count: "exact", head: true });
-      return count || 0;
-    } catch {
-      return 0;
-    }
-  };
-  
-  const initializeWithCustomHeaders = async (userId, email) => {
-    try {
-      console.log("🔄 Retrying with custom headers");
-      
-      // Manually fetch with headers
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/users?id=eq.${userId}&select=credits_initialized`,
-        {
-          headers: {
-            "apikey": process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-            "Authorization": `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-            "Content-Type": "application/json"
-          }
+    // Manually fetch with headers
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/users?id=eq.${userId}&select=credits_initialized`,
+      {
+        headers: {
+          "apikey": process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+          "Content-Type": "application/json"
         }
-      );
-      
-      if (!response.ok) throw new Error("Custom header request failed");
-      
-      const [data] = await response.json();
-      if (data?.credits_initialized) return;
-      
-      // Continue initialization
-      const fingerprint = generateDeviceFingerprint();
-      // ... rest of initialization logic
-    } catch (error) {
-      console.error("Custom header fallback failed:", error);
-      await updateUserCredits(userId, email, 10);
-    }
-  };  
+      }
+    );
     
+    if (!response.ok) throw new Error("Custom header request failed");
     
+    const [data] = await response.json();
+    if (data?.credits_initialized) return;
+    
+    // Continue initialization
+    const fingerprint = generateDeviceFingerprint();
+    // ... rest of initialization logic
+  } catch (error) {
+    console.error("Custom header fallback failed:", error);
+    await updateUserCredits(userId, email, 10);
+  }
+};
+
   const handleGoogleLogin = async () => {
     try {
+      const referrerId = localStorage.getItem("referrerId"); // make sure this is set!
+
+  const redirectUrl = `${window.location.origin}/auth${referrerId ? `?ref=${referrerId}` : ""}`;
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth`,
+          redirectTo: redirectUrl,
           queryParams: {
             access_type: "offline",
             prompt: "consent",

@@ -16,16 +16,13 @@ import { useUser } from "@/context/UserContext";
 import supabase from "@/utils/supabaseClient";
 import { useCredits } from "@/context/CreditContext";
 import { CharacterService, Character } from "@/services/CharacterService";
-import dynamic from "next/dynamic"; // Add this import
+import  CharactersPage  from "../../app/characters/page";
 
-const CharactersPage = dynamic(
-  () => import("../../app/characters/page"),
-  { ssr: false }
-);
   interface PanelData {
     url: string;
     dimensions: { width: number; height: number };
     dialogue?: string  ;
+    image?: HTMLImageElement; // ✅ Add this
   }
   
   interface StyleSelectorProps {
@@ -53,356 +50,352 @@ const CharactersPage = dynamic(
   type ColorOption = "black_white" | "colored";
 type GradioStyle = "Cinematic" | "Photographic" | "Anime" | "Manga" | "Digital Art" | "Pixel art" | "Fantasy art" | "Neonpunk" | "3D Model";
 
-  const PANEL_CONFIG = useMemo<Record<PanelType, PanelConfig>>(() => {
-    if (typeof window === 'undefined') return {} as Record<PanelType, PanelConfig>;
-    return {
-    'one-portrait': {
-      panelCount: 1,
-      layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
-        if (typeof window === 'undefined') return;
-        const margin = 140;
-        const border = 12;
+const PANEL_CONFIG: Record<PanelType, PanelConfig> = {
+  'one-portrait': {
+    panelCount: 1,
+    layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
+      panels.forEach((panel) => {
+      if (typeof window === 'undefined') return;
+      const margin = 140;
+      const border = 12;
 
-        ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, A4_WIDTH, A4_HEIGHT);
+      ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, A4_WIDTH, A4_HEIGHT);
 
-        const img = new Image();
-        img.crossOrigin = "Anonymous";  // Add this line
-        img.src = panels[0].url;
-  
-        const maxWidth = A4_WIDTH - margin * 2;
-        const maxHeight = A4_HEIGHT - margin * 2;
-        const scale = Math.min(
-          maxWidth / panels[0].dimensions.width ,
-          maxHeight / panels[0].dimensions.height
-        );
+  const img = panel.image;
+  if (!img) return;
 
-        const scaledWidth = panels[0].dimensions.width * scale;
-        const scaledHeight = panels[0].dimensions.height * scale;
-        const x = (A4_WIDTH - scaledWidth) / 2;
-        const y = (A4_HEIGHT - scaledHeight) / 2;
-  
-        // Border and image drawing
-        ctx.fillStyle = 'black';
-        ctx.fillRect(x - border, y - border, scaledWidth + border*2, scaledHeight + border*2);
-        ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
-        if (panels[0].dialogue) {
-          const bubbleX = x + 50;
-          const bubbleY = y + scaledHeight - 150;
-          addDialogueBubble(ctx, panels[0].dialogue, bubbleX, bubbleY);
-        }
-        if (panels.length !== 1) {
-          console.error('Single panel layout received wrong number of panels:', panels.length);
-          return;
-        }
-      }
-    },
-    'two-vertical': {
-  panelCount: 2,
-  layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
-    if (typeof window === 'undefined') return;
-    const MARGIN = 140;
-    const BORDER = 12;
-    const panelWidth = (A4_WIDTH - MARGIN * 3) / 2;
-    const maxHeight = A4_HEIGHT - MARGIN * 2;
-
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, A4_WIDTH, A4_HEIGHT);
-
-    panels.forEach((panel, index) => {
-      const img = new Image();
-      img.crossOrigin = "Anonymous";  // Add this line
-      img.src = panel.url;
-      
+      const maxWidth = A4_WIDTH - margin * 2;
+      const maxHeight = A4_HEIGHT - margin * 2;
       const scale = Math.min(
-        panelWidth / panel.dimensions.width ,
-        maxHeight / panel.dimensions.height
+        maxWidth / panels[0].dimensions.width ,
+        maxHeight / panels[0].dimensions.height
       );
-      
+
       const scaledWidth = panels[0].dimensions.width * scale;
       const scaledHeight = panels[0].dimensions.height * scale;
-       
-      const x = MARGIN + (panelWidth + MARGIN) * index;
-      const y = MARGIN + (A4_HEIGHT - scaledHeight) / 2;
-      // Draw border
+      const x = (A4_WIDTH - scaledWidth) / 2;
+      const y = (A4_HEIGHT - scaledHeight) / 2;
+
+      // Border and image drawing
       ctx.fillStyle = 'black';
-      ctx.fillRect(
-        x - BORDER,
-        y - BORDER,
-        scaledWidth + BORDER*2,
-        scaledHeight + BORDER*2
-      );
-      
-      // Draw image
+      ctx.fillRect(x - border, y - border, scaledWidth + border*2, scaledHeight + border*2);
       ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
-      if (panel.dialogue) {
+      if (panels[0].dialogue) {
         const bubbleX = x + 50;
         const bubbleY = y + scaledHeight - 150;
-        addDialogueBubble(ctx, panel.dialogue, bubbleX, bubbleY);
+        addDialogueBubble(ctx, panels[0].dialogue, bubbleX, bubbleY);
+      }
+      if (panels.length !== 1) {
+        console.error('Single panel layout received wrong number of panels:', panels.length);
+        return;
       }
     });
-  }
-},
-    'two-horizontal': {
-  panelCount: 2,
-  layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
-    if (typeof window === 'undefined') return;
-    const MARGIN = 140;
-    const BORDER = 12;
-    const PANEL_WIDTH = A4_WIDTH - MARGIN * 2;
-    const PANEL_HEIGHT = (A4_HEIGHT - MARGIN * 3) / 2;
+    }
+  },
+  'two-vertical': {
+panelCount: 2,
+layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
+  if (typeof window === 'undefined') return;
+  const MARGIN = 140;
+  const BORDER = 12;
+  const panelWidth = (A4_WIDTH - MARGIN * 3) / 2;
+  const maxHeight = A4_HEIGHT - MARGIN * 2;
 
-    // Clear canvas
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, A4_WIDTH, A4_HEIGHT);
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, A4_WIDTH, A4_HEIGHT);
 
-    panels.forEach((panel, index) => {
-      const y = MARGIN + (PANEL_HEIGHT + MARGIN) * index;
-      const img = new Image();
-      img.crossOrigin = "Anonymous";  // Add this line
-      img.src = panel.url;
-
-      // Draw border
-      ctx.fillStyle = 'black';
-      ctx.fillRect(
-        MARGIN - BORDER,
-        y - BORDER,
-        PANEL_WIDTH + BORDER * 2,
-        PANEL_HEIGHT + BORDER * 2
-      );
-
-      // Calculate scaling
-      const scale = Math.min(
-        PANEL_WIDTH / panel.dimensions.width,
-        PANEL_HEIGHT / panel.dimensions.height
-      );
-      const scaledWidth = panel.dimensions.width * scale;
-      const scaledHeight = panel.dimensions.height * scale;
-      
-      // Center image in panel
-      const xOffset = MARGIN + (PANEL_WIDTH - scaledWidth) / 2;
-      const yOffset = y + (PANEL_HEIGHT - scaledHeight) / 2;
-
-      ctx.drawImage(img, xOffset, yOffset, scaledWidth, scaledHeight);
-      if (panel.dialogue) {
-        const bubbleX = xOffset + 50;
-        const bubbleY = yOffset + scaledHeight - 150;
-        addDialogueBubble(ctx, panel.dialogue, bubbleX, bubbleY);
-      }
-    });
-  }
-},
-
-    'three-default': {
-      panelCount: 3,
-      layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
-        if (typeof window === 'undefined') return;
-        const margin = 140;
-        const border = 12;
-        const PANEL_WIDTH = 2200; // (2480 - 40*2)
-        const PANEL_HEIGHT = 1009; // (3508 - 40*4) / 3 → 3348/3=1116 → floor to 1112
-
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, A4_WIDTH, A4_HEIGHT);
-  
-        panels.forEach((panel, index) => {
-          const y = margin + (PANEL_HEIGHT + margin) * index;
-          const img = new Image();
-          img.crossOrigin = "Anonymous";  // Add this line
-          img.src = panel.url;
-
-          ctx.fillStyle = 'white';
-          ctx.fillRect(margin, y, PANEL_WIDTH, PANEL_HEIGHT);
-          
-          // Calculate scaling
-          const scale = Math.min(
-            PANEL_WIDTH / panel.dimensions.width,
-            PANEL_HEIGHT / panel.dimensions.height
-          );
-          const scaledWidth = panel.dimensions.width * scale;
-          const scaledHeight = panel.dimensions.height * scale;
-
-          const xOffset = margin + (PANEL_WIDTH - scaledWidth) / 2;
-          const yOffset = y + (PANEL_HEIGHT - scaledHeight) / 2;
-
-          ctx.fillStyle = 'black';
-          ctx.fillRect(
-            margin - border,
-            y - border,
-            PANEL_WIDTH + border * 2,
-            PANEL_HEIGHT + border * 2
-          );
-
-        ctx.drawImage(img, xOffset, yOffset, scaledWidth, scaledHeight);
-          // Border and image
-          if (panel.dialogue) {
-            const bubbleX = xOffset + 50;
-            const bubbleY = yOffset + scaledHeight - 150;
-            addDialogueBubble(ctx, panel.dialogue, bubbleX, bubbleY);
-          }
-        });
-      }
-    },
-    'three-vertical-horizontal': {
-  panelCount: 3,
-  layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
-    if (typeof window === 'undefined') return;
-    const margin = 140;
-    const border = 12;
-    const panelSpacing = 30;
-
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, A4_WIDTH, A4_HEIGHT);
-
-    const maxTopPanelWidth = (A4_WIDTH - margin * 2 - panelSpacing) / 2;
-    let tallestTopPanelHeight = 0;
-
-    // 🟦 Top two vertical panels
-    panels.slice(0, 2).forEach((panel, index) => {
-      const img = new Image();
-      img.crossOrigin = "Anonymous";  // Add this line
-      img.src = panel.url;
-
-      const scale = Math.min(
-        maxTopPanelWidth / panel.dimensions.width,
-        (A4_HEIGHT * 0.5) / panel.dimensions.height // Just use 50% cap
-      );
-
-      const scaledWidth = panel.dimensions.width * scale;
-      const scaledHeight = panel.dimensions.height * scale;
-
-      if (scaledHeight > tallestTopPanelHeight) {
-        tallestTopPanelHeight = scaledHeight;
-      }
-
-      const x = margin + (maxTopPanelWidth + panelSpacing) * index + (maxTopPanelWidth - scaledWidth) / 2;
-      const y = margin;
-
-      ctx.fillStyle = 'black';
-      ctx.fillRect(x - border, y - border, scaledWidth + border * 2, scaledHeight + border * 2);
-      ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
-    });
-
-    // 🟥 Bottom horizontal panel
-    const bottomPanel = panels[2];
-    const img = new Image();
-    img.crossOrigin = "Anonymous";  // Add this line
-    img.src = bottomPanel.url;
-
-    const BOTTOM_WIDTH = A4_WIDTH * 0.9;
-    const BOTTOM_HEIGHT = A4_HEIGHT * 0.5;
-
+  panels.forEach((panel, index) => {
+    const img = panel.image;
+    if (!img) return;
+    
     const scale = Math.min(
-      BOTTOM_WIDTH / img.width,
-      BOTTOM_HEIGHT / img.height
+      panelWidth / panel.dimensions.width ,
+      maxHeight / panel.dimensions.height
+    );
+    
+    const scaledWidth = panels[0].dimensions.width * scale;
+    const scaledHeight = panels[0].dimensions.height * scale;
+     
+    const x = MARGIN + (panelWidth + MARGIN) * index;
+    const y = MARGIN + (A4_HEIGHT - scaledHeight) / 2;
+    // Draw border
+    ctx.fillStyle = 'black';
+    ctx.fillRect(
+      x - BORDER,
+      y - BORDER,
+      scaledWidth + BORDER*2,
+      scaledHeight + BORDER*2
+    );
+    
+    // Draw image
+    ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
+    if (panel.dialogue) {
+      const bubbleX = x + 50;
+      const bubbleY = y + scaledHeight - 150;
+      addDialogueBubble(ctx, panel.dialogue, bubbleX, bubbleY);
+    }
+  });
+}
+},
+  'two-horizontal': {
+panelCount: 2,
+layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
+  if (typeof window === 'undefined') return;
+  const MARGIN = 140;
+  const BORDER = 12;
+  const PANEL_WIDTH = A4_WIDTH - MARGIN * 2;
+  const PANEL_HEIGHT = (A4_HEIGHT - MARGIN * 3) / 2;
+
+  // Clear canvas
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, A4_WIDTH, A4_HEIGHT);
+
+  panels.forEach((panel, index) => {
+    const y = MARGIN + (PANEL_HEIGHT + MARGIN) * index;
+    const img = panel.image;
+    if (!img) return;
+
+    // Draw border
+    ctx.fillStyle = 'black';
+    ctx.fillRect(
+      MARGIN - BORDER,
+      y - BORDER,
+      PANEL_WIDTH + BORDER * 2,
+      PANEL_HEIGHT + BORDER * 2
     );
 
-    const scaledWidth = img.width * scale;
-    const scaledHeight = img.height * scale;
+    // Calculate scaling
+    const scale = Math.min(
+      PANEL_WIDTH / panel.dimensions.width,
+      PANEL_HEIGHT / panel.dimensions.height
+    );
+    const scaledWidth = panel.dimensions.width * scale;
+    const scaledHeight = panel.dimensions.height * scale;
+    
+    // Center image in panel
+    const xOffset = MARGIN + (PANEL_WIDTH - scaledWidth) / 2;
+    const yOffset = y + (PANEL_HEIGHT - scaledHeight) / 2;
 
-    const x = margin + (BOTTOM_WIDTH - scaledWidth) / 2;
-    const y = margin + tallestTopPanelHeight + panelSpacing + border * 2; // ✅ True spacing based on top
+    ctx.drawImage(img, xOffset, yOffset, scaledWidth, scaledHeight);
+    if (panel.dialogue) {
+      const bubbleX = xOffset + 50;
+      const bubbleY = yOffset + scaledHeight - 150;
+      addDialogueBubble(ctx, panel.dialogue, bubbleX, bubbleY);
+    }
+  });
+}
+},
+
+  'three-default': {
+    panelCount: 3,
+    layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
+      if (typeof window === 'undefined') return;
+      const margin = 140;
+      const border = 12;
+      const PANEL_WIDTH = 2200; // (2480 - 40*2)
+      const PANEL_HEIGHT = 1009; // (3508 - 40*4) / 3 → 3348/3=1116 → floor to 1112
+
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, A4_WIDTH, A4_HEIGHT);
+
+      panels.forEach((panel, index) => {
+        const y = margin + (PANEL_HEIGHT + margin) * index;
+        const img = panel.image;
+        if (!img) return;
+
+        ctx.fillStyle = 'white';
+        ctx.fillRect(margin, y, PANEL_WIDTH, PANEL_HEIGHT);
+        
+        // Calculate scaling
+        const scale = Math.min(
+          PANEL_WIDTH / panel.dimensions.width,
+          PANEL_HEIGHT / panel.dimensions.height
+        );
+        const scaledWidth = panel.dimensions.width * scale;
+        const scaledHeight = panel.dimensions.height * scale;
+
+        const xOffset = margin + (PANEL_WIDTH - scaledWidth) / 2;
+        const yOffset = y + (PANEL_HEIGHT - scaledHeight) / 2;
+
+        ctx.fillStyle = 'black';
+        ctx.fillRect(
+          margin - border,
+          y - border,
+          PANEL_WIDTH + border * 2,
+          PANEL_HEIGHT + border * 2
+        );
+
+      ctx.drawImage(img, xOffset, yOffset, scaledWidth, scaledHeight);
+        // Border and image
+        if (panel.dialogue) {
+          const bubbleX = xOffset + 50;
+          const bubbleY = yOffset + scaledHeight - 150;
+          addDialogueBubble(ctx, panel.dialogue, bubbleX, bubbleY);
+        }
+      });
+    }
+  },
+  'three-vertical-horizontal': {
+panelCount: 3,
+layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
+  if (typeof window === 'undefined') return;
+  const margin = 140;
+  const border = 12;
+  const panelSpacing = 30;
+
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, A4_WIDTH, A4_HEIGHT);
+
+  const maxTopPanelWidth = (A4_WIDTH - margin * 2 - panelSpacing) / 2;
+  let tallestTopPanelHeight = 0;
+
+  // 🟦 Top two vertical panels
+  panels.slice(0, 2).forEach((panel, index) => {
+    const img = panel.image;
+    if (!img) return;
+
+    const scale = Math.min(
+      maxTopPanelWidth / panel.dimensions.width,
+      (A4_HEIGHT * 0.5) / panel.dimensions.height // Just use 50% cap
+    );
+
+    const scaledWidth = panel.dimensions.width * scale;
+    const scaledHeight = panel.dimensions.height * scale;
+
+    if (scaledHeight > tallestTopPanelHeight) {
+      tallestTopPanelHeight = scaledHeight;
+    }
+
+    const x = margin + (maxTopPanelWidth + panelSpacing) * index + (maxTopPanelWidth - scaledWidth) / 2;
+    const y = margin;
 
     ctx.fillStyle = 'black';
     ctx.fillRect(x - border, y - border, scaledWidth + border * 2, scaledHeight + border * 2);
     ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
-  }
+  });
+
+  // 🟥 Bottom horizontal panel
+  panels.forEach((panel) => {
+  const bottomPanel = panels[2];
+  const img = panel.image;
+  if (!img) return;
+  img.src = bottomPanel.url;
+
+  const BOTTOM_WIDTH = A4_WIDTH * 0.9;
+  const BOTTOM_HEIGHT = A4_HEIGHT * 0.5;
+
+  const scale = Math.min(
+    BOTTOM_WIDTH / img.width,
+    BOTTOM_HEIGHT / img.height
+  );
+
+  const scaledWidth = img.width * scale;
+  const scaledHeight = img.height * scale;
+
+  const x = margin + (BOTTOM_WIDTH - scaledWidth) / 2;
+  const y = margin + tallestTopPanelHeight + panelSpacing + border * 2; // ✅ True spacing based on top
+
+  ctx.fillStyle = 'black';
+  ctx.fillRect(x - border, y - border, scaledWidth + border * 2, scaledHeight + border * 2);
+  ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
+});
+}
 },
 
-    'three-horizontal-vertical': {
-      panelCount: 3,
-      layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
-        if (typeof window === 'undefined') return;
-        const margin = 140;
-        const border = 12;
-        const panelSpacing = 40;
-        const topHeight = (A4_HEIGHT - margin*2 - panelSpacing) * 0.6;
-        const bottomHeight = (A4_HEIGHT - margin*2 - panelSpacing) * 0.4;
-  
-        // Top horizontal panel
-        const topPanel = panels[0];
-        const imgTop = new Image();
-        imgTop.src = topPanel.url;
+  'three-horizontal-vertical': {
+    panelCount: 3,
+    layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
+      if (typeof window === 'undefined') return;
+      const margin = 140;
+      const border = 12;
+      const panelSpacing = 40;
+      const topHeight = (A4_HEIGHT - margin*2 - panelSpacing) * 0.6;
+      const bottomHeight = (A4_HEIGHT - margin*2 - panelSpacing) * 0.4;
 
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, A4_WIDTH, A4_HEIGHT);
+      // Top horizontal panel
+      const topPanel = panels[0];
+       const imgTop = typeof window !== 'undefined' ? new Image() : null;
+    if (!imgTop) return;
+      imgTop.src = topPanel.url;
+
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, A4_WIDTH, A4_HEIGHT);
+      
+      const maxWidth = A4_WIDTH - margin*2;
+      const scale = Math.min(
+        maxWidth / imgTop.width,
+        topHeight / imgTop.height
+      );
+      
+      const scaledWidth = imgTop.width * scale;
+      const scaledHeight = imgTop.height * scale;
+      const x = margin + (maxWidth - scaledWidth)/2;
+      const y = margin + (topHeight - scaledHeight)/2;
+
+      ctx.fillStyle = 'black';
+      ctx.fillRect(x - border, y - border, scaledWidth + border*2, scaledHeight + border*2);
+      ctx.drawImage(imgTop, x, y, scaledWidth, scaledHeight);
+ if (topPanel.dialogue) {
+          const bubbleX = x + 50;
+          const bubbleY = y + scaledHeight - 150;
+          
+          // Speech bubble background
+          ctx.fillStyle = 'white';
+          ctx.strokeStyle = 'black';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.roundRect(bubbleX, bubbleY, 300, 80, 10);
+          ctx.fill();
+          ctx.stroke();
+  
+          // Dialogue text
+          ctx.fillStyle = 'black';
+          ctx.font = '24px sans-serif';
+          ctx.textAlign = 'left';
+          wrapText(ctx, topPanel.dialogue, bubbleX + 15, bubbleY + 30, 270, 28);
+        }
+      // Bottom two vertical panels
+      panels.slice(1).forEach((panel, index) => {
+        const img = panel.image;
+        if (!img) return;
         
-        const maxWidth = A4_WIDTH - margin*2;
+        const maxWidth = (A4_WIDTH - margin*2 - panelSpacing) / 2;
         const scale = Math.min(
-          maxWidth / imgTop.width,
-          topHeight / imgTop.height
+          maxWidth / panel.dimensions.width,
+          bottomHeight / panel.dimensions.height
         );
         
-        const scaledWidth = imgTop.width * scale;
-        const scaledHeight = imgTop.height * scale;
-        const x = margin + (maxWidth - scaledWidth)/2;
-        const y = margin + (topHeight - scaledHeight)/2;
-  
+        const scaledWidth = panel.dimensions.width  * scale;
+        const scaledHeight = panel.dimensions.height  * scale;
+        const panelX = margin + (maxWidth + panelSpacing) * index + (maxWidth - scaledWidth)/2;
+        const panelY = margin + topHeight + panelSpacing + (bottomHeight - scaledHeight) / 2;
         ctx.fillStyle = 'black';
-        ctx.fillRect(x - border, y - border, scaledWidth + border*2, scaledHeight + border*2);
-        ctx.drawImage(imgTop, x, y, scaledWidth, scaledHeight);
-   if (topPanel.dialogue) {
-            const bubbleX = x + 50;
-            const bubbleY = y + scaledHeight - 150;
-            
-            // Speech bubble background
-            ctx.fillStyle = 'white';
-            ctx.strokeStyle = 'black';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.roundRect(bubbleX, bubbleY, 300, 80, 10);
-            ctx.fill();
-            ctx.stroke();
-    
-            // Dialogue text
-            ctx.fillStyle = 'black';
-            ctx.font = '24px sans-serif';
-            ctx.textAlign = 'left';
-            wrapText(ctx, topPanel.dialogue, bubbleX + 15, bubbleY + 30, 270, 28);
-          }
-        // Bottom two vertical panels
-        panels.slice(1).forEach((panel, index) => {
-          const img = new Image();
-          img.crossOrigin = "Anonymous";  // Add this line
-          img.src = panel.url;
+        ctx.fillRect(panelX - border, panelY - border, scaledWidth + border*2, scaledHeight + border*2);
+        ctx.drawImage(img, panelX, panelY, scaledWidth, scaledHeight);
+        if (panel.dialogue) {
+          const bubbleX = x + 50;
+          const bubbleY = y + scaledHeight - 150;
           
-          const maxWidth = (A4_WIDTH - margin*2 - panelSpacing) / 2;
-          const scale = Math.min(
-            maxWidth / panel.dimensions.width,
-            bottomHeight / panel.dimensions.height
-          );
-          
-          const scaledWidth = panel.dimensions.width  * scale;
-          const scaledHeight = panel.dimensions.height  * scale;
-          const panelX = margin + (maxWidth + panelSpacing) * index + (maxWidth - scaledWidth)/2;
-          const panelY = margin + topHeight + panelSpacing + (bottomHeight - scaledHeight) / 2;
+          // Speech bubble background
+          ctx.fillStyle = 'white';
+          ctx.strokeStyle = 'black';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.roundRect(bubbleX, bubbleY, 300, 80, 10);
+          ctx.fill();
+          ctx.stroke();
+  
+          // Dialogue text
           ctx.fillStyle = 'black';
-          ctx.fillRect(panelX - border, panelY - border, scaledWidth + border*2, scaledHeight + border*2);
-          ctx.drawImage(img, panelX, panelY, scaledWidth, scaledHeight);
-          if (panel.dialogue) {
-            const bubbleX = x + 50;
-            const bubbleY = y + scaledHeight - 150;
-            
-            // Speech bubble background
-            ctx.fillStyle = 'white';
-            ctx.strokeStyle = 'black';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.roundRect(bubbleX, bubbleY, 300, 80, 10);
-            ctx.fill();
-            ctx.stroke();
-    
-            // Dialogue text
-            ctx.fillStyle = 'black';
-            ctx.font = '24px sans-serif';
-            ctx.textAlign = 'left';
-            wrapText(ctx, panel.dialogue, bubbleX + 15, bubbleY + 30, 270, 28);
-          }
-        });
-      }
+          ctx.font = '24px sans-serif';
+          ctx.textAlign = 'left';
+          wrapText(ctx, panel.dialogue, bubbleX + 15, bubbleY + 30, 270, 28);
+        }
+      });
     }
-  };
-  }, []);
+  }
+};
 
   function addDialogueBubble(
     ctx: CanvasRenderingContext2D,
@@ -466,7 +459,9 @@ const [selectedColor, setSelectedColor] = useState<ColorOption>('black_white');
 const { credits, deductCredits } = useCredits();
 const { user } = useUser();
 
-    const generateA4Pages = async (panels: PanelData[]): Promise<string[]> => {
+let generateA4Pages: (panels: PanelData[]) => Promise<string[]> = async () => [];
+if (typeof window !== 'undefined') {
+    generateA4Pages = async (panels: PanelData[]): Promise<string[]> => {
       if (typeof window === 'undefined' || !isCanvasReady) return [];
       const A4_WIDTH = 2480;
       const A4_HEIGHT = 3508;
@@ -477,17 +472,26 @@ const { user } = useUser();
       canvas.height = A4_HEIGHT;
       const ctx = canvas.getContext('2d')!;
       // Load all images first
-      const images = await Promise.all(panels.map(async (panel) => {
-        const img = new Image();
-        img.crossOrigin = "Anonymous";  // Add this line
-        img.src = panel.url;
-        await new Promise(resolve => img.onload = resolve);
-        return img;
-      }));
+      const loadedPanels = await Promise.all(
+        panels.map(async (panel) => {
+          const img = new Image();
+          img.crossOrigin = "anonymous";
+          img.src = panel.url;
+          await new Promise<void>((resolve, reject) => {
+            img.onload = () => resolve();
+            img.onerror = () => reject(new Error("Image failed to load"));
+          });
+      
+          return {
+            ...panel,
+            image: img, // ✅ attach loaded image
+          };
+        })
+      );
     
       // Apply selected layout
       PANEL_CONFIG[selectedPanelType].layout(
-        panels,
+        loadedPanels,
         ctx,
         A4_WIDTH,
         A4_HEIGHT
@@ -496,23 +500,37 @@ const { user } = useUser();
       pages.push(canvas.toDataURL('image/png'));
       return pages;
     };
-  
+}  
     useEffect(() => {
+      console.log("Building ScriptWritingClient"); // top of file
+      console.log("Document is", typeof document); // should error if run on server
+
       if (!user?.id) return;
       if (canvasRef.current) {
         canvasRef.current.width = 2480;
         canvasRef.current.height = 3508;
       }
-      const savedScript = loadSavedContent("script-content");
+      const savedScript = localStorage.getItem("script-content");
       const selectedTemplate = localStorage.getItem("selected-template");
-      setContent(selectedTemplate || savedScript);
+      // Fix: Ensure setContent always receives a string, never null
+      console.log("selectedTemplate", selectedTemplate);
+console.log("savedScript", savedScript);
+      const initialContent = selectedTemplate ?? savedScript ?? "";
+      setContent(initialContent);
+      console.log("Loaded initial script content:", initialContent);
+
       const loadCharacters = async () => {
-        const chars = await CharacterService.getCharacters();
-        setCharacters(chars);
+        try {
+          const chars = await CharacterService.getCharacters();
+          setCharacters(chars);
+          console.log("Loaded characters:", chars);
+        } catch (error) {
+          console.error("Failed to load characters:", error);
+        }
       };
       loadCharacters();
     }, []);
-
+    
     const handleSave = () => {
       const validationErrors = validateScript(content);
       setErrors(validationErrors);
@@ -585,7 +603,13 @@ const updateCreditsInBackend = async (newCredits: number) => {
         
         // Generate initial panels with character names
         setGenerationProgress(p => ({...p, status: 'Generating panel scripts...'}));
-        const rawPanels = await aiService.generateScenesFromOutline(content, panelCount);
+        const plainOutline = content.replace(/<[^>]*>?/gm, '').trim();
+        console.log("Cleaned Outline:", plainOutline);
+        if (!plainOutline) {
+          alert("Your script is empty. Please write something before generating scenes.");
+          return;
+        }
+        const rawPanels = await aiService.generateScenesFromOutline(plainOutline, panelCount);
         const limitedPanels = rawPanels.slice(0, MAX_PANELS);
         console.log("Limited Panels:", limitedPanels); // Debug log
   

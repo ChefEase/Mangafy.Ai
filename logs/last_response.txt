@@ -1,16 +1,14 @@
-. the background scene is still a grassland.
-
 Panel 1
-Scene: Rain and Ayaka are fighting with swords in a grassland
-Camera: High angle wide shot
-Dialogue: None
+Scene: Sophie is walking down a busy city street, carrying a bag of groceries for an elderly neighbor. She is wearing a simple dress and has a kind expression on her face.
+Camera: Medium shot
+Dialogue: "I'll take those, Sophie. You're such a helpful girl." (Elderly neighbor)
 
 Panel 2
-Scene: Rain stabs Ayaka with his sword and blood spurts everywhere
-Camera: High angle
-Dialogue: "DIIIIIEEEEEEE!!!"
+Scene: Sophie is at the orphanage, playing with a group of children in the yard. She is laughing and pushing a boy on a swing.
+Camera: Wide shot
+Dialogue: "Sophie, you're the best! We all love you!" (Young girl)
 
 Panel 3
-Scene: Close up shot of Ayaka screaming in pain
-Camera: Close up shot on her face
-Dialogue: None
+Scene: Sophie is sitting at her mother's bedside in a small hospital room. She is holding her mother's hand and looking at her with concern.
+Camera: Close-up
+Dialogue: "Don't worry, Mom. I'll take care of everything. You just focus on getting better." (Sophie)

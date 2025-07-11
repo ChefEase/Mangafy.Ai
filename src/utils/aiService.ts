@@ -1,8 +1,8 @@
-import { HfInference } from "@huggingface/inference";
+import { InferenceClient } from "@huggingface/inference";
 import { formatStory } from "./FormatStory";
 
-const HF_API_KEY = process.env.HF_API_KEY; // Replace with your Hugging Face API key
-const client = new HfInference(HF_API_KEY);
+const HF_API_KEY = process.env.NEXT_PUBLIC_HF_TOKEN; // Replace with your Hugging Face API key
+const client = new InferenceClient(HF_API_KEY);
 
 export const generateScript = async (prompt: string): Promise<string> => {
   try {
@@ -11,7 +11,7 @@ export const generateScript = async (prompt: string): Promise<string> => {
       messages: [
         {
           role: "user",
-          content: `Generate a detailed manga panel script based on the following description: ${prompt}`,
+          content: `Generate a detailed manga panel script based on the following description: ${prompt} strictly in the format Scene, Camera Angle and Dialogue for each panel. No other thing should be added`,
         },
       ],
       provider: "together", // Specify the provider (if required)

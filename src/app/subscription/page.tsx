@@ -30,14 +30,26 @@ export default function SubscriptionPage() {
     };
     return (
       <div className="invite-section">
-        <h3>Invite a Friend & Earn Credits!</h3>
-        <p>Share your referral link and earn <strong>150 credits</strong> when your friend signs up:</p>
-        <div className="referral-container">
-          <input className="referral-input" value={referralLink} readOnly onClick={(e) => e.currentTarget.select()} />
-          <button className="copy-button" onClick={handleCopy}>Copy Link</button>
-        </div>
+      <h3>Invite a Friend & Earn Credits!</h3>
+      <p>
+        Share your referral link and earn <strong>150 credits</strong> when your friend signs up.
+        <br />
+        <span className="text-sm text-red-500 font-medium">
+          Important: To receive referral credits, your friend must create their account using the
+          Register or Login form — not the "Continue with Google" option.
+        </span>
+      </p>
+      <div className="referral-container">
+        <input
+          className="referral-input"
+          value={referralLink}
+          readOnly
+          onClick={(e) => e.currentTarget.select()}
+        />
+        <button className="copy-button" onClick={handleCopy}>Copy Link</button>
       </div>
-    );
+    </div>
+      );
   
   }
   const monthlyPlans = [

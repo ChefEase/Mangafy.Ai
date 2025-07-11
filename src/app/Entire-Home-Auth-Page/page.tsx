@@ -17,10 +17,11 @@ export default function AuthPage() {
 
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        router.push("/project-management");
-      }
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
+      if (user && user.email_confirmed_at) {
+        router.push("/Entire-Home-Auth-Page");
+      }      
     };
 
     const urlParams = new URLSearchParams(window.location.search);
