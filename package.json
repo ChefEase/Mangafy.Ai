@@ -38,6 +38,7 @@
     "next-pwa": "^5.6.0",
     "paper": "^0.12.18",
     "paper-jsdom": "^0.12.18",
+    "prop-types": "^15.8.1",
     "quill": "^2.0.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
