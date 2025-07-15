@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   webpack(config) {
     // stub Node modules that @gradio/client imports but does NOT actually need in the browser
+    
     config.resolve.fallback = {
       ...(config.resolve.fallback || {}),
       fs: false,
@@ -27,7 +28,6 @@ const withPWA = require("next-pwa")({
 module.exports = withPWA({
   reactStrictMode: true,
 });
-
 
 // next.config.js
 module.exports = {

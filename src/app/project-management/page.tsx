@@ -44,7 +44,13 @@ export default function ProjectManagementPage() {
   // ✅ Fixing `handleCreateProject`
   const handleCreateProject = async (projectData: { title: string; description: string; thumbnail: string }) => {
     const userId = localStorage.getItem("userId");
-    if (!userId) return;
+    console.log(localStorage.getItem("userId"));
+
+    if (!userId) {
+      console.error("❌ No userId found in localStorage");
+      alert("You're not signed in properly. Please log in again.");
+      return;
+    }
 
     const newProject = {
       id: crypto.randomUUID(),
@@ -65,6 +71,7 @@ export default function ProjectManagementPage() {
 
     } catch (error) {
       console.error("❌ Error saving project to Airtable:", error);
+      alert("Something went wrong saving your project.");
     } 
     setShowCreateModal(false);
   };
