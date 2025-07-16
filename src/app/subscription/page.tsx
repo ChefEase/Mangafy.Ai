@@ -56,96 +56,79 @@ export default function SubscriptionPage() {
     {
       type: "Free",
       price: "$0/month",
-      features: ["One-time 195 Free Credits", "6-16 Pages Generated"],
+      features: [
+        "🎁 One-time 195 Free Credits",
+        "✍️ Generate 6–16 Pages",
+        "📦 Access All Core Features",
+        "🤖 Character & Story Generation"
+      ],
       buttonText: "Current Plan",
       disabled: true,
       credits: 0,
     },
     {
-      type: "Manga Starter",
+      type: "Starter Creator",
       price: "$9.99/month",
-      features: ["600 Credits", "25-50 Pages Generated"],
-      buttonText: "Upgrade to Pro",
+      features: [
+        "🔓 1,200 Credits",
+        "📘 Generate 40–60 Pages",
+        "🧠 Character Consistency AI",
+        "🎨 Cover Art & Story Generator",
+        "🎁 Referral: Earn 125 Credits Each"
+      ],
+      buttonText: "Get Starter Creator",
       disabled: false,
-      credits: 600,
+      credits: 1200,
     },
     {
-      type: "Story Teller",
-      price: "$19.99/month",
-      features: ["1400 Credits", "50-100 Pages Generated"],
-      buttonText: "Upgrade to Pro",
+      type: "Ultimate Creator",
+      price: "$24.99/month",
+      features: [
+        "🚀 3,500 Credits",
+        "📚 Generate 100–150 Pages",
+        "🔥 Early Access to New Features",
+        "👥 Priority Support & Creator Chatbot",
+        "🎁 Referral: Earn 125 Credits Each"
+      ],
+      buttonText: "Go Ultimate",
       disabled: false,
-      credits: 1400,
+      credits: 3500,
+    },
+  ];
+    
+  const yearlyPlans = [
+    {
+      type: "Starter Creator (Yearly)",
+      price: "$95.99/year",
+      features: [
+        "💰 Save 20% (Normally $120)",
+        "🔓 1,200 Monthly Credits (14,400/yr)",
+        "📘 40–60 Pages Monthly",
+        "🧠 Character Consistency AI",
+        "🎨 Cover Art & Story Generator",
+        "🎁 Referral: Earn 125 Credits Each"
+      ],
+      buttonText: "Get Yearly Starter",
+      disabled: false,
+      credits: 1200,
     },
     {
-      type: "Story Teller Pro",
-      price: "$39.99/month",
-      features: ["3200 Credits", "100-150 Pages Generated"],
-      buttonText: "Upgrade to Pro",
+      type: "Ultimate Creator (Yearly)",
+      price: "$239.99/year",
+      features: [
+        "💰 Save 20% (Normally $300)",
+        "🚀 3,500 Monthly Credits (42,000/yr)",
+        "📚 100–150 Pages Monthly",
+        "🔥 Early Access to New Features",
+        "👥 Priority Support & Creator Chatbot",
+        "🎁 Referral: Earn 125 Credits Each"
+      ],
+      buttonText: "Go Yearly Ultimate",
       disabled: false,
-      credits: 3200,
-    },
-    {
-      type: "Creator Pro",
-      price: "$79.99/month",
-      features: ["7200 Credits", "150-200 Pages Generated"],
-      buttonText: "Upgrade to Pro",
-      disabled: false,
-      credits: 7200,
-    },
-    {
-      type: "Studio Premium",
-      price: "$149.99/month",
-      features: ["16,000 Credits", "200-400 Pages Generated"],
-      buttonText: "Upgrade to Pro",
-      disabled: false,
-      credits: 16000,
+      credits: 3500,
     },
   ];
   
-  const yearlyPlans = [
-    {
-      type: "Manga Starter",
-      price: "$99.99/year",
-      features: ["600 Credits", "25-50 Pages Generated"],
-      buttonText: "Upgrade to Pro",
-      disabled: false,
-      credits: 600,
-    },
-    {
-      type: "Story Teller",
-      price: "$199.99/year",
-      features: ["1400 Credits", "50-100 Pages Generated"],
-      buttonText: "Upgrade to Pro",
-      disabled: false,
-      credits: 1400,
-    },
-    {
-      type: "Story Teller Pro",
-      price: "$399.99/year",
-      features: ["3200 Credits", "100-150 Pages Generated"],
-      buttonText: "Upgrade to Pro",
-      disabled: false,
-      credits: 3200,
-    },
-    {
-      type: "Creator Pro",
-      price: "$799.99/year",
-      features: ["7200 Credits", "150-200 Pages Generated"],
-      buttonText: "Upgrade to Pro",
-      disabled: false,
-      credits: 7200,
-    },
-    {
-      type: "Studio Premium",
-      price: "$1499.99/year",
-      features: ["16,000 Credits", "200-400 Pages Generated"],
-      buttonText: "Upgrade to Pro",
-      disabled: false,
-      credits: 16000,
-    },
-  ];
-
   const handlePurchase = async (credits: number) => {
     await addCredits(credits);
     alert(`🎉 You've been awarded ${credits} credits!`);
