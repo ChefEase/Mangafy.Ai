@@ -24,6 +24,9 @@ export default function AuthCallback() {
   
       console.log("AuthCallback: userId:", userId, "userEmail:", userEmail);
   
+      if (typeof window !== "undefined" && userId) {
+        localStorage.setItem("userId", userId);
+      }
       // Check if user exists in 'users' table
       const { data: existingUser, error: fetchUserError } = await supabase
         .from("users")
@@ -93,7 +96,9 @@ export default function AuthCallback() {
       } else {
         console.log("User already exists, skipping user/referral creation");
       }
-  
+      if (typeof window !== "undefined" && !localStorage.getItem("userId")) {
+        localStorage.setItem("userId", userId);
+      }
       router.push("/project-management");
     };
   
