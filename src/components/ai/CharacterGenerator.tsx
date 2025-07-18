@@ -84,7 +84,7 @@ export default function CharacterGenerator() {
       } else {
         // ✅ IMAGE-TO-IMAGE — UPDATED TO USE /api/generate-image
         if (!referenceImage) throw new Error("Please upload a reference image");
-  
+        setIsGenerating(true); // ✅ Show loading immediately
         const reader = new FileReader();
         reader.onloadend = async () => {
           const base64Image = reader.result as string;

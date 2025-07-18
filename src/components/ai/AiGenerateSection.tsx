@@ -10,6 +10,14 @@ export interface AIGenerateSectionProps {
   onGenerate: (generatedScript: string) => Promise<void>;
 }
 
+function cleanScriptOutput(raw: string): string {
+  const match = raw.match(/Panel\s*1\s*:/i);
+  if (match) {
+    return raw.slice(match.index!).trim();
+  }
+  return raw.trim(); // fallback if "Panel 1" isn't found
+}
+
 export default function AIGenerateSection({ onGenerate }: AIGenerateSectionProps) {
   const { credits, deductCredits, addCredits } = useCredits();
   const [prompt, setPrompt] = useState("");
@@ -35,7 +43,8 @@ export default function AIGenerateSection({ onGenerate }: AIGenerateSectionProps
     setError("");
   
     try {
-      const script = await generateScript(prompt);  
+      let script = await generateScript(prompt);  
+      script = cleanScriptOutput(script);
       let cleanedScript = script
       .replace(/^#+\s*/gm, "")  // Remove markdown headers like ####
       .replace(/\*\*/g, "")     // Remove bold markers

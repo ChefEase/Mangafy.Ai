@@ -158,6 +158,16 @@
   align-items: center;
 }
 
+.result-panel .image-container img,
+.character-generator img,
+.preview {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
 @media (max-width: 768px) {
   .character-generator {
     padding: 1rem;
@@ -183,11 +193,21 @@
   }
 
   .result-panel {
-    grid-column: span 1;
+    grid-template-columns: 1fr;
   }
 
   .image-container {
     grid-template-columns: 1fr;
+  }
+
+  .image-container img,
+  .character-generator img,
+  .preview {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
   }
 
   .mode-selector button {
