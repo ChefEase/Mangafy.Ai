@@ -462,7 +462,6 @@ const { user } = useUser();
 let generateA4Pages: (panels: PanelData[]) => Promise<string[]> = async () => [];
 if (typeof window !== 'undefined') {
     generateA4Pages = async (panels: PanelData[]): Promise<string[]> => {
-      if (typeof window === 'undefined' || !isCanvasReady) return [];
       const A4_WIDTH = 2480;
       const A4_HEIGHT = 3508;
       const pages: string[] = [];
@@ -479,7 +478,10 @@ if (typeof window !== 'undefined') {
           img.src = panel.url;
           await new Promise<void>((resolve, reject) => {
             img.onload = () => resolve();
-            img.onerror = () => reject(new Error("Image failed to load"));
+            img.onerror = (e) => {
+              console.error('Image load error:', panel.url, e);
+              reject(new Error("Image failed to load"));
+            }
           });
       
           return {
@@ -690,8 +692,16 @@ const updateCreditsInBackend = async (newCredits: number) => {
           }
     
         // Generate A4 pages
+          // ADD THIS VALIDATION
+          if (newPanels.length === 0) {
+            throw new Error("No panels were generated successfully");
+        }
         setGenerationProgress(p => ({...p, status: 'Arranging pages...'}));
         const pages = await generateA4Pages(newPanels);
+        console.log('Generated pages:', pages.length);
+        if (pages.length === 0) {
+            throw new Error("Page generation returned empty array");
+        }
         setGeneratedPanels(pages);
         const deductionSuccess = await deductCredits(cost);
         if (!deductionSuccess) {
@@ -713,7 +723,6 @@ const updateCreditsInBackend = async (newCredits: number) => {
       } finally {
         setIsGenerating(false);
       }
-      setIsCanvasReady(true);
     };
     
     const getPanelDimensions = (index: number) => {
