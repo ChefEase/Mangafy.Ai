@@ -17,6 +17,9 @@ export default function ChatInterface() {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const CHAT_COST_PER_MESSAGE = 0.05; // Cost per AI response
+  const [chatRecords, setChatRecords] = useState<any[]>([]);
+const [messageRecords, setMessageRecords] = useState<any[]>([]);
+
 
   useEffect(() => {
     const loadData = async () => {
@@ -34,7 +37,9 @@ export default function ChatInterface() {
     
         const chatData = await chatRes.json();
         const messageData = await messageRes.json();
-    
+        setChatRecords(chatData.records || []);
+        setMessageRecords(messageData.records || []);
+
         if (!chatData.records || !messageData.records) {
           console.error("Failed to load records");
           return;
@@ -76,7 +81,18 @@ export default function ChatInterface() {
   const createNewChat = async (title: string) => {
     const now = new Date();
     const AIRTABLE_TOKEN = "patIcK5hqVA19dyEk.d90f3484ca4bda1a32788051177ba6cda8ac2793ea7cf2421729b9f23657df99";
+    const userId = localStorage.getItem("userId"); // 🔐 make sure you save this on login
+
+    const chats: Chat[] = chatRecords
+    .filter((record: any) => record.fields.userId === userId)
+    .map(record => ({
+      id: record.id,
+      title: record.fields.title || 'Untitled Chat',
+      createdAt: record.fields.createdAt ? new Date(record.fields.createdAt) : new Date(),
+      updatedAt: record.fields.updatedAt ? new Date(record.fields.updatedAt) : new Date(),
+    }));
   
+
     const res = await fetch("https://api.airtable.com/v0/apppD5DROHf5ImEYG/Chats", {
       method: "POST",
       headers: {
@@ -88,6 +104,7 @@ export default function ChatInterface() {
           title,
           createdAt: now.toISOString(),
           updatedAt: now.toISOString(),
+          userId,
         },
       }),
     });
@@ -163,6 +180,20 @@ export default function ChatInterface() {
       alert(`You need at least ${CHAT_COST_PER_MESSAGE} credits to send a message`);
       return;
     }
+const userId = localStorage.getItem("userId");
+
+const messages: Message[] = messageRecords
+  .filter((record: any) => record.fields.userId === userId)
+  .map(record => ({
+    id: record.id,
+    chatId: record.fields.chatId,
+    role: record.fields.role,
+    content: record.fields.content,
+    imageUrl: Array.isArray(record.fields.imageUrl) && record.fields.imageUrl.length > 0
+      ? record.fields.imageUrl[0].url
+      : undefined,
+    createdAt: record.fields.createdAt ? new Date(record.fields.createdAt) : new Date(),
+  }));
 
     const userMessage: Message = {
       id: '', // temporary placeholder
@@ -196,17 +227,16 @@ export default function ChatInterface() {
               content: userMessage.content,
               imageUrl: userMessage.imageUrl ? [{ url: userMessage.imageUrl }] : [],
               createdAt: userMessage.createdAt.toISOString(),
+              userId, // ✅ save userId on message too
             },
           }),
         });
 
-        const saved = await saveMessage(userMessage);
-        if (saved?.id) {
-          userMessage.id = saved.id;              // Airtable’s record ID
+        const userResult = await userRes.json();
+        if (userResult.id) {
+          userMessage.id = userResult.id;
           setMessages(prev => [...prev, userMessage]);
-        } else {
-          console.error("Failed to persist user message");
-        }
+        }        
 
         const hfMessages = [...messages, userMessage].map(msg => {
           const blocks = [];

@@ -40,12 +40,14 @@ export default function CoverGenerator() {
     setIsGenerating(true);
     setError(null);
     setCoverImage(null);
+    let creditsWereDeducted = false; // 🛡️ track if deduction happened
     try {
          // Deduct credits first
          const deductionSuccess = await deductCredits(COVER_COST);
          if (!deductionSuccess) {
            throw new Error("Credit deduction failed");
          }
+         creditsWereDeducted = true;
       const prompt = `
         Manga cover inspired by **${selectedStyle}**.
         ${artStyles[selectedStyle as keyof typeof artStyles]}
@@ -58,8 +60,8 @@ export default function CoverGenerator() {
         prompt,
         steps: 50,
         negative_prompt: 'text errors, blurry, watermark, deformed, bad anatomy',
-        width: 1024,
-        height: 1820,
+        width: 1008,
+        height: 1792,
         guidance_scale: 8.5
       });
   
@@ -78,7 +80,10 @@ export default function CoverGenerator() {
 
     } catch (error: any) {
       console.error('Cover generation error:', error);
-      await addCredits(COVER_COST);
+      if (creditsWereDeducted) {
+        await addCredits(COVER_COST);
+      }
+  
       setError(
         error.message || 
         "Cover generation failed. Credits have been refunded. Please try again."
