@@ -2,18 +2,17 @@
   "name": "Mangafy.Ai",
   "version": "0.1.0",
   "private": true,
-  "main": "server.js",
   "scripts": {
     "dev": "next dev --turbopack",
     "vercel-build": "npm ci && npm run build",
     "build": "next build",
-    "start": "node server.js",
+    "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
     "@gradio/client": "^1.15.3",
     "@heroicons/react": "^2.2.0",
-    "@huggingface/inference": "^3.15.0",
+    "@huggingface/inference": "^3.3.5",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.48.1",
     "@types/cropperjs": "^1.1.5",
