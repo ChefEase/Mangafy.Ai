@@ -496,7 +496,7 @@ private validateModel(model: string) {
     }
     console.log("Sending outline to backend:", outline);
     try {
-      const response = await fetch("http://localhost:4000/app/script-writing", {
+      const response = await fetch("https://mangafy-ai-backend.onrender.com", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ outline, panelCount }),
