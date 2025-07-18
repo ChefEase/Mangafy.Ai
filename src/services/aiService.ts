@@ -500,7 +500,7 @@ private validateModel(model: string) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ outline, panelCount }),
-      });
+      });s
   
       if (!response.ok) {
         const errorBody = await response.json();
