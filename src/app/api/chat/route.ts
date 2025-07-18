@@ -17,7 +17,6 @@ export async function POST(req: Request) {
 
     // Call HF chat completion
     const chatCompletion = await client.chatCompletion({
-      provider: "hyperbolic",
       model: "Qwen/Qwen2.5-VL-7B-Instruct",
       messages: body.messages,
     });
