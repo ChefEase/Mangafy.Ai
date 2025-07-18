@@ -515,7 +515,7 @@ if (typeof window !== 'undefined') {
       // Fix: Ensure setContent always receives a string, never null
       console.log("selectedTemplate", selectedTemplate);
 console.log("savedScript", savedScript);
-      const initialContent = selectedTemplate ?? savedScript ?? "";
+      const initialContent = selectedTemplate || savedScript || "";
       setContent(initialContent);
       console.log("Loaded initial script content:", initialContent);
 
@@ -671,7 +671,16 @@ const updateCreditsInBackend = async (newCredits: number) => {
               color: selectedColor, // ✅ Fix: Include this
               gradioStyle: selectedPreset, // ✅ Also needed if using Gradio
             });
-  
+
+            if (!(panelImage instanceof Blob)) {
+              console.error("Panel image is not a blob!", panelImage);
+              throw new Error("Invalid panel image format");
+            }
+            
+            if (!panelImage || panelImage.size < 1000) {
+              throw new Error("Empty or corrupted image blob");
+            }
+            
             newPanels.push({
               url: URL.createObjectURL(panelImage),
               dimensions,

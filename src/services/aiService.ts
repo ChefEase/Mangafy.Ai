@@ -197,11 +197,20 @@ export class AIService {
     });
 
     if (!response.ok) {
+      const errText = await response.text();
       throw new Error(`Failed to generate image: ${response.status}`);
     }
 
-    const blob = await response.blob();
-    return blob;
+    const { url } = await response.json();
+    if (!url) throw new Error("Image URL missing from generation response");
+
+    const imageResp = await fetch(url);
+  if (!imageResp.ok) {
+    throw new Error(`Failed to fetch image from Gradio URL: ${url}`);
+  }
+
+  const blob = await imageResp.blob();
+  return blob;
   }
 
   async generateTextToImageFluxDev(payload: {
