@@ -195,22 +195,17 @@ export class AIService {
         add_quality_tags: opts.add_quality_tags ?? true,
       }),
     });
-
+    let json;
     if (!response.ok) {
       const errText = await response.text();
       throw new Error(`Failed to generate image: ${response.status}`);
     }
-
-    const { url } = await response.json();
-    if (!url) throw new Error("Image URL missing from generation response");
-
-    const imageResp = await fetch(url);
-  if (!imageResp.ok) {
-    throw new Error(`Failed to fetch image from Gradio URL: ${url}`);
-  }
-
-  const blob = await imageResp.blob();
-  return blob;
+    const blob = await response.blob(); // Directly get Blob from response
+    if (blob.type !== 'image/png') {
+      throw new Error(`Unexpected content type: ${blob.type}`);
+    }
+    console.log('Response Content-Type:', response.headers.get('content-type'));
+    return blob;
   }
 
   async generateTextToImageFluxDev(payload: {

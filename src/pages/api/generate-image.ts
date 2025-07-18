@@ -44,18 +44,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   ];
 
   try {
+    
     // Safe call with cast to unknown first, then expected tuple
     const result = await gradio.predict(args as any, { api_name: "/run" });
+    if (typeof result === 'string' && result.startsWith('�PNG')) {
+      // Handle binary data directly
+      return res.status(200).send(Buffer.from(result, 'binary'));
+    }
     const [images, metadata] = result as unknown as [{ image: { url: string } }[], Record<string, any>];
 
     if (!images?.[0]?.image?.url) {
       return res.status(500).json({ error: "No image url returned" });
     }
-
-    return res.status(200).json({ url: images[0].image.url, meta: metadata });
+    console.log('Gradio result type:', typeof result);
+    const imageResp = await fetch(images[0].image.url);
+const imageBuffer = await imageResp.arrayBuffer();
+res.setHeader('Content-Type', 'image/png');
+return res.status(200).send(Buffer.from(imageBuffer));
 
   } catch (err: any) {
     console.error("❌ Gradio API error:", err);
+    res.setHeader('Content-Type', 'application/json');
     return res.status(500).json({ error: err.message || "unknown error" });
   }
 }
