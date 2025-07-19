@@ -210,13 +210,12 @@ const messages: Message[] = messageRecords
     try{
         // Deduct credits first
         const deductionSuccess = await deductCredits(CHAT_COST_PER_MESSAGE);
-        
+        didDeduct = true;
         if (!deductionSuccess) {
           alert("Failed to deduct credits. Please try again.");
           return;
         }
-        didDeduct = true;
-
+       
         const userRes = await fetch("https://api.airtable.com/v0/apppD5DROHf5ImEYG/Messages", {
           method: "POST",
           headers: {
