@@ -19,7 +19,7 @@ export default function ChatInterface() {
   const CHAT_COST_PER_MESSAGE = 0.05; // Cost per AI response
   const [chatRecords, setChatRecords] = useState<any[]>([]);
 const [messageRecords, setMessageRecords] = useState<any[]>([]);
-
+const isSending = useRef(false); // Lock to prevent concurrent requests
 
   useEffect(() => {
     const loadData = async () => {
@@ -174,6 +174,9 @@ const [messageRecords, setMessageRecords] = useState<any[]>([]);
   
 
   const sendMessage = async (content: string, imageUrl?: string) => {
+    if (isSending.current) return;
+    isSending.current = true;
+
     if (!currentChat || (!content.trim() && !imageUrl)) return;
   
     if (credits < CHAT_COST_PER_MESSAGE) {
@@ -210,11 +213,11 @@ const messages: Message[] = messageRecords
     try{
         // Deduct credits first
         const deductionSuccess = await deductCredits(CHAT_COST_PER_MESSAGE);
-        didDeduct = true;
         if (!deductionSuccess) {
           alert("Failed to deduct credits. Please try again.");
           return;
         }
+        didDeduct = true;
        
         const userRes = await fetch("https://api.airtable.com/v0/apppD5DROHf5ImEYG/Messages", {
           method: "POST",
@@ -356,6 +359,7 @@ const messages: Message[] = messageRecords
     alert(`Failed to send message: ${error.message || 'Unknown error'}. Credits have been refunded.`);
   } finally {
     setIsLoading(false);
+      isSending.current = false; // Release lock
   }
     };
   
