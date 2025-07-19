@@ -47,12 +47,12 @@ export default function AuthPage() {
   return (
     <div className="home">
       <Navbar setActiveForm={setActiveForm} />
-     {/*} <div className="form-container">
+      <div className="form-container">
         {activeForm === "register" && <RegisterForm referrerId={referrerId}/>}
-        {activeForm === "login" && <LoginForm />}
+      {/*  {activeForm === "login" && <LoginForm />}
         {activeForm === "reset-password" && <ResetPasswordForm />}
-        {activeForm === "google-login" && <GoogleLoginButton />}
-      </div> */}
+        {activeForm === "google-login" && <GoogleLoginButton />} */}
+      </div> 
     </div>
   );
 }
