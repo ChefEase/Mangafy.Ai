@@ -206,7 +206,9 @@ const initializeWithCustomHeaders = async (userId, email) => {
         localStorage.setItem("userId", data.user.id);
       }
 
-      router.push("/project-management");
+      setTimeout(() => {
+        router.push("/project-management");
+      }, 1000); // even 10ms is often enough
       
     } catch (error) {
       alert(error.message);
