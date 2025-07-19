@@ -16,6 +16,10 @@ export default function AuthPage() {
   const [referrerId, setReferrerId] = useState<string | null>(null);
 
   useEffect(() => {
+    console.log("AuthPage loaded on", navigator.userAgent);
+  }, []);
+
+  useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       const user = session?.user;
@@ -36,23 +40,19 @@ export default function AuthPage() {
         console.error("localStorage error on iOS:", e);
       }
     }
-
-    useEffect(() => {
-      console.log("AuthPage loaded on", navigator.userAgent);
-    }, []);
     
     checkSession();
   }, [router]);
 
   return (
     <div className="home">
-      <Navbar setActiveForm={setActiveForm} />
+     {/* <Navbar setActiveForm={setActiveForm} />
       <div className="form-container">
         {activeForm === "register" && <RegisterForm referrerId={referrerId}/>}
         {activeForm === "login" && <LoginForm />}
         {activeForm === "reset-password" && <ResetPasswordForm />}
         {activeForm === "google-login" && <GoogleLoginButton />}
-      </div>
+      </div> */}
     </div>
   );
 }
