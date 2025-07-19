@@ -49,8 +49,8 @@ export default function AuthPage() {
       <Navbar setActiveForm={setActiveForm} />
       <div className="form-container">
         {activeForm === "register" && <RegisterForm referrerId={referrerId}/>}
-      {/*  {activeForm === "login" && <LoginForm />}
-        {activeForm === "reset-password" && <ResetPasswordForm />}
+        {activeForm === "login" && <LoginForm />}
+      {/*}  {activeForm === "reset-password" && <ResetPasswordForm />}
         {activeForm === "google-login" && <GoogleLoginButton />} */}
       </div> 
     </div>
