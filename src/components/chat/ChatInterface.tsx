@@ -176,7 +176,8 @@ const isSending = useRef(false); // Lock to prevent concurrent requests
   const sendMessage = async (content: string, imageUrl?: string) => {
     if (isSending.current) return;
     isSending.current = true;
-
+    setIsLoading(true);
+    
     if (!currentChat || (!content.trim() && !imageUrl)) return;
   
     if (credits < CHAT_COST_PER_MESSAGE) {
@@ -207,7 +208,6 @@ const messages: Message[] = messageRecords
       createdAt: new Date(),
     };
   
-    setIsLoading(true);
     const AIRTABLE_TOKEN = "patIcK5hqVA19dyEk.d90f3484ca4bda1a32788051177ba6cda8ac2793ea7cf2421729b9f23657df99";
     let didDeduct = false;
     try{
