@@ -51,7 +51,7 @@ export default function AuthPage() {
         {activeForm === "register" && <RegisterForm referrerId={referrerId}/>}
         {activeForm === "login" && <LoginForm />}
         {activeForm === "reset-password" && <ResetPasswordForm />}
-      {/*}  {activeForm === "google-login" && <GoogleLoginButton />} */}
+        {activeForm === "google-login" && <GoogleLoginButton />} 
       </div> 
     </div>
   );
