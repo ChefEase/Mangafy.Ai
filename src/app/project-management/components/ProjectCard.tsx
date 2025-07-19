@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 
 interface Project {
   id: string;
@@ -25,6 +25,7 @@ export default function ProjectCard({
 }: ProjectCardProps) {
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
+  const longPressTimer = useRef<number | null>(null);
 
   const handleRightClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -32,7 +33,33 @@ export default function ProjectCard({
     setShowContextMenu(true);
   };
 
-  const handleAddChapter = (e: React.MouseEvent) => {
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length !== 1) return; // Only single touch
+    const touch = e.touches[0];
+
+    longPressTimer.current = window.setTimeout(() => {
+      setContextMenuPosition({ x: touch.clientX, y: touch.clientY });
+      setShowContextMenu(true);
+    }, 600); // 600ms for long press
+  };
+
+  // Cancel long press if touch ends or moves
+  const cancelLongPress = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  };
+
+  const handleTouchEnd = () => {
+    cancelLongPress();
+  };
+
+  const handleTouchMove = () => {
+    cancelLongPress();
+  };
+
+  const handleAddChapter = (e: React.MouseEvent | React.TouchEvent) => {
     e.stopPropagation();
     const chapterTitle = prompt("Enter the chapter title:");
     if (chapterTitle) {
@@ -41,7 +68,7 @@ export default function ProjectCard({
     setShowContextMenu(false);
   };
 
-  const handleRename = (e: React.MouseEvent) => {
+  const handleRename = (e: React.MouseEvent | React.TouchEvent) => {
     e.stopPropagation();
     const newTitle = prompt("Enter the new project title:", project.title);
     if (newTitle) {
@@ -50,7 +77,7 @@ export default function ProjectCard({
     setShowContextMenu(false);
   };
 
-  const handleDeleteProject = (e: React.MouseEvent, projectId: string) => {
+  const handleDeleteProject = (e: React.MouseEvent | React.TouchEvent, projectId: string) => {
     e.stopPropagation();
     const confirmDelete = window.confirm("Are you sure you want to delete this project?");
     if (confirmDelete) {
@@ -59,7 +86,14 @@ export default function ProjectCard({
   };
 
   return (
-    <div className="project-card" onClick={() => onSelect(project)} onContextMenu={handleRightClick}>
+    <div className="project-card" 
+    onClick={() => onSelect(project)} 
+    onContextMenu={handleRightClick}
+    onTouchStart={handleTouchStart}
+    onTouchEnd={handleTouchEnd}
+    onTouchMove={handleTouchMove}
+
+    >
       <img src={project.thumbnail} alt={project.title} />
       <h3>{project.title}</h3>
       <p>{project.description}</p>
@@ -71,6 +105,10 @@ export default function ProjectCard({
             top: "100px",
             left: "100px",
             zIndex: 1000,
+            backgroundColor: "white",
+            border: "1px solid #ccc",
+            padding: "8px",
+            borderRadius: "4px",
           }}
         >
           <button onClick={handleRename}>Rename</button>
