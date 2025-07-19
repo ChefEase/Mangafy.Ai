@@ -206,13 +206,16 @@ const messages: Message[] = messageRecords
   
     setIsLoading(true);
     const AIRTABLE_TOKEN = "patIcK5hqVA19dyEk.d90f3484ca4bda1a32788051177ba6cda8ac2793ea7cf2421729b9f23657df99";
-
+    let didDeduct = false;
     try{
         // Deduct credits first
         const deductionSuccess = await deductCredits(CHAT_COST_PER_MESSAGE);
+        
         if (!deductionSuccess) {
-          throw new Error("Credit deduction failed");
+          alert("Failed to deduct credits. Please try again.");
+          return;
         }
+        didDeduct = true;
 
         const userRes = await fetch("https://api.airtable.com/v0/apppD5DROHf5ImEYG/Messages", {
           method: "POST",
@@ -346,8 +349,10 @@ const messages: Message[] = messageRecords
         });
       }
   } catch (error: any) {
-    // Refund credits on error
-    await addCredits(CHAT_COST_PER_MESSAGE);
+    if (didDeduct) {
+      await addCredits(CHAT_COST_PER_MESSAGE);
+    }
+    
     console.error('Error sending message:', error);
     alert(`Failed to send message: ${error.message || 'Unknown error'}. Credits have been refunded.`);
   } finally {
