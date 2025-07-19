@@ -28,9 +28,19 @@ export default function AuthPage() {
     const ref = urlParams.get('ref');
     if (ref) {
       setReferrerId(ref);
-      localStorage.setItem("referrerId", ref);  // ✅ SAVE TO LOCAL STORAGE HERE
+      try {
+        if (typeof window !== "undefined") {
+          localStorage.setItem("referrerId", ref);
+        }
+      } catch (e) {
+        console.error("localStorage error on iOS:", e);
+      }
     }
 
+    useEffect(() => {
+      console.log("AuthPage loaded on", navigator.userAgent);
+    }, []);
+    
     checkSession();
   }, [router]);
 

@@ -12,12 +12,16 @@ const inter = Inter({ subsets: ['latin'] });
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   // Request notification permissions when the app loads
   useEffect(() => {
-    if (Notification.permission !== 'granted') {
-      Notification.requestPermission().then((permission) => {
-        if (permission === 'granted') {
-          console.log('Notification permission granted!');
-        }
-      });
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      if (Notification.permission !== 'granted') {
+        Notification.requestPermission()
+          .then((permission) => {
+            if (permission === 'granted') {
+              console.log('Notification permission granted!');
+            }
+          })
+          .catch((e) => console.error('Notification error:', e));
+      }
     }
   }, []);
 
