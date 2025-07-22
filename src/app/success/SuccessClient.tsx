@@ -1,29 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation"; // use next/navigation in app dir
+import { useRouter, useSearchParams } from "next/navigation"; // App Router versions
 
 export default function SuccessClient() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const searchParams = useSearchParams();
+  const sessionId = searchParams?.get("session_id");
+
   const [credits, setCredits] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  // In app directory, router.query is replaced by useSearchParams or router.getSearchParams()  
-  // But useRouter in app directory doesn’t have query, use useSearchParams instead:
-
-  // import useSearchParams from "next/navigation";
-  // const searchParams = useSearchParams();
-  // const sessionId = searchParams.get("session_id");
-
-  const [sessionId, setSessionId] = useState<string | null>(null);
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const id = urlParams.get("session_id");
-    setSessionId(id);
-  }, []);
-
+  // Fetch session details
   useEffect(() => {
     async function fetchSessionDetails() {
       if (!sessionId) return;
@@ -48,19 +37,28 @@ export default function SuccessClient() {
     fetchSessionDetails();
   }, [sessionId]);
 
-  if (loading) return <p className="text-center p-6">Verifying your purchase...</p>;
-
-  if (error) return <p className="text-center text-red-500 p-6">Something went wrong. Please contact support.</p>;
-
+  // Redirect after 15 seconds
   useEffect(() => {
     if (!loading) {
       const timer = setTimeout(() => {
         router.push("/project-management");
-      }, 15000); // 15 seconds
+      }, 15000);
 
       return () => clearTimeout(timer);
     }
   }, [loading, router]);
+
+  // UI
+  if (loading)
+    return <p className="text-center p-6">Verifying your purchase...</p>;
+
+  if (error)
+    return (
+      <p className="text-center text-red-500 p-6">
+        Something went wrong. Please contact support.
+      </p>
+    );
+
   return (
     <div className="success-page text-center p-6">
       <h1 className="text-3xl font-bold mb-2">🎉 Payment Successful!</h1>
