@@ -21,7 +21,6 @@ export default function SubscriptionStatus() {
 
   return (
     <div className="subscription-status">
-      <p>Your current subscription: <strong>{subscription}</strong></p>
       <Link href="/subscription">
         <button>Upgrade to Premium</button>
       </Link>
