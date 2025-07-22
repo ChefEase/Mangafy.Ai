@@ -174,7 +174,7 @@ export class AIService {
     seed?:number;
     num_inference_steps?: number; 
   }): Promise<Blob> {
-    const response = await fetch("https://f48c82f1e0c8.ngrok-free.app/generate-image", {
+    const response = await fetch("https://ef6f6aca1599.ngrok-free.app/generate-image", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

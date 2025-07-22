@@ -1,34 +1,241 @@
 'use client';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import Logo from '@/public/logo.png'; // Replace with your logo
+import Link from 'next/link';
+import Logo from '@/public/logo.png';
+import styles from './LandingPage.module.css';
 
-export default function SplashScreen() {
-  const router = useRouter();
+const MANGA_SAMPLES: { pages: string[] }[] = [
+  {
+    pages: [
+      /*'/samples/sample1-left.png',
+      '/samples/sample1-center.png',
+      '/samples/sample1-right.png',*/
+    ],
+  },
+  {
+    pages: [
+      /*'/samples/sample2-left.png',
+      '/samples/sample2-center.png',
+      '/samples/sample2-right.png',*/
+    ],
+  },
+  {
+    pages: [
+      /*'/samples/sample3-left.png',
+      '/samples/sample3-center.png',
+      '/samples/sample3-right.png',*/
+    ],
+  },
+];
+
+
+const CAROUSEL_IMAGES = [
+  '/samples/sample1.png',
+  '/samples/sample2.png',
+  '/samples/sample3.png',
+  '/samples/sample 4.png',
+  '/samples/sample5.png',
+  '/samples/sample 6.png',
+  '/samples/sample 7.jpeg',
+  '/samples/sample 8.png',
+  '/samples/sample9.png',
+  '/samples/sample 10.png',
+  '/samples/sample11.png',
+  '/samples/sample12.png',  
+  '/samples/sample 13.png',  
+  // ... add up to 30*/
+];
+
+const FEATURES = [
+  {
+    title: 'AI Story-to-Manga Conversion',
+    description:
+      'Turn your written stories into fully illustrated manga pages with a single click.',
+    media: '/features/feature1.png',
+  },
+  {
+    title: 'Custom Character Generation',
+    description:
+      'Create unique manga characters with AI tailored to your story’s style.',
+    media: '/features/feature2.png',
+  },
+];
+
+const PRICING = [
+  { plan: 'Free', price: '$0', perks: ['Limited manga generations', 'Basic features'] },
+  { plan: 'Pro', price: '$9.99/mo', perks: ['Unlimited manga creations', 'Advanced AI styles', 'Priority support'] },
+];
+
+const FAQ = [
+  {
+    question: 'How does Mangafy.ai work?',
+    answer: 'Our AI takes your story input and generates manga illustrations automatically.',
+  },
+  {
+    question: 'Do I need to be an artist?',
+    answer: 'No, Mangafy.ai creates all the art for you based on your story input.',
+  },
+  {
+    question: 'What payment methods do you accept?',
+    answer: 'Stripe, PayPal, and soon more options will be available.',
+  },
+];
+
+export default function LandingPage() {
+  const [carouselIndex, setCarouselIndex] = useState(0);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      router.push('/Entire-Home-Auth-Page');
-    }, 3500);
-
-    return () => clearTimeout(timer);
-  }, [router]);
+    const interval = setInterval(() => {
+      setCarouselIndex((idx) => (idx + 1) % CAROUSEL_IMAGES.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div className="splash-container">
-      <div className="splash-content">
-        <Image 
-          src={Logo} 
-          alt="Manga Creator Logo" 
-          width={480} 
-          height={360}
-          className="splash-logo"
-        />
-        <div className="curated-by">
-        Mangafy.Ai – Where Imagination Becomes Manga. 🎨✨
+    <main className={styles.main}>
+      {/* Floating vertical carousel behind header */}
+      <div className={styles.carouselContainer}>
+        <div className={styles.carouselInner}>
+          {CAROUSEL_IMAGES.map((img, i) => (
+            <div
+              key={i}
+              className= {styles.carouselItem}>
+              <Image
+                src={img}
+                alt={`Sample manga carousel ${i + 1}`}
+                width={150}
+                height={250}
+                className={styles.carouselImage}
+                priority={i === carouselIndex}
+              />
+            </div>
+          ))}
         </div>
       </div>
-    </div>
+
+      {/* HEADER */}
+      <header className={styles.header}>
+        <div className={styles.logoContainer}>
+          <Image src={Logo} alt="Mangafy.ai Logo" width={48} height={48} />
+          <span className={styles.logoText}>Mangafy.ai</span>
+        </div>
+      </header>
+
+      {/* HERO */}
+      <section className={styles.hero}>
+        <h1 className={styles.heroTitle}>Welcome to Mangafy-ai</h1>
+        <p className={styles.heroSubtitle}>
+          Where imagination becomes reality. Create comics and manga with AI.
+          <br />
+          With one click, turn your stories into manga.
+        </p>
+        <Link href="/splash-screen" legacyBehavior>
+          <a className={styles.ctaButton}>Try Mangafy Now For Free</a>
+        </Link>
+      </section>
+
+      <Image
+    src="/hero_visible_left.jpg"
+    alt="Visible Manga Left"
+    className={styles.heroImageLeft}
+    width={180}
+    height={260}
+  />
+  <Image
+    src="/hero_visible_right.jpg"
+    alt="Visible Manga Right"
+    className={styles.heroImageRight}
+    width={180}
+    height={260}
+  />
+      {/* SAMPLES */}
+      <section className={styles.samplesSection}>
+        <h2 className={styles.sectionTitle}>See Mangafy in Action</h2>
+        <div className={styles.samplesWrapper}>
+          {MANGA_SAMPLES.map((sample : { pages: string[] }, i: number) => (
+            <div key={i} className={styles.sampleRow}>
+              {sample.pages.map((page: string, idx: number) => (
+                <div key={idx} className={styles.samplePage}>
+                  <Image
+                    src={page}
+                    alt={`Sample manga page ${idx + 1}`}
+                    width={300}
+                    height={450}
+                    className={styles.sampleImage}
+                    priority={i === 0}
+                  />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* FEATURES */}
+      <section className={styles.featuresSection}>
+        <h2 className={styles.sectionTitleFeatures}>Features</h2>
+        {FEATURES.map(({ title, description, media }, i) => (
+          <div key={i} className={styles.featureItem}>
+            <div className={styles.featureText}>
+              <h3 className={styles.featureTitle}>{title}</h3>
+              <p className={styles.featureDescription}>{description}</p>
+            </div>
+            <div className={styles.featureMedia}>
+              <Image src={media} alt={title} width={500} height={350} className={styles.featureImage} />
+            </div>
+          </div>
+        ))}
+      </section>
+
+      {/* PRICING */}
+      <section className={styles.pricingSection}>
+        <h2 className={styles.sectionTitlePricing}>Pricing</h2>
+        <div className={styles.pricingWrapper}>
+          {PRICING.map(({ plan, price, perks }) => (
+            <div key={plan} className={styles.pricingCard}>
+              <h3 className={styles.pricingPlan}>{plan}</h3>
+              <p className={styles.pricingPrice}>{price}</p>
+              <ul className={styles.pricingPerks}>
+                {perks.map((perk, idx) => (
+                  <li key={idx}>{perk}</li>
+                ))}
+              </ul>
+              <button className={styles.pricingButton}>Choose {plan}</button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className={styles.faqSection}>
+        <h2 className={styles.sectionTitleFaq}>FAQ</h2>
+        {FAQ.map(({ question, answer }, i) => (
+          <div key={i} className={styles.faqItem}>
+            <h4 className={styles.faqQuestion}>{question}</h4>
+            <p className={styles.faqAnswer}>{answer}</p>
+          </div>
+        ))}
+      </section>
+
+      {/* FOOTER */}
+      <footer className={styles.footer}>
+        <p>
+          Contact us: <a href="mailto:hello@mangafy.ai" className={styles.footerLink}>hello@mangafy.ai</a>
+        </p>
+        <p>
+          Follow us on{' '}
+          <a
+            href="https://instagram.com/mangafy.ai"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.footerLink}
+          >
+            Instagram
+          </a>
+        </p>
+        <p className={styles.footerCopy}>© 2025 Mangafy.ai</p>
+      </footer>
+    </main>
   );
 }

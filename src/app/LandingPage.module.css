@@ -1,0 +1,372 @@
+/* LandingPage.module.css */
+
+.main {
+    position: relative;
+    min-height: 100vh;
+    background: white;
+    color: #1a202c; /* gray-900 */
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+  }
+  
+  .carouselContainer {
+    position: absolute;
+    top: 70;
+    left: 0;
+    width: 100%;
+    height: 18rem;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+  }
+  
+  .carouselInner {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.25;
+    animation: scrollHorizontal 80s linear infinite;
+    width: 3000px;
+  }
+  
+  @keyframes scrollHorizontal {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-1500px);
+    }
+  }
+  
+  .carouselItem {
+    margin: 0 1rem;
+  }
+  
+  .activeCarouselItem {
+    position: relative;
+    transform: translateY(0);
+    opacity: 1;
+  }
+  
+  .carouselImage {
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .header {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e2e8f0; /* gray-200 */
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+  }
+  
+  .logoContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .logoText {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ed8936; /* orange-600 */
+  }
+  
+  .hero {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 5rem 1.5rem;
+    max-width: 48rem;
+    margin: 0 auto;
+  }
+  
+  .heroTitle {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #ed8936; /* orange-600 */
+    margin-bottom: 1rem;
+  }
+  
+  .heroSubtitle {
+    font-size: 1.25rem;
+    color: #4a5568; /* gray-700 */
+    margin-bottom: 1.5rem;
+  }
+  
+  .ctaButton {
+    padding: 0.75rem 2rem;
+    background-color: #ed8936; /* orange-600 */
+    color: white;
+    border-radius: 0.375rem;
+    box-shadow: 0 10px 15px rgba(237, 137, 54, 0.6);
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  
+  .ctaButton:hover {
+    background-color: #dd6b20; /* orange-700 */
+  }
+  
+  .samplesSection {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+  
+  .sectionTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #3182ce; /* blue-600 */
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .samplesWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+  
+  .sampleRow {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+  
+  .samplePage {
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .sampleImage {
+    object-fit: cover;
+  }
+  
+  .featuresSection {
+    background-color: #fff7ed; /* orange-50 */
+    padding: 3rem 1.5rem;
+    max-width: 80rem;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 3.5rem;
+  }
+  
+  .sectionTitleFeatures {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #c05621; /* orange-700 */
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .featureItem {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .heroImageLeft {
+    position: absolute;
+    bottom: 2rem;
+    left: 1rem;
+    z-index: 5;
+    top: 370px;
+    transform: scale(1.5); /* Scales both width and height */
+    transform-origin: center; /* Optional: scale from center */
+    left: 100px;
+  }
+  
+  .heroImageRight {
+    position: absolute;
+    bottom: 2rem;
+    right: 1rem;
+    z-index: 5;
+    top: 380px;
+    transform: scale(1.6); /* Scales both width and height */
+    transform-origin: center; /* Optional: scale from center */
+    right: 100px;
+  }
+  
+  @media (min-width: 768px) {
+    .featureItem {
+      flex-direction: row;
+      align-items: center;
+      gap: 2.5rem;
+    }
+  }
+  
+  .featureText {
+    flex: 1;
+  }
+  
+  .featureTitle {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #ed8936; /* orange-600 */
+    margin-bottom: 0.75rem;
+  }
+  
+  .featureDescription {
+    color: #4a5568; /* gray-700 */
+  }
+  
+  .featureMedia {
+    flex: 1;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .featureImage {
+    object-fit: cover;
+  }
+  
+  .pricingSection {
+    max-width: 64rem;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+  
+  .sectionTitlePricing {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #3182ce; /* blue-600 */
+    margin-bottom: 2rem;
+  }
+  
+  .pricingWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  @media (min-width: 768px) {
+    .pricingWrapper {
+      flex-direction: row;
+      justify-content: center;
+      gap: 3rem;
+    }
+  }
+  
+  .pricingCard {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 2rem;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 20rem;
+  }
+  
+  .pricingPlan {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .pricingPrice {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ed8936; /* orange-600 */
+    margin-bottom: 1rem;
+  }
+  
+  .pricingPerks {
+    list-style-type: disc;
+    list-style-position: inside;
+    color: #4a5568;
+    margin-bottom: 1.5rem;
+    text-align: left;
+  }
+  
+  .pricingButton {
+    background-color: #ed8936;
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease;
+    border: none;
+  }
+  
+  .pricingButton:hover {
+    background-color: #dd6b20;
+  }
+  
+  .faqSection {
+    background: white;
+    border-top: 1px solid #e2e8f0;
+    max-width: 64rem;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .sectionTitleFaq {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ed8936; /* orange-600 */
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .faqItem {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .faqQuestion {
+    font-weight: 600;
+    font-size: 1.125rem;
+  }
+  
+  .faqAnswer {
+    color: #4a5568;
+  }
+  
+  .footer {
+    background-color: #ed8936; /* orange-600 */
+    color: white;
+    padding: 1.5rem 0;
+    margin-top: 3rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .footerLink {
+    text-decoration: underline;
+    color: white;
+  }
+  
+  .footerCopy {
+    font-size: 0.875rem;
+    opacity: 0.75;
+  }
+  

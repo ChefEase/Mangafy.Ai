@@ -161,8 +161,8 @@ console.log(data); // 👀 check structure
 
   const getStylePrompt = (style: string) => {
     const styles = {
-      anime: 'anime style, vibrant colors, cel-shading, studio ghibli',
-      manga: 'black and white manga style, screentones, ink drawing',
+      anime: 'anime style, cel-shading, minimalist detail',
+      manga: 'black and white manga style, screentones, ink drawing, cel shading',
       western: 'western comic style, bold lines, dynamic shading',
       realistic: 'photorealistic, detailed anatomy, realistic proportions',
       fantasy: 'fantasy art, digital painting, magical atmosphere'
