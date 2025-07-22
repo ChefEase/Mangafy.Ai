@@ -11,7 +11,7 @@
   
   .carouselContainer {
     position: absolute;
-    top: 70;
+    top: 100;
     left: 0;
     width: 100%;
     height: 18rem;
@@ -26,7 +26,7 @@
     align-items: center;
     justify-content: center;
     opacity: 0.25;
-    animation: scrollHorizontal 80s linear infinite;
+    animation: scrollHorizontal 120s linear infinite;
     width: 3000px;
   }
   
@@ -155,8 +155,12 @@
   }
   
   .sampleImage {
-    object-fit: cover;
+    width: 100%;
+    height: auto;
+    object-fit: contain; /* ensures full image fits without cropping */
+    display: block;
   }
+  
   
   .featuresSection {
     background-color: #fff7ed; /* orange-50 */
@@ -204,6 +208,92 @@
     right: 100px;
   }
   
+  .how-to-generate-section {
+    background-color: white;
+    padding: 4rem 1.5rem;
+    text-align: center;
+    z-index: 2; /* ensures it's *above* the background but *below* sticky/floating elements */
+    margin-top: 15rem;
+  }
+  
+  .section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #f97316; /* orange-500 */
+    margin-bottom: 3rem;
+  }
+  
+  .steps-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 3rem;
+    justify-items: center;
+  }
+  
+  .step-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 250px;
+  }
+  
+  .step-image {
+    width: 280px;
+    height: 280px;
+    object-fit: contain;
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease;
+    /* add perspective to the container to enhance 3D effect */
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+  }
+  
+  .steps-container > .step-card:nth-child(2) .step-image {
+    width: 280px;
+    height: 280px;
+    transform: perspective(500px) rotateX(345deg) scale(1.3);
+  }
+
+  .steps-container > .step-card:nth-child(3) .step-image {
+    width: 180px;
+    height: 180px;
+    transform: perspective(600px) rotateX(10deg) rotateY(20deg) scale(1.8);
+  }
+
+  /* Step 4: zoomed in, rotated for clarity */
+.steps-container > .step-card:nth-child(4) .step-image {
+    width: 180px;
+    height: 180px;
+    transform: perspective(600px) rotateX(-10deg) rotateY(-5deg) scale(2.3);
+  }
+
+  .image-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .mouse-icon {
+    position: absolute;
+    width: 42px; /* Adjust as needed */
+    height: auto;
+    top: 28.3%;  /* Move vertically */
+    left: 80%; /* Move horizontally */
+    transform: translate(-50%, -50%) rotate(45deg) scale(1.3); /* fine tune position and tilt */
+    pointer-events: none; /* mouse icon won’t interfere with interaction */
+    z-index: 10000;
+  }
+  
+  .step-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .step-description {
+    font-size: 0.875rem;
+    color: #4b5563; /* gray-600 */
+  }
+  
   @media (min-width: 768px) {
     .featureItem {
       flex-direction: row;
@@ -236,7 +326,9 @@
   
   .featureImage {
     object-fit: cover;
-  }
+    width: 100%;
+    height: 100%;
+  }  
   
   .pricingSection {
     max-width: 64rem;

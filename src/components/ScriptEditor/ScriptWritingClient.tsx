@@ -1060,7 +1060,7 @@ const CreditIcon = ({ cost }: { cost: number }) => (
 
   <h4>⚠️ Character Description Tips</h4>
   <p>
-    When describing characters, keep it <strong>brief and visual</strong>.
+    When describing characters, try and keep it <strong>brief and visual</strong>.
     Use <em>short phrases</em> instead of full sentences, and only include what
     can actually be seen in the image.
   </p>

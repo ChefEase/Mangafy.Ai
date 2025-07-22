@@ -8,9 +8,9 @@ import styles from './LandingPage.module.css';
 const MANGA_SAMPLES: { pages: string[] }[] = [
   {
     pages: [
-      /*'/samples/sample1-left.png',
-      '/samples/sample1-center.png',
-      '/samples/sample1-right.png',*/
+      '/samples/chapter1.png',
+      '/samples/page 2.png',
+      '/samples/page 3.png',
     ],
   },
   {
@@ -44,10 +44,19 @@ const CAROUSEL_IMAGES = [
   '/samples/sample11.png',
   '/samples/sample12.png',  
   '/samples/sample 13.png',  
+  '/samples/sample14.png', 
+  '/samples/sample15.png', 
+  '/samples/sample16.png', 
+  '/samples/sample17.png', 
   // ... add up to 30*/
 ];
 
 const FEATURES = [
+  {
+title: 'Ai Character Consistency Engine',
+description: 'Mangafy.ai uses your uploaded characters and their descriptions to maintain consistent appearances across all manga panels. Our AI parses character roles, traits, and visuals from your input to ensure visual continuity. The more detailed and concise the description, the better the results — with up to 85% accuracy in maintaining character consistency across scenes.',
+media: '/samples/sample3.png',
+  },
   {
     title: 'AI Story-to-Manga Conversion',
     description:
@@ -134,7 +143,6 @@ export default function LandingPage() {
           <a className={styles.ctaButton}>Try Mangafy Now For Free</a>
         </Link>
       </section>
-
       <Image
     src="/hero_visible_left.jpg"
     alt="Visible Manga Left"
@@ -149,9 +157,43 @@ export default function LandingPage() {
     width={180}
     height={260}
   />
+<section className={styles['how-to-generate-section']}>
+      <h2 className={styles['section-title']}>How to Generate Manga with Mangafy.ai</h2>
+      <div className={styles['steps-container']}>
+        
+        <div className={styles['step-card']}>
+          <img src="/steps/daichi.jpeg" alt="Step 1" className={styles['step-image']} />
+          <h3 className={styles['step-title']}>Step 1: Get Your Character</h3>
+          <p className={styles['step-description']}>Use a reference or image for your character idea.</p>
+        </div>
+
+        <div className={styles['step-card']}>
+          <img src="/steps/step2.png" alt="Step 2" className={styles['step-image']} />
+          <h3 className={styles['step-title']}>Step 2: Upload Character</h3>
+          <p className={styles['step-description']}>Upload it, name it, and describe the physical features, role (e.g., protagonist).</p>
+        </div>
+
+        <div className={styles['step-card']}>
+          <img src="/steps/step3.png" alt="Step 3" className={styles['step-image']} />
+          <h3 className={styles['step-title']}>Step 3: Write Your Story</h3>
+          <p className={styles['step-description']}>Describe each panel with characters, background, and camera angle.</p>
+        </div>
+
+        <div className={styles['step-card']}>
+          <div className="image-wrapper">
+          <img src="/steps/step4.png" alt="Step 4" className={styles['step-image']} />
+          <img src="/icons/mouse.png" alt="Mouse icon" className={styles['mouse-icon']} />
+          </div>
+          <h3 className={styles['step-title']}>Step 4: Choose Style & Generate</h3>
+          <p className={styles['step-description']}>Pick art style, color or B&W, and hit generate!</p>
+        </div>
+
+      </div>
+    </section>
+
       {/* SAMPLES */}
       <section className={styles.samplesSection}>
-        <h2 className={styles.sectionTitle}>See Mangafy in Action</h2>
+        <h2 className={styles.sectionTitle}>See Mangafy-Ai in Action</h2>
         <div className={styles.samplesWrapper}>
           {MANGA_SAMPLES.map((sample : { pages: string[] }, i: number) => (
             <div key={i} className={styles.sampleRow}>
@@ -160,8 +202,8 @@ export default function LandingPage() {
                   <Image
                     src={page}
                     alt={`Sample manga page ${idx + 1}`}
-                    width={300}
-                    height={450}
+                    width={600}
+                    height={850}
                     className={styles.sampleImage}
                     priority={i === 0}
                   />
