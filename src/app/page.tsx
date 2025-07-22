@@ -8,7 +8,7 @@ import styles from './LandingPage.module.css';
 const MANGA_SAMPLES: { pages: string[] }[] = [
   {
     pages: [
-      '/samples/chapter1.png',
+      '/samples/Chapter1.png',
       '/samples/page 2.png',
       '/samples/page 3.png',
     ],
@@ -59,9 +59,11 @@ media: '/samples/sample3.png',
   },
   {
     title: 'AI Story-to-Manga Conversion',
-    description:
-      'Turn your written stories into fully illustrated manga pages with a single click.',
-    media: '/features/feature1.png',
+    description: `Turn your written stories into fully illustrated manga pages with a single click.
+  Our intelligent pipeline understands narrative structure, dialogue, and visual context — allowing it to transform raw text into manga panels with dynamic compositions, expressive characters, and cinematic flow.
+  You can specify panel layout, camera angles, and style preferences to tailor the output to your vision. It's storytelling, visually automated.`,
+    media: '/features/story-to-manga.mp4', // Replace with your actual video file path
+    isVideo: true
   },
   {
     title: 'Custom Character Generation',
@@ -217,14 +219,33 @@ export default function LandingPage() {
       {/* FEATURES */}
       <section className={styles.featuresSection}>
         <h2 className={styles.sectionTitleFeatures}>Features</h2>
-        {FEATURES.map(({ title, description, media }, i) => (
+        {FEATURES.map(({ title, description, media, isVideo }, i) => (
           <div key={i} className={styles.featureItem}>
             <div className={styles.featureText}>
               <h3 className={styles.featureTitle}>{title}</h3>
               <p className={styles.featureDescription}>{description}</p>
             </div>
             <div className={styles.featureMedia}>
-              <Image src={media} alt={title} width={500} height={350} className={styles.featureImage} />
+            {isVideo ? (
+        <video
+          src={media}
+          width={500}
+          height={350}
+          className={styles.featureImage}
+          autoPlay
+          muted
+          loop
+          playsInline
+        />
+      ) : (
+        <Image
+          src={media}
+          alt={title}
+          width={500}
+          height={350}
+          className={styles.featureImage}
+        />
+      )}
             </div>
           </div>
         ))}
