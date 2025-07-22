@@ -52,6 +52,15 @@ export default function SuccessClient() {
 
   if (error) return <p className="text-center text-red-500 p-6">Something went wrong. Please contact support.</p>;
 
+  useEffect(() => {
+    if (!loading) {
+      const timer = setTimeout(() => {
+        router.push("/project-management");
+      }, 15000); // 15 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [loading, router]);
   return (
     <div className="success-page text-center p-6">
       <h1 className="text-3xl font-bold mb-2">🎉 Payment Successful!</h1>
