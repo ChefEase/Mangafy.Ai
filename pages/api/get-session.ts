@@ -1,14 +1,11 @@
-// src/pages/api/get-session.ts
-
 import type { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
-import supabase from "@/utils/supabaseClient"; // Make sure this imports correctly
+import supabase from "@/utils/supabaseClient";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-06-30.basil",
 });
 
-// Mapping of Stripe price IDs to credits
 const priceToCredits: Record<string, number> = {
   "price_1RnV3NCfqQf6EFEyrJGUcfkP": 1200,
   "price_1RnV5nCfqQf6EFEyvx3H79KA": 3500,
@@ -36,26 +33,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const creditsToAdd = priceToCredits[priceId];
-
     if (!creditsToAdd) {
       return res.status(400).json({ error: "Unknown priceId" });
     }
 
-    // Add credits in Supabase
-    const { data, error } = await supabase
+    // ✅ Step 1: Get current credits
+    const { data: userData, error: userError } = await supabase
       .from("users")
-      .update({ credits: supabase.rpc("increment_credits", { uid: userId, amount: creditsToAdd }) }) // OR manually do the math if no RPC
+      .select("credits")
       .eq("id", userId)
-      .select();
+      .single();
 
-    if (error) {
-      console.error("Supabase update error:", error);
+    if (userError || !userData) {
+      console.error("User fetch failed:", userError);
+      return res.status(500).json({ error: "User not found" });
+    }
+
+    // ✅ Step 2: Update credits
+    const newCredits = (userData.credits || 0) + creditsToAdd;
+    const { error: updateError } = await supabase
+      .from("users")
+      .update({ credits: newCredits })
+      .eq("id", userId);
+
+    if (updateError) {
+      console.error("Credit update failed:", updateError);
       return res.status(500).json({ error: "Failed to update user credits" });
     }
 
     res.status(200).json({ credits: creditsToAdd });
-  } catch (err: any) {
-    console.error("Stripe session fetch failed:", err);
+  } catch (err) {
+    console.error("Session fetch failed:", err);
     res.status(500).json({ error: "Failed to retrieve session" });
   }
 }
