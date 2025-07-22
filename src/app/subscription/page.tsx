@@ -13,11 +13,13 @@ interface Plan {
   buttonText: string;
   disabled: boolean;
   credits: number;
+  priceId?: string; // ✅ Add this
 }
 
 
 export default function SubscriptionPage() {
   const { addCredits } = useCredits();
+  const { user } = useUser(); // ✅ Move this here
 
   function InviteSection() {
     const { user } = useUser();
@@ -69,6 +71,7 @@ export default function SubscriptionPage() {
     {
       type: "Starter Creator",
       price: "$9.99/month",
+      priceId: "price_1RnV3NCfqQf6EFEyrJGUcfkP",
       features: [
         "🔓 1,200 Credits",
         "📘 Generate 40–60 Pages",
@@ -83,6 +86,7 @@ export default function SubscriptionPage() {
     {
       type: "Ultimate Creator",
       price: "$24.99/month",
+      priceId: "price_1RnV5nCfqQf6EFEyvx3H79KA",
       features: [
         "🚀 3,500 Credits",
         "📚 Generate 100–150 Pages",
@@ -100,6 +104,7 @@ export default function SubscriptionPage() {
     {
       type: "Starter Creator (Yearly)",
       price: "$95.99/year",
+      priceId:"price_1RnV9mCfqQf6EFEyBT96MPqv",
       features: [
         "💰 Save 20% (Normally $120)",
         "🔓 1,200 Monthly Credits (14,400/yr)",
@@ -110,11 +115,12 @@ export default function SubscriptionPage() {
       ],
       buttonText: "Get Yearly Starter",
       disabled: false,
-      credits: 1200,
+      credits: 14400,
     },
     {
       type: "Ultimate Creator (Yearly)",
       price: "$239.99/year",
+      priceId: "price_1RnVCJCfqQf6EFEyvODEySQl",
       features: [
         "💰 Save 20% (Normally $300)",
         "🚀 3,500 Monthly Credits (42,000/yr)",
@@ -125,13 +131,26 @@ export default function SubscriptionPage() {
       ],
       buttonText: "Go Yearly Ultimate",
       disabled: false,
-      credits: 3500,
+      credits: 42000,
     },
   ];
   
-  const handlePurchase = async (credits: number) => {
-    await addCredits(credits);
-    alert(`🎉 You've been awarded ${credits} credits!`);
+  const handlePurchase = async (priceId: string) => {
+    const res = await fetch("/api/checkout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        priceId,
+        userId: user?.id,
+      }),
+    });
+  
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    }
   };
 
   const renderPlans = (plans: Plan[]) =>
@@ -144,7 +163,7 @@ export default function SubscriptionPage() {
             <li key={i}>{feature}</li>
           ))}
         </ul>
-        <button onClick={() => handlePurchase(plan.credits)}>
+        <button onClick={() => handlePurchase(plan.priceId!)}>
           {plan.buttonText}
         </button>
       </div>
