@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { aiService } from '@/services/aiService';
 import './styles/coverGenerator.css';
 import { useCredits } from '@/context/CreditContext'; // Import credit context
+import { CharacterService } from '@/services/CharacterService'; // or your own method of retrieving saved characters
+
 
 const artStyles = {
   'My Hero Academia': `A colorful and action-packed cover with bold linework and sharp highlights. The main character is drawn in the **My Hero Academia** style, with exaggerated expressions and detailed shading. High-energy pose, dynamic perspective, and speed lines in the background. The background is present but not overly detailed.`,
@@ -25,7 +27,7 @@ export default function CoverGenerator() {
   function isBlob(value: any): value is Blob {
     return value && typeof value === 'object' && typeof value.arrayBuffer === 'function';
   }
-  
+
   const generateCover = async () => {
     if (!title.trim()) {
       setError("Please enter a cover description");
@@ -48,13 +50,19 @@ export default function CoverGenerator() {
            throw new Error("Credit deduction failed");
          }
          creditsWereDeducted = true;
-      const prompt = `
-        Manga cover inspired by **${selectedStyle}**.
-        ${artStyles[selectedStyle as keyof typeof artStyles]}
-        Scene description: **"${title}"**.
-        The title should appear in a **bold, stylized font**.
-        High contrast, detailed composition.
-      `;
+         const characters = await CharacterService.getCharacters();
+
+  const processedTitle = characters.reduce((acc, character) => {
+    const regex = new RegExp(`\\b${character.name}\\b`, 'gi');
+    return acc.replace(regex, character.description);
+  }, title);
+         const prompt = `
+         Manga cover inspired by **${selectedStyle}**.
+         ${artStyles[selectedStyle as keyof typeof artStyles]}
+         Scene description: **"${processedTitle}"**.
+         The title should appear in a **bold, stylized font**.
+         High contrast, detailed composition.
+       `;
 
       const imageBlob = await aiService.generateTextToImageFluxDev({
         prompt,
