@@ -512,12 +512,17 @@ if (typeof window !== 'undefined') {
         canvasRef.current.width = 2480;
         canvasRef.current.height = 3508;
       }
+      const params = new URLSearchParams(window.location.search);
+      const fromAI = params.get("source") === "ai";
+
       const savedScript = localStorage.getItem("saved-script");
       const selectedTemplate = localStorage.getItem("script-content");
       // Fix: Ensure setContent always receives a string, never null
       console.log("selectedTemplate", selectedTemplate);
 console.log("savedScript", savedScript);
-      const initialContent = selectedTemplate || savedScript || "";
+const initialContent = fromAI && selectedTemplate
+? selectedTemplate
+: savedScript || "";
       setContent(initialContent);
       console.log("Loaded initial script content:", initialContent);
 

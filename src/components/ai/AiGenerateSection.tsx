@@ -71,7 +71,9 @@ export default function AIGenerateSection({ onGenerate }: AIGenerateSectionProps
   
   const handleApply = () => {
     localStorage.setItem("script-content", generatedScript);
-    router.push("/script-writing");
+    setTimeout(() => {
+      router.push("/script-writing?source=ai");
+    }, 100);
   };
 
   return (
