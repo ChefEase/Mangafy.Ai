@@ -199,6 +199,13 @@
   background-color: #3a5bd9;
 }
   
+.negative-prompt-input {
+  margin-top: 1rem;
+  padding: 0.5rem;
+  width: 100%;
+  font-size: 1rem;
+}
+
 @media (max-width: 600px) {
   .cover-generator {
     padding: 1rem;

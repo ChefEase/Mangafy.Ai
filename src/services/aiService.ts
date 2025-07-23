@@ -174,7 +174,7 @@ export class AIService {
     seed?:number;
     num_inference_steps?: number; 
   }): Promise<Blob> {
-    const response = await fetch("https://07927d42c44b.ngrok-free.app/generate-image", {
+    const response = await fetch("https://0201689ca0c4.ngrok-free.app/generate-image", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -182,7 +182,7 @@ export class AIService {
         negative_prompt: opts.negative_prompt ?? "",
         width: opts.width ?? 1024,
         height: opts.height ?? 1024,
-        guidance_scale: opts.guidance_scale ?? 13.5,
+        guidance_scale: opts.guidance_scale ?? 17,
         seed: opts.seed ?? Math.floor(Math.random() * 10000000),
         sampler: opts.sampler ?? "Euler a",
         aspect_ratio: opts.aspect_ratio, // fallback default if not mappe
@@ -225,7 +225,7 @@ export class AIService {
           num_inference_steps: payload.steps || 5, // Default to 5 steps as in your example
           width: payload.width || 1024,
           height: payload.height || 1024,
-          guidance_scale: payload.guidance_scale || 13.5,
+          guidance_scale: payload.guidance_scale || 17,
         },
        // Force Replicate provider
       });
@@ -337,7 +337,7 @@ async generatePanel(payload: {
         negative_prompt: negativePrompt,
         width: payload.width!,
         height: payload.height!,
-        guidance_scale: 13.5,
+        guidance_scale: 17,
         seed: randomSeed,
         sampler: "Euler a",
         aspect_ratio: this.mapToClosestAspectRatio(payload.width!, payload.height!),
@@ -467,7 +467,7 @@ private validateModel(model: string) {
         parameters: {
           width: 1792,
           height: 1024,
-          guidance_scale: 13.5,
+          guidance_scale: 17,
           num_inference_steps: 50
         }
       });

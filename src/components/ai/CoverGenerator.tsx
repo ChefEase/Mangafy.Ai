@@ -23,6 +23,7 @@ export default function CoverGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null); // Add error state
   const COVER_COST = 10; // Define cover art cost (matches credit system)
+  const [negativePrompt, setNegativePrompt] = useState('');
 
   function isBlob(value: any): value is Blob {
     return value && typeof value === 'object' && typeof value.arrayBuffer === 'function';
@@ -67,10 +68,10 @@ export default function CoverGenerator() {
       const imageBlob = await aiService.generateTextToImageFluxDev({
         prompt,
         steps: 50,
-        negative_prompt: 'text errors, blurry, watermark, deformed, bad anatomy',
+        negative_prompt:  negativePrompt ||"text errors, blurry, watermark, deformed, bad anatomy",
         width: 1008,
         height: 1792,
-        guidance_scale: 13.5
+        guidance_scale: 17
       });
   
       let imageUrl: string;
@@ -122,6 +123,14 @@ export default function CoverGenerator() {
         placeholder="Describe the cover scene..."
       />
 
+<input
+        type="text"
+        value={negativePrompt}
+        onChange={(e) => setNegativePrompt(e.target.value)}
+        placeholder="Add negative prompt keywords (e.g. Luffy, straw hat, watermark)"
+        className="negative-prompt-input"
+      />
+      
       <select value={selectedStyle} onChange={(e) => setSelectedStyle(e.target.value)}>
         {Object.keys(artStyles).map((style) => (
           <option key={style} value={style}>
