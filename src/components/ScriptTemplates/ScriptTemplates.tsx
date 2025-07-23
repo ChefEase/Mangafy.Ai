@@ -17,7 +17,7 @@ const ScriptTemplates = () => {
     // Save the selected template content to localStorage
     localStorage.setItem("selected-template", content);
     // Redirect to the ScriptEditor page
-    router.push("/script-writing");
+    router.push("/script-writing?source=template");
   };
 
   return (

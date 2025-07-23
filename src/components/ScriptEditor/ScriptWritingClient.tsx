@@ -513,21 +513,37 @@ if (typeof window !== 'undefined') {
         canvasRef.current.height = 3508;
       }
       const params = new URLSearchParams(window.location.search);
-      const fromAI = params.get("source") === "ai";
+      const source = params.get("source");
 
       const savedScript = localStorage.getItem("saved-script");
       const selectedTemplate = localStorage.getItem("selected-template");
       const generatedScript = localStorage.getItem("script-content");
       // Fix: Ensure setContent always receives a string, never null
-      console.log("selectedTemplate", selectedTemplate);
-console.log("savedScript", savedScript);
-console.log("generatedScript", generatedScript)
-const initialContent = fromAI && generatedScript
-? generatedScript
-: selectedTemplate || savedScript || "";
-      setContent(initialContent);
-      console.log("Loaded initial script content:", initialContent);
+let initialContent = "";
 
+    if (source === "ai" && generatedScript) {
+      initialContent = generatedScript;
+    } else if (source === "template" && selectedTemplate) {
+      initialContent = selectedTemplate;
+    } else {
+      initialContent = savedScript || "";
+    }
+      setContent(initialContent);
+      // Clean up used keys (optional)
+    if (source === "template") {
+      localStorage.removeItem("selected-template");
+    }
+
+    // Remove the query param from URL after use
+    if (source) {
+      const cleanURL = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, document.title, cleanURL);
+    }
+    console.log("selectedTemplate", selectedTemplate);
+    console.log("savedScript", savedScript);
+    console.log("generatedScript", generatedScript)
+      console.log("Loaded initial script content:", initialContent);
+    
       const loadCharacters = async () => {
         try {
           const chars = await CharacterService.getCharacters();
