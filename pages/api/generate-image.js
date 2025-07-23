@@ -62,13 +62,12 @@ export default async function handler(req, res) {
       if (!lastImage?.url) {
         return res.status(500).json({ error: "Invalid image format" });
       }
-      
+      console.timeEnd("Prediction") 
       return res.status(200).json({ image: lastImage });
 
     } catch (err) {
       console.error("🔥 Generation failed:", JSON.stringify(err, null, 2));
       res.status(500).json({ error: err.message || "Generation failed" });
     }
-    console.timeEnd("Prediction")
   }
 
