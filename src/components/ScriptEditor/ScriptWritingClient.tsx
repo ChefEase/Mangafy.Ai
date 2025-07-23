@@ -517,7 +517,7 @@ if (typeof window !== 'undefined') {
       // Fix: Ensure setContent always receives a string, never null
       console.log("selectedTemplate", selectedTemplate);
 console.log("savedScript", savedScript);
-      const initialContent = selectedTemplate || savedScript || "";
+      const initialContent = savedScript || selectedTemplate || "";
       setContent(initialContent);
       console.log("Loaded initial script content:", initialContent);
 
