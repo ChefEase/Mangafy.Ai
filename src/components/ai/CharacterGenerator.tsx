@@ -36,10 +36,6 @@ export default function CharacterGenerator() {
       return;
     }
     try {
-      const deductionSuccess = await deductCredits(CHARACTER_COST);
-      if (!deductionSuccess) {
-        throw new Error("Credit deduction failed");
-      }
       let result;
   
       if (mode === 'text') {
@@ -78,7 +74,12 @@ export default function CharacterGenerator() {
         } else {
           throw new Error('Unsupported image format returned from AI service.');
         }
-      
+
+        const deductionSuccess = await deductCredits(CHARACTER_COST);
+        if (!deductionSuccess) {
+          throw new Error("Credit deduction failed");
+        }
+        
         setGeneratedImage(imageUrl);
         setIsGenerating(false);
       } else {
@@ -111,26 +112,26 @@ export default function CharacterGenerator() {
   const data = await res.json();
   console.log("👉 Full response data:", data);
 
-  if (!res.ok) {
-    throw new Error(data.error || "Unknown error");
-  }
-
-  if (data?.image?.url) {
-    setGeneratedImage(data.image.url);
-  } else {
+  if (!res.ok || !data?.image?.url) {
     if (data.error?.includes("exceeded your GPU quota")) {
       alert("⏳ You've hit the GPU limit on the backend model. Please try again in a few hours.");
     } else {
       alert(data.error || "Image generation failed.");
     }
     throw new Error("No image URL returned from server");
-  }  
-  
+  }
+
+  const deductionSuccess = await deductCredits(CHARACTER_COST);
+  if (!deductionSuccess) {
+    throw new Error("Credit deduction failed");
+  }
+
+  setGeneratedImage(data.image.url);
+
 console.log(data); // 👀 check structure
   console.log("data.image:", data.image);
   console.log("typeof data.image:", typeof data.image);
   
-          setIsGenerating(false);
         };
   
         reader.readAsDataURL(referenceImage); // triggers reader.onloadend
