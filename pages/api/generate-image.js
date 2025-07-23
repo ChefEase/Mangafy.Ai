@@ -28,7 +28,7 @@ export default async function handler(req, res) {
       const prompt = fields.prompt?.[0] || "";
       const imageFile = files.image?.[0];
       const lora_name = fields.lora_name?.[0] || "Ghibli";
-      const guidance_scale = parseFloat(fields.guidance_scale?.[0] || "3.5");
+      const guidance_scale = parseFloat(fields.guidance_scale?.[0] || "13.5");
       const num_inference_steps = parseInt(fields.num_inference_steps?.[0] || "25");
       const seed = parseInt(fields.seed?.[0] || "42");
       const width = parseInt(fields.width?.[0] || "1024");

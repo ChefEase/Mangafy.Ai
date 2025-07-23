@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     seed = 0,
     custom_width = 1024,
     custom_height = 1024,
-    guidance_scale = 7,
+    guidance_scale = 13.5,
     num_inference_steps = 28,
     sampler = "Euler a",
     aspect_ratio_selector = "896 x 1152",
