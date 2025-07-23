@@ -70,7 +70,7 @@ export default function CoverGenerator() {
         negative_prompt: 'text errors, blurry, watermark, deformed, bad anatomy',
         width: 1008,
         height: 1792,
-        guidance_scale: 8.5
+        guidance_scale: 5
       });
   
       let imageUrl: string;
