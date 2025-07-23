@@ -41,8 +41,8 @@ export default function TemplatesPage() {
   const router = useRouter();
 
   const handleApplyTemplate = (content: string) => {
-    localStorage.setItem("script-content", content);
-    router.push("/script-writing");
+    localStorage.setItem("selected-template", content);
+    router.push("/script-writing?source=template");
   };
 
   return (
