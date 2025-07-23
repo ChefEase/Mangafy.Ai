@@ -512,12 +512,12 @@ if (typeof window !== 'undefined') {
         canvasRef.current.width = 2480;
         canvasRef.current.height = 3508;
       }
-      const savedScript = localStorage.getItem("script-content");
-      const selectedTemplate = localStorage.getItem("selected-template");
+      const savedScript = localStorage.getItem("saved-script");
+      const selectedTemplate = localStorage.getItem("script-content");
       // Fix: Ensure setContent always receives a string, never null
       console.log("selectedTemplate", selectedTemplate);
 console.log("savedScript", savedScript);
-      const initialContent = savedScript || selectedTemplate || "";
+      const initialContent = selectedTemplate || savedScript || "";
       setContent(initialContent);
       console.log("Loaded initial script content:", initialContent);
 
