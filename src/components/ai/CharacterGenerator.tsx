@@ -15,7 +15,7 @@ export default function CharacterGenerator() {
     negative_prompt: 'nsfw, text, deformed, mutated',
     textStyle: 'anime',
     imageStyle: 'Ghibli',
-    guidance_scale: 17,
+    guidance_scale: 13.5,
     num_inference_steps: 25,
     seed: 42,
     width: 1024,
