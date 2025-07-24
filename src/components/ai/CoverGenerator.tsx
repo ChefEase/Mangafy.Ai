@@ -10,7 +10,7 @@ const artStyles = {
   'My Hero Academia': `A colorful and action-packed cover with bold linework and sharp highlights. The character is drawn in **My Hero Academia art style**, with exaggerated expressions and detailed shading. High-energy pose, dynamic perspective, and speed lines in the background. The background is present but not overly detailed.`,
   'Dandadan': `A surreal and highly detailed manga cover in **Dandadan art style**. The colors are striking, with dramatic lighting and an eerie, almost chaotic feel. The character is drawn in a dramatic pose, surrounded by supernatural energy. The background has a mix of realism and abstract shapes.`,
   'Quintessential Quintuplets': `A soft and romantic manga cover in **Quintessential Quintuplets art style**. The character has expressive and delicate facial features with bright, pastel tones. The background is light and warm, giving a dreamy aesthetic. The focus is on the character’s emotions rather than action.`,
-  'One Piece': `A bold and vibrant manga cover in **One Piece art style**. The characters have expressive, exaggerated features with strong outlines. The background is lively, full of movement and adventure. The scene has a slight comic-like exaggeration, with a fun, action-packed feel.`,
+  'One Piece': `A bold and vibrant manga cover in **One Piece art style**. The character has expressive, exaggerated features with strong outlines. The background is a little lively. The scene has a slight comic-like exaggeration, with a slight fun, action-packed feel.`,
   'Jujutsu Kaisen': `A dark and intense manga cover in **Jujutsu Kaisen art style**. The shading is heavy, with deep shadows and a mix of soft and hard highlights. The character is in a battle-ready stance, surrounded by cursed energy effects. The background is moody and atmospheric, adding tension to the scene.`,
   'Tokyo Revengers': `A stylish and modern manga cover in **Tokyo Revengers art style**. The colors are semi-muted with a strong focus on street aesthetics. The character is either standing confidently or in a mid-action shot, with a slight blur to add motion. The background is city-themed, resembling gang rivalry settings.`
 };
@@ -130,7 +130,7 @@ export default function CoverGenerator() {
         placeholder="Add negative prompt keywords (e.g. Luffy, straw hat, watermark)"
         className="negative-prompt-input"
       />
-      
+
       <select value={selectedStyle} onChange={(e) => setSelectedStyle(e.target.value)}>
         {Object.keys(artStyles).map((style) => (
           <option key={style} value={style}>
