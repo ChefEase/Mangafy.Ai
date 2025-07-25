@@ -37,15 +37,23 @@ const isSending = useRef(false); // Lock to prevent concurrent requests
     
         const chatData = await chatRes.json();
         const messageData = await messageRes.json();
-        setChatRecords(chatData.records || []);
-        setMessageRecords(messageData.records || []);
+        const userId = localStorage.getItem("userId");
+
+const filteredChats = (chatData.records || []).filter(
+  (record: any) => record.fields.userId === userId
+);
+const filteredMessages = (messageData.records || []).filter(
+  (record: any) => record.fields.userId === userId
+);
+        setChatRecords(filteredChats);
+        setMessageRecords(filteredMessages);
 
         if (!chatData.records || !messageData.records) {
           console.error("Failed to load records");
           return;
         }
 
-        const chats: Chat[] = chatData.records.map((record: any) => ({
+        const chats: Chat[] = filteredChats.map((record: any) => ({
           id: record.id,
           title: record.fields.title || 'Untitled Chat',
           createdAt: record.fields.createdAt ? new Date(record.fields.createdAt) : new Date(),
@@ -53,7 +61,7 @@ const isSending = useRef(false); // Lock to prevent concurrent requests
 
         }));
     
-        const messages: Message[] = messageData.records.map((record: any) => ({
+        const messages: Message[] = filteredMessages.map((record: any) => ({
           id: record.id,
           chatId: record.fields.chatId,
           role: record.fields.role,
