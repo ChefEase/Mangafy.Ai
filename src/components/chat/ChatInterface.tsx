@@ -321,6 +321,7 @@ const messages: Message[] = messageRecords
               content: assistantMessage.content,
               imageUrl: '',
               createdAt: assistantMessage.createdAt.toISOString(),
+              userId, // ✅ This is the fix!
             },
           }),
         });
