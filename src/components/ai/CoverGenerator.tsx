@@ -1,21 +1,28 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { aiService } from '@/services/aiService';
-import './styles/coverGenerator.css';
 import { useCredits } from '@/context/CreditContext';
 import { CharacterService } from '@/services/CharacterService';
+import './styles/coverGenerator.css';
 
 const artStyles = {
- 'Vinland Saga': `anime, vinland saga art style, dramatic, bold linework, sharp eyes, expressive poses, snowy battlefield, nordic theme, cel-shading, high contrast, dynamic perspective`,
- 'The Promised Neverland': `anime, promised neverland art style, cinematic, soft shading, childlike features, eerie atmosphere, candlelight, ruins, deep shadows, symbolic imagery, tension`,
+  'Vinland Saga': `anime, vinland saga art style, dramatic, bold linework, sharp eyes, expressive poses, snowy battlefield, nordic theme, cel-shading, high contrast, dynamic perspective`,
+  'The Promised Neverland': `anime, promised neverland art style, cinematic, soft shading, childlike features, eerie atmosphere, candlelight, ruins, deep shadows, symbolic imagery, tension`,
   'Dandadan': `surreal, high-detail, Dandadan art style, dramatic lighting, chaotic atmosphere, supernatural energy, dynamic poses, abstract shapes, vivid color, anime manga`,
   'Quintessential Quintuplets': `soft, romantic, manga cover, Quintessential Quintuplets art style, delicate features, pastel tones, dreamy, warm background, emotional focus, anime romance`,
   'Jujutsu Kaisen': `dark, intense, Jujutsu Kaisen art style, manga cover, heavy shading, deep shadows, battle-ready stance, cursed energy, moody atmosphere, tension, gritty, cinematic anime`,
   'Tokyo Revengers': `stylish, modern, anime manga cover, Tokyo Revengers art style, semi-muted colors, street aesthetic, confident pose, motion blur, city background, gang theme, action shot`,
   'Comic Book (Marvel/DC)': `comic book art style, Marvel, DC Comics, bold lines, dramatic lighting, heroic poses, halftone shading, vibrant color, dynamic action`,
-  'Custom Art Style': '', // Placeholder for user-defined styles
+  'Custom Art Style': '',
 };
 
+const textEffects = ['None', 'Shadow', 'Stroke', '3D'];
+const advancedTextOptions = ['Graffiti', 'Neon Glow', 'Manga SFX', 'Cyberpunk Glitch', 'Ancient Runes'];
+const fontOptions = [
+  'Comic Sans MS', 'Bangers', 'Luckiest Guy', 'Fredoka One', 'Chewy', 'Indie Flower', 'Permanent Marker', 'Baloo 2', 'Boogaloo', 'Bubblegum Sans', 'Rubik Wet Paint',
+  'Impact', 'Oswald', 'Bebas Neue', 'Anton', 'Archivo Black', 'Montserrat', 'Titillium Web', 'Russo One', 'Black Ops One', 'League Spartan',
+  'Pacifico', 'Lobster', 'Amatic SC', 'Satisfy', 'Great Vibes', 'Shadows Into Light', 'Dancing Script', 'Caveat', 'Gloria Hallelujah', 'Abril Fatface'
+];
 
 export default function CoverGenerator() {
   const { credits, deductCredits, addCredits } = useCredits();
@@ -26,27 +33,27 @@ export default function CoverGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [negativePrompt, setNegativePrompt] = useState('');
-  const COVER_COST = 10;
+
   const [textOverlay, setTextOverlay] = useState('');
   const [textPosition, setTextPosition] = useState('bottom center');
   const [textColor, setTextColor] = useState('white');
-  const [textFont, setTextFont] = useState('serif');
+  const [textFont, setTextFont] = useState('Comic Sans MS');
+  const [advancedText, setAdvancedText] = useState(false);
+  const [advancedTextStyle, setAdvancedTextStyle] = useState('Graffiti');
+  const [textEffect, setTextEffect] = useState('None');
+  const [fontSize, setFontSize] = useState(60);
+  const [textRotation, setTextRotation] = useState(0);
 
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const COVER_COST = 10;
 
   function isBlob(value: any): value is Blob {
     return value && typeof value === 'object' && typeof value.arrayBuffer === 'function';
   }
 
   const generateCover = async () => {
-    if (!title.trim()) {
-      setError("Please enter a cover description");
-      return;
-    }
-
-    if (credits < COVER_COST) {
-      setError(`You need ${COVER_COST} credits to generate cover art`);
-      return;
-    }
+    if (!title.trim()) return setError("Please enter a cover description");
+    if (credits < COVER_COST) return setError(`You need ${COVER_COST} credits to generate cover art`);
 
     setIsGenerating(true);
     setError(null);
@@ -64,20 +71,14 @@ export default function CoverGenerator() {
         return acc.replace(regex, character.description);
       }, title);
 
-      const styleDescription =
-        selectedStyle === 'Custom Art Style'
-          ? `A manga cover in a unique, user-defined art style: ${customStyleText}`
-          : artStyles[selectedStyle as keyof typeof artStyles];
+      const styleDescription = selectedStyle === 'Custom Art Style'
+        ? `A manga cover in a unique, user-defined art style: ${customStyleText}`
+        : artStyles[selectedStyle as keyof typeof artStyles];
 
-          const prompt = `
-          Manga cover in the style of ${selectedStyle}.
-          ${styleDescription}
-          Scene description: "${processedTitle}".
-          Add visible title text: "${textOverlay}".
-          Font: ${textFont}, color: ${textColor}, position: ${textPosition}.
-          Ensure title text is readable and integrated into the artwork.
-          High contrast, detailed composition.
-        `;
+      const prompt = `Manga cover in the style of ${selectedStyle}.
+      ${styleDescription}
+      Scene description: "${processedTitle}".
+      High contrast, detailed composition.`;
 
       const imageBlob = await aiService.generateTextToImageFluxDev({
         prompt,
@@ -85,7 +86,7 @@ export default function CoverGenerator() {
         negative_prompt: negativePrompt || "text errors, blurry, watermark, deformed, bad anatomy",
         width: 1008,
         height: 1792,
-        guidance_scale: 13.5
+        guidance_scale: 13.5,
       });
 
       let imageUrl: string;
@@ -99,7 +100,6 @@ export default function CoverGenerator() {
 
       setCoverImage(imageUrl);
     } catch (error: any) {
-      console.error('Cover generation error:', error);
       if (creditsWereDeducted) await addCredits(COVER_COST);
       setError(error.message || "Cover generation failed. Credits refunded. Try again.");
     } finally {
@@ -107,95 +107,325 @@ export default function CoverGenerator() {
     }
   };
 
+  const drawCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas || !coverImage) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const image = new Image();
+    image.src = coverImage;
+    image.onload = () => {
+      canvas.width = image.width;
+      canvas.height = image.height;
+      ctx.drawImage(image, 0, 0);
+
+      if (!textOverlay) return;
+const lines = textOverlay.split('\n');
+    let size = fontSize;
+    ctx.textAlign = textPosition.includes('left') ? 'left' : textPosition.includes('right') ? 'right' : 'center';
+    ctx.textBaseline = 'top'; // So we can adjust Y more precisely
+  
+    // Set font to check heights
+    ctx.font = `${size}px '${textFont}', sans-serif`;
+    const lineHeight = size + 10;
+    const totalHeight = lines.length * lineHeight;
+  
+    // Calculate Y based on vertical alignment
+    let y = 0;
+    if (textPosition.includes('top')) {
+      y = 40;
+    } else if (textPosition.includes('bottom')) {
+      y = canvas.height - totalHeight - 40;
+    } else {
+      y = (canvas.height - totalHeight) / 2;
+    }
+  
+    // Calculate X based on alignment
+    const calcX = () => {
+      if (textPosition.includes('left')) return 40;
+      if (textPosition.includes('right')) return canvas.width - 40;
+      return canvas.width / 2;
+    };
+    const x = calcX();
+  
+    // Inside drawCanvas()
+
+lines.forEach((line, i) => {
+  const finalLine = line;
+  if (advancedText && advancedTextStyle === 'Manga SFX') {
+  const chars = finalLine.split('');
+
+  const canvasW = canvas.width;
+  const canvasH = canvas.height;
+
+  // Respect textPosition
+  let centerX = canvasW / 2;
+  if (textPosition.includes('left')) centerX = 200;
+  if (textPosition.includes('right')) centerX = canvasW - 200;
+
+  let baseY = canvasH / 2;
+  if (textPosition.includes('top')) baseY = 250;
+  if (textPosition.includes('bottom')) baseY = canvasH - 250;
+
+  const arcHeight = 200;
+
+  let totalWidth = 0;
+  const scales: number[] = [];
+
+  for (let i = 0; i < chars.length; i++) {
+    const scale = 0.8 + (i / chars.length) * 1.2;
+    scales.push(scale);
+    ctx.font = `bold ${fontSize * scale}px '${textFont}', sans-serif`;
+    totalWidth += ctx.measureText(chars[i]).width;
+  }
+
+  let offsetX = centerX - totalWidth / 2;
+
+  for (let i = 0; i < chars.length; i++) {
+    const char = chars[i];
+    const scale = scales[i];
+    ctx.font = `bold ${fontSize * scale}px '${textFont}', sans-serif`;
+    const charWidth = ctx.measureText(char).width;
+
+    const percent = i / (chars.length - 1 || 1);
+    const angle = Math.PI * percent;
+    const y = baseY - Math.sin(angle) * arcHeight;
+    const x = offsetX;
+
+    ctx.save();
+    ctx.translate(x + charWidth / 2, y);
+    ctx.rotate((angle - Math.PI / 2) * 0.5);
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = 'white';
+    ctx.strokeText(char, 0, 0);
+    ctx.fillStyle = textColor;
+    ctx.fillText(char, 0, 0);
+    ctx.restore();
+
+    offsetX += charWidth;
+  }
+
+  return; // ✅ skip default text drawing
+}
+
+  let currentSize = size;
+  ctx.font = `${currentSize}px '${textFont}', sans-serif`;
+  let textWidth = ctx.measureText(line).width;
+  const maxWidth = canvas.width - 80;
+
+  if (textWidth > maxWidth) {
+    const scale = maxWidth / textWidth;
+    currentSize = Math.floor(currentSize * scale);
+    ctx.font = `${currentSize}px '${textFont}', sans-serif`;
+  }
+
+  const lineY = y + i * (currentSize + 10);
+
+  ctx.save();
+  ctx.translate(x, lineY);
+  ctx.rotate((textRotation * Math.PI) / 180);
+  ctx.textAlign = textPosition.includes('left') ? 'left' :
+                  textPosition.includes('right') ? 'right' : 'center';
+
+  // Standard effects
+  if (textEffect === 'Shadow') {
+    ctx.shadowColor = 'black';
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetX = 4;
+    ctx.shadowOffsetY = 4;
+  }
+
+  if (textEffect === '3D') {
+    for (let j = 0; j < 5; j++) {
+      ctx.fillStyle = 'black';
+      ctx.fillText(finalLine, j, j);
+    }
+  }
+
+  if (textEffect === 'Stroke') {
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = 'black';
+    ctx.strokeText(finalLine, 0, 0);
+  }
+
+  // Advanced effects
+  if (advancedText) {
+    switch (advancedTextStyle) {
+      case 'Neon Glow':
+        ctx.shadowColor = textColor;
+        ctx.shadowBlur = 50;
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = textColor;
+        ctx.strokeText(finalLine, 0, 0);
+        break;
+    
+      case 'Graffiti':
+        ctx.save();
+        ctx.rotate(-0.05);
+        ctx.shadowColor = 'black';
+        ctx.shadowBlur = 10;
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#000';
+        ctx.strokeText(finalLine, 0, 0);
+        ctx.fillStyle = textColor;
+        ctx.fillText(finalLine, 0, 0);
+        ctx.restore();
+        break;
+    
+        case 'Manga SFX': {
+          const chars = finalLine.split('');
+        
+          const canvasW = canvas.width;
+          const canvasH = canvas.height;
+        
+          let centerX = canvasW / 2;
+          if (textPosition.includes('left')) centerX = 200;
+          if (textPosition.includes('right')) centerX = canvasW - 200;
+        
+          let baseY = canvasH / 2;
+          if (textPosition.includes('top')) baseY = 250;
+          if (textPosition.includes('bottom')) baseY = canvasH - 250;
+        
+          const arcHeight = 200;
+        
+          let totalWidth = 0;
+          const scales: number[] = [];
+        
+          for (let i = 0; i < chars.length; i++) {
+            const scale = 0.8 + (i / chars.length) * 1.2;
+            scales.push(scale);
+            ctx.font = `bold ${fontSize * scale}px '${textFont}', sans-serif`;
+            totalWidth += ctx.measureText(chars[i]).width;
+          }
+        
+          let offsetX = centerX - totalWidth / 2;
+        
+          for (let i = 0; i < chars.length; i++) {
+            const char = chars[i];
+            const scale = scales[i];
+            ctx.font = `bold ${fontSize * scale}px '${textFont}', sans-serif`;
+            const charWidth = ctx.measureText(char).width;
+        
+            const percent = i / (chars.length - 1 || 1);
+            const angle = Math.PI * percent;
+            const y = baseY - Math.sin(angle) * arcHeight;
+            const x = offsetX;
+        
+            ctx.save();
+            ctx.translate(x + charWidth / 2, y);
+            ctx.rotate((angle - Math.PI / 2) * 0.5);
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = 'white';
+            ctx.strokeText(char, 0, 0);
+            ctx.fillStyle = textColor;
+            ctx.fillText(char, 0, 0);
+            ctx.restore();
+        
+            offsetX += charWidth;
+          }
+        
+          return;
+        }
+            case 'Cyberpunk Glitch': {
+          const jitter = 2 + Math.random() * 2;
+          ctx.save();
+        
+          // Horizontal RGB channel split
+          ctx.fillStyle = 'magenta';
+          ctx.fillText(finalLine, -jitter, -1);
+          ctx.fillStyle = 'cyan';
+          ctx.fillText(finalLine, jitter, 1);
+          ctx.fillStyle = 'lime';
+          ctx.fillText(finalLine, 0, jitter * 0.5);
+        
+          // Main text
+          ctx.shadowColor = '#0ff';
+          ctx.shadowBlur = 12;
+          ctx.globalAlpha = 0.9;
+          ctx.fillStyle = textColor;
+          ctx.fillText(finalLine, 0, 0);
+        
+          // Glitch slices
+          for (let i = 0; i < 3; i++) {
+            const sliceY = Math.random() * currentSize;
+            const sliceHeight = 4 + Math.random() * 6;
+            const offset = (Math.random() - 0.5) * 10;
+        
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(-200, sliceY, 400, sliceHeight);
+            ctx.clip();
+            ctx.translate(offset, 0);
+            ctx.fillText(finalLine, 0, 0);
+            ctx.restore();
+          }
+        
+          ctx.restore();
+          break;
+        }
+        
+    
+      case 'Ancient Runes':
+        ctx.save();
+        ctx.rotate(-0.08);
+        ctx.fillStyle = '#228B22'; // forest green
+        ctx.shadowColor = '#013220';
+        ctx.shadowBlur = 8;
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'darkgreen';
+        ctx.strokeText(finalLine, 0, 0);
+        ctx.fillText(finalLine, 0, 0);
+        ctx.font = `20px sans-serif`;
+        ctx.fillText('ᚠ', -currentSize / 2, 20); // basic rune glyph
+        ctx.restore();
+        break;
+    }
+  }
+
+  ctx.fillStyle = textColor;
+  ctx.fillText(finalLine, 0, 0);
+  ctx.restore();
+
+  // Reset shadow
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+});
+        };
+  };
+
+  useEffect(() => {
+    drawCanvas();
+  }, [coverImage, textOverlay, textEffect, advancedText, advancedTextStyle, textFont, textRotation, textColor, textPosition, fontSize]);
+
   const downloadCover = () => {
-    if (!coverImage) return;
+    if (!canvasRef.current) return;
     const link = document.createElement('a');
-    link.href = coverImage;
-    link.download = `generated_cover.png`;
-    document.body.appendChild(link);
+    link.href = canvasRef.current.toDataURL();
+    link.download = 'generated_cover.png';
     link.click();
-    document.body.removeChild(link);
   };
 
   return (
     <div className="cover-generator">
       {error && <div className="error-message">{error}</div>}
 
-      <input
-        type="text"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="Describe the cover scene..."
-      />
+      <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Describe the cover scene..." />
+      <input value={negativePrompt} onChange={(e) => setNegativePrompt(e.target.value)} placeholder="Negative keywords (optional)" className="negative-prompt-input" />
 
-      <input
-        type="text"
-        value={negativePrompt}
-        onChange={(e) => setNegativePrompt(e.target.value)}
-        placeholder="Negative prompt keywords (e.g. Luffy, watermark)"
-        className="negative-prompt-input"
-      />
-
+      <label>
+        Art Style
       <select value={selectedStyle} onChange={(e) => setSelectedStyle(e.target.value)}>
         {Object.keys(artStyles).map((style) => (
-          <option key={style} value={style}>
-            {style}
-          </option>
+          <option key={style} value={style}>{style}</option>
         ))}
       </select>
-
+      </label>
       {selectedStyle === 'Custom Art Style' && (
-        <input
-          type="text"
-          value={customStyleText}
-          onChange={(e) => setCustomStyleText(e.target.value)}
-          placeholder="Describe your custom art style"
-          className="custom-style-input"
-        />
+        <input value={customStyleText} onChange={(e) => setCustomStyleText(e.target.value)} placeholder="Describe your custom style" />
       )}
-  <input
-        type="text"
-        value={textOverlay}
-        onChange={(e) => setTextOverlay(e.target.value)}
-        placeholder="Text to appear on the cover (e.g. The Crimson Blade)"
-        className="text-overlay-input"
-      />
 
-      <div className="form-group">
-        <label>Text Position</label>
-        <select value={textPosition} onChange={(e) => setTextPosition(e.target.value)}>
-          <option value="top left">Top Left</option>
-          <option value="top center">Top Center</option>
-          <option value="top right">Top Right</option>
-          <option value="bottom left">Bottom Left</option>
-          <option value="bottom center">Bottom Center</option>
-          <option value="bottom right">Bottom Right</option>
-        </select>
-      </div>
-
-      <div className="form-group">
-        <label>Text Font</label>
-        <select value={textFont} onChange={(e) => setTextFont(e.target.value)}>
-          <option value="serif">Serif</option>
-          <option value="sans-serif">Sans-serif</option>
-          <option value="handwritten">Handwritten</option>
-          <option value="fantasy">Fantasy</option>
-          <option value="gothic">Gothic</option>
-        </select>
-      </div>
-
-      <div className="form-group">
-        <label>Text Color</label>
-        <select value={textColor} onChange={(e) => setTextColor(e.target.value)}>
-          <option value="white">White</option>
-          <option value="black">Black</option>
-          <option value="red">Red</option>
-          <option value="yellow">Yellow</option>
-          <option value="blue">Blue</option>
-        </select>
-      </div>
-      
-      <button
+<button
         onClick={generateCover}
         disabled={isGenerating || credits < COVER_COST}
         className="generate-button"
@@ -208,10 +438,74 @@ export default function CoverGenerator() {
         )}
       </button>
 
+
       {coverImage && (
-        <div className="cover-result">
-          <img src={coverImage} alt="Generated cover art" />
-          <button onClick={downloadCover}>Download Cover</button>
+        <div className="cover-preview-wrapper" style={{ marginTop: '2rem' }}>
+         <canvas ref={canvasRef} className="cover-canvas" />
+          <div className="text-editor-panel">
+          <label>
+            Overlay Text
+            <textarea
+              className="modern-textarea"
+              rows={3}
+              value={textOverlay}
+              onChange={(e) => setTextOverlay(e.target.value)}
+              placeholder="Enter overlay text"
+            />
+          </label>
+
+          <label>
+            Text Position
+            <select value={textPosition} onChange={(e) => setTextPosition(e.target.value)}>
+              <option value="top left">Top Left</option>
+              <option value="top center">Top Center</option>
+              <option value="top right">Top Right</option>
+              <option value="bottom left">Bottom Left</option>
+              <option value="bottom center">Bottom Center</option>
+              <option value="bottom right">Bottom Right</option>
+            </select>
+            </label>
+
+            <label>
+              Text Font
+            <select value={textFont} onChange={(e) => setTextFont(e.target.value)}>
+              {fontOptions.map(font => <option key={font} value={font}>{font}</option>)}
+            </select>
+            </label>
+            <label>Font Size: <input type="range" min="50" max="200" value={fontSize} onChange={(e) => setFontSize(+e.target.value)} /></label>
+            <label>Rotation: <input type="range" min={-45} max={45} value={textRotation} onChange={(e) => setTextRotation(+e.target.value)} /></label>
+
+            <label>
+              Text Color
+            <select value={textColor} onChange={(e) => setTextColor(e.target.value)}>
+              <option value="white">White</option>
+              <option value="black">Black</option>
+              <option value="red">Red</option>
+              <option value="yellow">Yellow</option>
+              <option value="blue">Blue</option>
+            </select>
+            </label>
+
+            <label>
+              Text Effect
+            <select value={textEffect} onChange={(e) => setTextEffect(e.target.value)}>
+              {textEffects.map(effect => <option key={effect} value={effect}>{effect}</option>)}
+            </select>
+            </label>
+            <label>
+              <input type="checkbox" checked={advancedText} onChange={() => setAdvancedText(!advancedText)} /> 
+              Advanced Effect: On     
+            </label>
+
+            <label>
+            {advancedText && (
+              <select value={advancedTextStyle} onChange={(e) => setAdvancedTextStyle(e.target.value)}>
+                {advancedTextOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+              </select>
+            )}
+            </label>
+            <button onClick={downloadCover}>Download</button>
+          </div>
         </div>
       )}
     </div>

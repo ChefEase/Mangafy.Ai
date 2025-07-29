@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Comic+Sans+MS&family=Bebas+Neue&family=Impact&family=Lobster&family=Pacifico&family=Oswald&family=Bangers&family=Luckiest+Guy&family=Fredoka+One&family=Chewy&family=Indie+Flower&family=Permanent+Marker&family=Baloo+2&family=Boogaloo&family=Rubik+Wet+Paint&family=Bubblegum+Sans&family=Anton&family=Archivo+Black&family=Montserrat&family=Titillium+Web&family=Russo+One&family=Black+Ops+One&family=League+Spartan:wght@900&family=Amatic+SC&family=Satisfy&family=Great+Vibes&family=Shadows+Into+Light&family=Dancing+Script&family=Caveat&family=Gloria+Hallelujah&family=Abril+Fatface&display=swap');
 .cover-generator {
     display: flex;
     flex-direction: column;
@@ -206,6 +207,71 @@
   font-size: 1rem;
 }
 
+.cover-preview-wrapper {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.cover-canvas {
+  max-width: 350px;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.text-editor-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background-color: #1c1c2c;
+  padding: 1.5rem;
+  border-radius: 10px;
+  max-width: 400px;
+  width: 100%;
+}
+
+.text-control-group {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.text-slider {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.text-advanced-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.modern-textarea {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  border-radius: 10px;
+  background-color: #252532;
+  border: 2px solid #444;
+  color: #fff;
+  resize: vertical;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+.modern-textarea:focus {
+  border-color: #6c5ce7;
+  box-shadow: 0 0 8px rgba(108, 92, 231, 0.5);
+}
+
 @media (max-width: 600px) {
   .cover-generator {
     padding: 1rem;
@@ -225,6 +291,20 @@
   button {
     padding: 10px 20px;
     font-size: 0.9rem;
+  }
+
+  .cover-preview-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .text-control-group {
+    flex-direction: column;
+  }
+
+  .text-editor-panel {
+    width: 100%;
+    padding: 1rem;
   }
 
   .cover-result img {
