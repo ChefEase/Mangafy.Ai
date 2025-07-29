@@ -6,13 +6,13 @@ import { useCredits } from '@/context/CreditContext';
 import { CharacterService } from '@/services/CharacterService';
 
 const artStyles = {
- 'Vinland Saga': `anime, vinland saga style, dramatic, bold linework, sharp eyes, expressive poses, snowy battlefield, nordic theme, cel-shading, high contrast, dynamic perspective`,
- 'The Promised Neverland': `anime, promised neverland style, cinematic, soft shading, childlike features, eerie atmosphere, candlelight, ruins, deep shadows, symbolic imagery, tension`,
-  'Dandadan': `surreal, high-detail, Dandadan style, dramatic lighting, chaotic atmosphere, supernatural energy, dynamic poses, abstract shapes, vivid color, anime manga`,
-  'Quintessential Quintuplets': `soft, romantic, manga cover, Quintessential Quintuplets style, delicate features, pastel tones, dreamy, warm background, emotional focus, anime romance`,
-  'Jujutsu Kaisen': `dark, intense, Jujutsu Kaisen style, manga cover, heavy shading, deep shadows, battle-ready stance, cursed energy, moody atmosphere, tension, gritty, cinematic anime`,
-  'Tokyo Revengers': `stylish, modern, anime manga cover, Tokyo Revengers style, semi-muted colors, street aesthetic, confident pose, motion blur, city background, gang theme, action shot`,
-  'Comic Book (Marvel/DC)': `comic book style, Marvel, DC Comics, bold lines, dramatic lighting, heroic poses, halftone shading, vibrant color, dynamic action`,
+ 'Vinland Saga': `anime, vinland saga art style, dramatic, bold linework, sharp eyes, expressive poses, snowy battlefield, nordic theme, cel-shading, high contrast, dynamic perspective`,
+ 'The Promised Neverland': `anime, promised neverland art style, cinematic, soft shading, childlike features, eerie atmosphere, candlelight, ruins, deep shadows, symbolic imagery, tension`,
+  'Dandadan': `surreal, high-detail, Dandadan art style, dramatic lighting, chaotic atmosphere, supernatural energy, dynamic poses, abstract shapes, vivid color, anime manga`,
+  'Quintessential Quintuplets': `soft, romantic, manga cover, Quintessential Quintuplets art style, delicate features, pastel tones, dreamy, warm background, emotional focus, anime romance`,
+  'Jujutsu Kaisen': `dark, intense, Jujutsu Kaisen art style, manga cover, heavy shading, deep shadows, battle-ready stance, cursed energy, moody atmosphere, tension, gritty, cinematic anime`,
+  'Tokyo Revengers': `stylish, modern, anime manga cover, Tokyo Revengers art style, semi-muted colors, street aesthetic, confident pose, motion blur, city background, gang theme, action shot`,
+  'Comic Book (Marvel/DC)': `comic book art style, Marvel, DC Comics, bold lines, dramatic lighting, heroic poses, halftone shading, vibrant color, dynamic action`,
   'Custom Art Style': '', // Placeholder for user-defined styles
 };
 
@@ -27,6 +27,11 @@ export default function CoverGenerator() {
   const [error, setError] = useState<string | null>(null);
   const [negativePrompt, setNegativePrompt] = useState('');
   const COVER_COST = 10;
+  const [textOverlay, setTextOverlay] = useState('');
+  const [textPosition, setTextPosition] = useState('bottom center');
+  const [textColor, setTextColor] = useState('white');
+  const [textFont, setTextFont] = useState('serif');
+
 
   function isBlob(value: any): value is Blob {
     return value && typeof value === 'object' && typeof value.arrayBuffer === 'function';
@@ -64,13 +69,15 @@ export default function CoverGenerator() {
           ? `A manga cover in a unique, user-defined art style: ${customStyleText}`
           : artStyles[selectedStyle as keyof typeof artStyles];
 
-      const prompt = `
-        Manga cover inspired by **${selectedStyle}**.
-        ${styleDescription}
-        Scene description: **"${processedTitle}"**.
-        The title should appear in a **bold, stylized font**.
-        High contrast, detailed composition.
-      `;
+          const prompt = `
+          Manga cover in the style of ${selectedStyle}.
+          ${styleDescription}
+          Scene description: "${processedTitle}".
+          Add visible title text: "${textOverlay}".
+          Font: ${textFont}, color: ${textColor}, position: ${textPosition}.
+          Ensure title text is readable and integrated into the artwork.
+          High contrast, detailed composition.
+        `;
 
       const imageBlob = await aiService.generateTextToImageFluxDev({
         prompt,
@@ -146,7 +153,48 @@ export default function CoverGenerator() {
           className="custom-style-input"
         />
       )}
+  <input
+        type="text"
+        value={textOverlay}
+        onChange={(e) => setTextOverlay(e.target.value)}
+        placeholder="Text to appear on the cover (e.g. The Crimson Blade)"
+        className="text-overlay-input"
+      />
 
+      <div className="form-group">
+        <label>Text Position</label>
+        <select value={textPosition} onChange={(e) => setTextPosition(e.target.value)}>
+          <option value="top left">Top Left</option>
+          <option value="top center">Top Center</option>
+          <option value="top right">Top Right</option>
+          <option value="bottom left">Bottom Left</option>
+          <option value="bottom center">Bottom Center</option>
+          <option value="bottom right">Bottom Right</option>
+        </select>
+      </div>
+
+      <div className="form-group">
+        <label>Text Font</label>
+        <select value={textFont} onChange={(e) => setTextFont(e.target.value)}>
+          <option value="serif">Serif</option>
+          <option value="sans-serif">Sans-serif</option>
+          <option value="handwritten">Handwritten</option>
+          <option value="fantasy">Fantasy</option>
+          <option value="gothic">Gothic</option>
+        </select>
+      </div>
+
+      <div className="form-group">
+        <label>Text Color</label>
+        <select value={textColor} onChange={(e) => setTextColor(e.target.value)}>
+          <option value="white">White</option>
+          <option value="black">Black</option>
+          <option value="red">Red</option>
+          <option value="yellow">Yellow</option>
+          <option value="blue">Blue</option>
+        </select>
+      </div>
+      
       <button
         onClick={generateCover}
         disabled={isGenerating || credits < COVER_COST}
