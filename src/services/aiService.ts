@@ -289,7 +289,7 @@ export class AIService {
 }
 
 private generateSceneSpecificPrompt(scene: string, styleConfig: ArtStyleConfig): string {
-  return `${styleConfig.prompt}`
+  return `${styleConfig.prompt}, ${scene}`
 }
 private mapToClosestAspectRatio(width: number, height: number): string {
   const ratioMap = [
