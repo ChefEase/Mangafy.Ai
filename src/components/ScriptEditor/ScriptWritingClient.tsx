@@ -848,6 +848,7 @@ const AnimeStyleSelector = ({ selectedStyle, onChange }: StyleSelectorProps) => 
       <option value="dandadaan">Dandadan (Yukinobu Tatsu)</option>
       <option value="quintessential-quintuplets">Quintessential Quintuplets (Negi Haruba)</option>
       <option value="tokyo-revengers">Tokyo Revengers (Ken Wakui)</option>
+      <option value="comic-book">Comic Book (Marvel/DC)</option> {/* ✅ New Style */}
     </select>
   </div>
 );

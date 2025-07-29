@@ -42,7 +42,7 @@ export default function SuccessClient() {
     if (!loading) {
       const timer = setTimeout(() => {
         router.push("/project-management");
-      }, 15000);
+      }, 5000);
 
       return () => clearTimeout(timer);
     }

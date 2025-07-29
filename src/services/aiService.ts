@@ -58,35 +58,46 @@ export class AIService {
   // Art style configurations without model references
   private readonly ART_STYLES = {
     default: {
-      prompt: `Black and white manga manga art style`,
-      negative_prompt: "color, 3D, CGI, photorealistic, painterly"
+      prompt: "black and white manga, screentone shading, hand-drawn ink lines, minimal color, Japanese comic layout, dramatic paneling",
+      negative_prompt: "color, 3D, CGI, photorealistic, painterly, soft gradients, western comic style"
     },
+  
     "one-piece": {
-      prompt: `One Piece Art Style`,
-      negative_prompt: "photorealistic, 3D, CGI, hyperrealistic, blurred, low detail, child-like drawing, watermark, signature, duplicate heads, text errors, out-of-focus, poorly drawn anatomy, plain background, pastel art style",
+      prompt: "one piece art style, exaggerated expressions, cartoony anatomy, bold black outlines, bright cel-shading, dynamic action poses, whimsical designs, chaotic energy",
+      negative_prompt: "photorealistic, 3D, CGI, hyperrealistic, blurred, low detail, child-like drawing, watermark, signature, duplicate heads, text errors, out-of-focus, poorly drawn anatomy, plain background, pastel art style"
     },
+  
     "jujutsu-kaisen": {
-      prompt: ` jujutsu kaisen art style`,
-      negative_prompt: "bright colors, overly simplified designs, clean digital look",
+      prompt: "jujutsu kaisen art style, dark tone, heavy shadows, cursed energy effects, sharp linework, serious expressions, anime action, gritty atmosphere",
+      negative_prompt: "bright colors, overly simplified designs, clean digital look, soft pastels, cute expressions"
     },
+  
     "my-hero-academia": {
-      prompt: ` My Hero academia art style`,
-      negative_prompt: "realistic, washed-out tones, low detail",
+      prompt: "my hero academia art style, sharp cel-shading, comic-style motion lines, heroic poses, colorful uniforms, expressive faces, bold outlines, dynamic panels",
+      negative_prompt: "realistic, washed-out tones, low detail, grayscale, horror style"
     },
+  
     "dandadan": {
-      prompt: `dandadan art style `,
-      negative_prompt: "orderly, too clean, flat linework",
+      prompt: "dandadan art style, surreal atmosphere, eerie lighting, detailed linework, supernatural elements, chaotic composition, dramatic expressions, anime horror-fantasy fusion",
+      negative_prompt: "orderly, too clean, flat linework, pastel tones, generic backgrounds"
     },
+  
     "quintessential-quintuplets": {
-      prompt: `Quintessential Quintuplets art style`,
-      negative_prompt: "dark themes, excessive contrast, rough inking",
+      prompt: "quintessential quintuplets art style, romantic atmosphere, soft lighting, pastel palette, gentle expressions, clean thin line art, bright warm backgrounds, anime romance vibe",
+      negative_prompt: "dark themes, excessive contrast, rough inking, horror elements, strong shadows"
     },
+  
     "tokyo-revengers": {
-      prompt: `A tokyo revengers art style`,
-      negative_prompt: "clean, overly polished, soft shading, 3D rendering, overly detailed backgrounds",
-    }    // All other art styles remain unchanged...
-} as const;
-
+      prompt: "tokyo revengers art style, urban street vibe, thin line art, confident stances, semi-muted colors, gang fashion, action blur, cityscape backgrounds, gritty youth drama",
+      negative_prompt: "clean, overly polished, soft shading, 3D rendering, overly detailed fantasy backgrounds"
+    },
+  
+    "comic-book": {
+      prompt: "comic book style, Marvel, DC Comics, heroic proportions, bold black outlines, halftone texture, dramatic lighting, vibrant colors, inked shading, dynamic pose, American superhero comics",
+      negative_prompt: "anime, watercolor, grayscale, painterly, photorealistic, manga, screentones"
+    }
+  } as const;
+  
 
   constructor() {
     // Keep your existing constructor logic
@@ -174,7 +185,7 @@ export class AIService {
     seed?:number;
     num_inference_steps?: number; 
   }): Promise<Blob> {
-    const response = await fetch("https://3f297c84228a.ngrok-free.app/generate-image", {
+    const response = await fetch("https://fc08bdaf9ed3.ngrok-free.app/generate-image", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

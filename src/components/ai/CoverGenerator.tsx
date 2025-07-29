@@ -6,14 +6,16 @@ import { useCredits } from '@/context/CreditContext';
 import { CharacterService } from '@/services/CharacterService';
 
 const artStyles = {
-  'Vinland Saga': `A dramatic, high-detail **anime manga cover** inspired by Vinland Saga. Characters are drawn with intense, stylized anime features — sharp eyes, bold linework, and expressive poses. Hair and clothing have clean anime-style rendering with visible inked outlines. The background features Nordic settings like snowy battlefields or wooden longships, drawn in anime cel-shading. The scene is cinematic, with motion lines, high contrast shadows, and dynamic perspective. Emphasize anime aesthetics: big expressive eyes, exaggerated emotion, and stylized proportion.`,
-  'The Promised Neverland': `A cinematic manga cover inspired by **The Promised Neverland**. Characters are illustrated with delicate, childlike features and soft, painterly shading, emphasizing their innocence. The background contrasts this with a dark, unsettling atmosphere — overgrown ruins, dim candlelight, looming silhouettes, or abstract, symbolic imagery (e.g., clocks, cages, wings). Lighting is moody and low-key, with deep shadows and subtle rim highlights. The composition evokes tension, mystery, and quiet dread, blending beauty with a sense of danger and foreboding.`,
-  'Dandadan': `A surreal and highly detailed anime manga cover in **Dandadan** style. The colors are striking, with dramatic lighting and an eerie, almost chaotic feel. The characters are drawn in a dramatic pose, surrounded by supernatural energy. The background has a mix of anime and abstract shapes.`,
-  'Quintessential Quintuplets': `A soft and romantic manga cover in **Quintessential Quintuplets** style. The characters have expressive and delicate facial features with bright, pastel tones. The background is light and warm, giving a dreamy aesthetic. The focus is on the character’s emotions rather than action.`,
-  'Jujutsu Kaisen': `A dark and intense manga cover in **Jujutsu Kaisen** style. The shading is heavy, with deep shadows and a mix of soft and hard highlights. The characters are in a battle-ready stance, surrounded by cursed energy effects. The background is moody and atmospheric, adding tension to the scene.`,
-  'Tokyo Revengers': `A stylish and modern anime manga cover in **Tokyo Revengers** style. The colors are semi-muted with a strong focus on street aesthetics. The characters haave either standing confidently or in a mid-action shot, with a slight blur to add motion. The background is city-themed, resembling gang rivalry settings.`,
+ 'Vinland Saga': `anime, vinland saga style, dramatic, bold linework, sharp eyes, expressive poses, snowy battlefield, nordic theme, cel-shading, high contrast, dynamic perspective`,
+ 'The Promised Neverland': `anime, promised neverland style, cinematic, soft shading, childlike features, eerie atmosphere, candlelight, ruins, deep shadows, symbolic imagery, tension`,
+  'Dandadan': `surreal, high-detail, Dandadan style, dramatic lighting, chaotic atmosphere, supernatural energy, dynamic poses, abstract shapes, vivid color, anime manga`,
+  'Quintessential Quintuplets': `soft, romantic, manga cover, Quintessential Quintuplets style, delicate features, pastel tones, dreamy, warm background, emotional focus, anime romance`,
+  'Jujutsu Kaisen': `dark, intense, Jujutsu Kaisen style, manga cover, heavy shading, deep shadows, battle-ready stance, cursed energy, moody atmosphere, tension, gritty, cinematic anime`,
+  'Tokyo Revengers': `stylish, modern, anime manga cover, Tokyo Revengers style, semi-muted colors, street aesthetic, confident pose, motion blur, city background, gang theme, action shot`,
+  'Comic Book (Marvel/DC)': `comic book style, Marvel, DC Comics, bold lines, dramatic lighting, heroic poses, halftone shading, vibrant color, dynamic action`,
   'Custom Art Style': '', // Placeholder for user-defined styles
 };
+
 
 export default function CoverGenerator() {
   const { credits, deductCredits, addCredits } = useCredits();

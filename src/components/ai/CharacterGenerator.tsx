@@ -166,7 +166,9 @@ console.log(data); // 👀 check structure
       manga: 'black and white manga style, screentones, ink drawing, cel shading',
       western: 'western comic style, bold lines, dynamic shading',
       realistic: 'photorealistic, detailed anatomy, realistic proportions',
-      fantasy: 'fantasy art, digital painting, magical atmosphere'
+      fantasy: 'fantasy art, digital painting, magical atmosphere',
+      comic: 'American comic book style, dynamic poses, strong shadows, inked lines, vibrant colors, dramatic lighting'
+
     };
     return styles[style as keyof typeof styles] || '';
   };
@@ -200,6 +202,7 @@ console.log(data); // 👀 check structure
       <option value="western">Western Comic</option>
       <option value="realistic">Realistic</option>
       <option value="fantasy">Fantasy Art</option>
+      <option value="comic">Comic Book (DC/Marvel)</option> {/* ✅ NEW */}
     </select>
   </div>
 )}
@@ -275,6 +278,7 @@ console.log(data); // 👀 check structure
                 <option>Jojo</option>
                 <option>Line</option>
                 <option>Vector</option>
+                <option>Comic Book</option> {/* ✅ NEW */}
               </select>
             </div>
 
