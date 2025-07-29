@@ -26,15 +26,19 @@ export async function POST(req: Request) {
     console.log("🧠 HF Response:", JSON.stringify(chatCompletion, null, 2));
     return NextResponse.json(chatCompletion.choices?.[0]?.message || { content: "no response" });
   } catch (error: any) {
-    console.error("🔥 Hugging Face API Error:", error);
+    console.error("🔥 Hugging Face API Error:", JSON.stringify(error, null, 2));
 
     if (error instanceof Error && error.message.includes("401")) {
       return NextResponse.json({ error: "Invalid Hugging Face Token" }, { status: 401 });
     }
 
     return NextResponse.json(
-      { error: "Internal Server Error", detail: error.message || error },
+      {
+        error: "Internal Server Error",
+        detail: typeof error === 'object' ? JSON.stringify(error, null, 2) : String(error)
+      },
       { status: 500 }
     );
+    
   }
 }
