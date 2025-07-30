@@ -197,7 +197,7 @@ export class AIService {
         seed: opts.seed ?? Math.floor(Math.random() * 10000000),
         sampler: opts.sampler ?? "Euler a",
         aspect_ratio: opts.aspect_ratio, // fallback default if not mappe
-        num_inference_steps: 30,
+        num_inference_steps: 35,
         style: opts.style,
         quality: opts.quality ?? "Standard v3.1",
         use_upscaler: opts.use_upscaler ?? true,
@@ -291,7 +291,7 @@ export class AIService {
 private generateSceneSpecificPrompt(scene: string, styleConfig: ArtStyleConfig): string {
   return `${styleConfig.prompt}, ${scene}`
 }
-private mapToClosestAspectRatio(width: number, height: number): string {
+public mapToClosestAspectRatio(width: number, height: number): string {
   const ratioMap = [
     { width: 1024, height: 1024, label: "1024 x 1024" },
     { width: 1152, height: 896, label: "1152 x 896" },

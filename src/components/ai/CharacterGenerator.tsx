@@ -12,11 +12,11 @@ export default function CharacterGenerator() {
   const [mode, setMode] = useState<'text' | 'image'>('text');
   const [params, setParams] = useState({
     prompt: '',
-    negative_prompt: 'nsfw, text, deformed, mutated',
+    negative_prompt: 'nsfw, text, deformed, mutated, worst quality',
     textStyle: 'anime',
     imageStyle: 'Ghibli',
     guidance_scale: 13.5,
-    num_inference_steps: 25,
+    num_inference_steps: 35,
     seed: 42,
     width: 1024,
     height: 1820,
@@ -36,16 +36,28 @@ export default function CharacterGenerator() {
       return;
     }
     try {
-      let result;
+      let result: Blob | String;
   
       if (mode === 'text') {
         const fullPrompt = `${params.prompt}, ${getStylePrompt(params.textStyle)}, high quality character design`;
-        result = await aiService.generateTextToImageFluxDev({
+        result = await aiService.generateTextToImage({
           prompt: fullPrompt,
           negative_prompt: params.negative_prompt,
-          steps: 40,
-        });
-      
+          width: params.width,
+          height: params.height,
+          guidance_scale: params.guidance_scale,
+          seed: Math.floor(Math.random() * 2_000_000) + 1,
+          num_inference_steps: 35,
+          sampler: "Euler a",
+          aspect_ratio: aiService.mapToClosestAspectRatio(params.width, params.height),
+          style: "Anime",
+          quality: "Standard v3.1",
+          use_upscaler: true,
+          upscaler_strength: 0.55,
+          upscale_by: 1.5,
+          add_quality_tags: true,
+        }) as Blob | String;
+        
         console.log("result:", result);
         console.log("typeof result:", typeof result);
       
@@ -162,14 +174,23 @@ console.log(data); // 👀 check structure
 
   const getStylePrompt = (style: string) => {
     const styles = {
-      anime: 'anime style, cel-shading, minimalist detail',
-      manga: 'black and white manga style, screentones, ink drawing, cel shading',
-      western: 'western comic style, bold lines, dynamic shading',
-      realistic: 'photorealistic, detailed anatomy, realistic proportions',
-      fantasy: 'fantasy art, digital painting, magical atmosphere',
-      comic: 'American comic book style, dynamic poses, strong shadows, inked lines, vibrant colors, dramatic lighting'
-
-    };
+      vinlandSaga: 'Vinland Saga style, gritty realism, detailed armor and clothing, Norse aesthetic, expressive faces, muted tones',
+      promisedNeverland: 'Promised Neverland style, soft lines, large expressive eyes, eerie lighting, delicate features, suspenseful atmosphere',
+      dandadan: 'Dandadan style, high-energy action, sharp features, intricate supernatural designs, intense motion lines, vivid color pops',
+      quintessentialQuintuplets: 'Quintessential Quintuplets style, romantic comedy aesthetic, bright colors, glossy eyes, soft shading, detailed school uniforms',
+      jujutsuKaisen: 'Jujutsu Kaisen style, edgy linework, modern urban feel, dynamic action poses, cursed energy effects, gritty yet stylish',
+      tokyoRevengers: 'Tokyo Revengers style, sharp and clean line art, gang fashion, expressive emotion, time-travel edge, street-style tone',
+      onePiece: 'One Piece style, exaggerated expressions, cartoonish proportions, vibrant color palette, adventurous and whimsical elements',
+      myHeroAcademia: 'My Hero Academia style, comic-inspired layout, dynamic action poses, flashy powers, clean shading, modern superhero vibe',
+      bleach: 'Bleach style, sleek character designs, flowing clothing, spiritual energy effects, dramatic contrasts, monochrome and color blends',
+      chainsawMan: 'Chainsaw Man style, gritty and raw, chaotic energy, horror-influenced design, sketchy linework, intense emotion',
+      comicBook: 'American comic book style (Marvel/DC), bold outlines, muscular anatomy, dramatic poses, vibrant color blocking, classic superhero aesthetic',
+      waifu: 'Waifu style, ultra-polished anime look, perfect skin, big sparkly eyes, glossy hair, soft lighting, idealized beauty, more appeal',
+      swordArtOnline: 'Sword Art Online style, sleek character designs, glowing digital effects, fantasy-meets-sci-fi armor, ethereal lighting',
+      naruto: 'Naruto style, sharp angular features, chakra effects, ninja gear, hand signs, dynamic motion lines, emotional intensity',
+      dragonBall: 'Dragon Ball style, bold muscles, energy auras, spiky hair, explosive action scenes, classic shounen aesthetic',
+      reZero: 'Re:Zero style, detailed fantasy clothing, emotional expressions, soft pastel colors, dramatic lighting, isekai charm'
+    };        
     return styles[style as keyof typeof styles] || '';
   };
 
@@ -197,12 +218,23 @@ console.log(data); // 👀 check structure
       value={params.textStyle}
       onChange={(e) => setParams({...params, textStyle: e.target.value})}
     >
-      <option value="anime">Anime</option>
-      <option value="manga">Manga</option>
-      <option value="western">Western Comic</option>
-      <option value="realistic">Realistic</option>
-      <option value="fantasy">Fantasy Art</option>
-      <option value="comic">Comic Book (DC/Marvel)</option> {/* ✅ NEW */}
+     <option value="vinlandSaga">Vinland Saga</option>
+<option value="promisedNeverland">Promised Neverland</option>
+<option value="dandadan">Dandadan</option>
+<option value="quintessentialQuintuplets">Quintessential Quintuplets</option>
+<option value="jujutsuKaisen">Jujutsu Kaisen</option>
+<option value="tokyoRevengers">Tokyo Revengers</option>
+<option value="onePiece">One Piece</option>
+<option value="myHeroAcademia">My Hero Academia</option>
+<option value="bleach">Bleach</option>
+<option value="chainsawMan">Chainsaw Man</option>
+<option value="comicBook">Comic Book (DC/Marvel)</option> 
+<option value="waifu">Waifu</option>
+<option value="swordArtOnline">Sword Art Online</option> 
+<option value="naruto">Naruto</option> 
+<option value="dragonBall">Dragon Ball</option> 
+<option value="reZero">Re:Zero</option> 
+
     </select>
   </div>
 )}
