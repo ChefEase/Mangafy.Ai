@@ -21,17 +21,34 @@ export default function ChatInterface() {
 const [messageRecords, setMessageRecords] = useState<any[]>([]);
 const isSending = useRef(false); // Lock to prevent concurrent requests
 
+async function uploadImageToCloudinary(base64Image: string): Promise<string | null> {
+  const CLOUDINARY_UPLOAD_PRESET = "character_images";
+  const CLOUDINARY_CLOUD_NAME = "ducgd9u2b";
+
+  const formData = new FormData();
+  formData.append("file", base64Image);
+  formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+    method: "POST",
+    body: formData,
+  });
+
+  const data = await res.json();
+  return data.secure_url || null;
+}
+
   useEffect(() => {
     const loadData = async () => {
       try {
         const chatRes = await fetch("https://api.airtable.com/v0/apppD5DROHf5ImEYG/Chats", {
           headers: {
-            Authorization: `Bearer patIcK5hqVA19dyEk.d90f3484ca4bda1a32788051177ba6cda8ac2793ea7cf2421729b9f23657df99`
+            Authorization: `Bearer patIcK5hqVA19dyEk.20411c3eb56f086697e63795bfd76519e8a8b866f01ccab3eef5e17a431df5bb`
           }
         });
         const messageRes = await fetch("https://api.airtable.com/v0/apppD5DROHf5ImEYG/Messages", {
           headers: {
-            Authorization: `Bearer patIcK5hqVA19dyEk.d90f3484ca4bda1a32788051177ba6cda8ac2793ea7cf2421729b9f23657df99`
+            Authorization: `Bearer patIcK5hqVA19dyEk.20411c3eb56f086697e63795bfd76519e8a8b866f01ccab3eef5e17a431df5bb`
           }
         });
     
@@ -88,7 +105,7 @@ const filteredMessages = (messageData.records || []).filter(
   
   const createNewChat = async (title: string) => {
     const now = new Date();
-    const AIRTABLE_TOKEN = "patIcK5hqVA19dyEk.d90f3484ca4bda1a32788051177ba6cda8ac2793ea7cf2421729b9f23657df99";
+    const AIRTABLE_TOKEN = "patIcK5hqVA19dyEk.20411c3eb56f086697e63795bfd76519e8a8b866f01ccab3eef5e17a431df5bb";
     const userId = localStorage.getItem("userId"); // 🔐 make sure you save this on login
 
     const chats: Chat[] = chatRecords
@@ -132,7 +149,7 @@ const filteredMessages = (messageData.records || []).filter(
   
   const deleteChat = async (chatId: string) => {
     try {
-      const AIRTABLE_TOKEN = "patIcK5hqVA19dyEk.d90f3484ca4bda1a32788051177ba6cda8ac2793ea7cf2421729b9f23657df99";
+      const AIRTABLE_TOKEN = "patIcK5hqVA19dyEk.20411c3eb56f086697e63795bfd76519e8a8b866f01ccab3eef5e17a431df5bb";
       const AIRTABLE_BASE_ID = "apppD5DROHf5ImEYG";
   
       // Optimistically remove chat and messages from UI
@@ -216,7 +233,7 @@ const messages: Message[] = messageRecords
       createdAt: new Date(),
     };
   
-    const AIRTABLE_TOKEN = "patIcK5hqVA19dyEk.d90f3484ca4bda1a32788051177ba6cda8ac2793ea7cf2421729b9f23657df99";
+    const AIRTABLE_TOKEN = "patIcK5hqVA19dyEk.20411c3eb56f086697e63795bfd76519e8a8b866f01ccab3eef5e17a431df5bb";
     let didDeduct = false;
     try{
         // Deduct credits first
@@ -227,6 +244,15 @@ const messages: Message[] = messageRecords
         }
         didDeduct = true;
        
+        let airtableImageField: { url: string }[] = [];
+
+if (userMessage.imageUrl) {
+  const uploadedUrl = await uploadImageToCloudinary(userMessage.imageUrl);
+  if (!uploadedUrl) throw new Error("Image upload failed");
+
+  airtableImageField = [{ url: uploadedUrl }];
+}
+
         const userRes = await fetch("https://api.airtable.com/v0/apppD5DROHf5ImEYG/Messages", {
           method: "POST",
           headers: {
@@ -238,7 +264,7 @@ const messages: Message[] = messageRecords
               chatId: userMessage.chatId,
               role: userMessage.role,
               content: userMessage.content,
-              imageUrl: userMessage.imageUrl ? [{ url: userMessage.imageUrl }] : [],
+              imageUrl: airtableImageField,
               createdAt: userMessage.createdAt.toISOString(),
               userId, // ✅ save userId on message too
             },

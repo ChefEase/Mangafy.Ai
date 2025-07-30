@@ -11,16 +11,28 @@ export default function ChatInput({ onSendMessage, isLoading, costPerMessage }: 
   const [message, setMessage] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [fileSize, setFileSize] = useState<number | null>(null);
+
+
+  const MAX_FILE_SIZE_MB = 2.5;
+  const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+  
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      alert(`Image is too large! Maximum size is ${MAX_FILE_SIZE_MB} MB.`);
+      return;
     }
+  
+    setFileSize(file.size); // ✅ Track size
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSubmit = () => {
@@ -44,13 +56,22 @@ export default function ChatInput({ onSendMessage, isLoading, costPerMessage }: 
         <div className={styles.imagePreview}>
           <img src={imagePreview} alt="Preview" />
           <button 
-            onClick={() => setImagePreview(null)} 
+            onClick={() => {
+              setImagePreview(null)
+              setFileSize(null);
+            }}  
             className={styles.removeImage}
           >
             ×
           </button>
         </div>
       )}
+
+{fileSize !== null && (
+  <p className={styles.imageSizeLabel}>
+    Size: {(fileSize / 1024 / 1024).toFixed(2)} MB
+  </p>
+)}
 
       <div className={styles.inputContainer}>
         <button

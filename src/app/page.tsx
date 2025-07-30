@@ -69,7 +69,7 @@ media: '/samples/sample3.png',
     title: 'Custom Character Generation',
     description:
       'Create unique manga characters with AI tailored to your story’s style. Whether you need a stoic warrior, a whimsical sidekick, or a mysterious villain, Mangafy.ai allows you to generate characters based on detailed prompts, personality traits, and design preferences. Customize clothing, expressions, poses, and more, ensuring every character feels authentic and visually aligned with your manga universe.',
-    media: '/features/feature1.mp4',
+    media: '/features/feature4.mp4',
     isVideo: true
   },
   {
@@ -85,7 +85,14 @@ media: '/samples/sample3.png',
       'Effortlessly create manga-style stories with our AI-powered panel generator. Choose from a variety of story templates or generate original plots, then apply them directly to your script box. Each story is broken into dynamic panels ready for editing, making storytelling faster, more flexible, and visually captivating.',
     media: '/features/feature3.mp4',
     isVideo: true
-  }    
+  },
+  {
+    title: 'AI Cover Art Creator',
+    description:
+      'Design stunning manga-style cover pages using our AI-powered generator. Upload your own characters or use pre-saved ones to generate personalized covers with dynamic artwork. Once generated, customize your cover with editable text, fonts, colors, and visual effects — all in real-time. Perfect for creators who want total control over both the art and design.',
+    media: '/features/feature1.mp4',
+    isVideo: true
+  }      
 ];
 
 const PRICING = [
