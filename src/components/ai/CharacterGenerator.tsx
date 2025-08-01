@@ -30,6 +30,7 @@ export default function CharacterGenerator() {
     setIsGenerating(true);
     setError(null);
     // Check credits before proceeding
+    let creditsDeducted = false; // 👈 Track if we deducted
     if (credits < CHARACTER_COST) {
       setError(`You need ${CHARACTER_COST} credits to generate a character`);
       setIsGenerating(false);
@@ -37,7 +38,6 @@ export default function CharacterGenerator() {
     }
     try {
       let result: Blob | String;
-  
       if (mode === 'text') {
         const fullPrompt = `${params.prompt}, ${getStylePrompt(params.textStyle)}, high quality character design`;
         result = await aiService.generateTextToImage({
@@ -91,7 +91,7 @@ export default function CharacterGenerator() {
         if (!deductionSuccess) {
           throw new Error("Credit deduction failed");
         }
-        
+        creditsDeducted = true; // ✅ TRACK IT HERE
         setGeneratedImage(imageUrl);
         setIsGenerating(false);
       } else {
@@ -99,23 +99,16 @@ export default function CharacterGenerator() {
         if (!referenceImage) throw new Error("Please upload a reference image");
 
         setIsGenerating(true); // ✅ Show loading immediately
-        
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-          const base64Image = reader.result as string;
-          const blob = await (await fetch(base64Image)).blob();
+        console.log("Sending POST request to /api/generate-image with formData");
 
           const formData = new FormData();
           formData.append("prompt", params.prompt);
-          formData.append("lora_name", params.imageStyle.replace(/\s+/g, "_"));
           formData.append("guidance_scale", params.guidance_scale.toString());
           formData.append("num_inference_steps", params.num_inference_steps.toString());
           formData.append("seed", params.seed.toString());
-          formData.append("width", params.width.toString());
-          formData.append("height", params.height.toString());
-          formData.append("image", referenceImage);
-          
-  formData.append("prompt", params.prompt);
+          if (referenceImage) {
+            formData.append("image", referenceImage);
+          }
   
   const res = await fetch("/api/generate-image", {
     method: "POST",
@@ -123,6 +116,7 @@ export default function CharacterGenerator() {
   });
   const data = await res.json();
   console.log("👉 Full response data:", data);
+  console.log("Reference image before sending:", referenceImage);
 
   if (!res.ok || !data?.image?.url) {
     if (data.error?.includes("exceeded your GPU quota")) {
@@ -137,22 +131,19 @@ export default function CharacterGenerator() {
   if (!deductionSuccess) {
     throw new Error("Credit deduction failed");
   }
-
+  creditsDeducted = true; // ✅ TRACK IT HERE
   setGeneratedImage(data.image.url);
 
 console.log(data); // 👀 check structure
   console.log("data.image:", data.image);
   console.log("typeof data.image:", typeof data.image);
   
-        };
-  
-        reader.readAsDataURL(referenceImage); // triggers reader.onloadend
       }
   
     } catch (err: any) {
-       // Refund credits on error
-       await addCredits(CHARACTER_COST);
-      
+      if (creditsDeducted) {
+        await addCredits(CHARACTER_COST);
+      }
        setError(
          err.message || 
          "Generation failed. Credits have been refunded. Please try again."
@@ -295,25 +286,6 @@ console.log(data); // 👀 check structure
         <div className="params-grid">
           {mode === 'image' && (
             <>
-            <div className="form-group">
-              <label>Art Style</label>
-              <select
-                value={params.imageStyle}
-                onChange={(e) => {
-                  console.log('Image Style changed:', e.target.value);
-                  setParams({ ...params, imageStyle: e.target.value });
-                }}
-              >
-                <option>American Cartoon</option>
-                <option>Chines Ink</option>
-                <option>Ghibli</option>
-                <option>Jojo</option>
-                <option>Line</option>
-                <option>Vector</option>
-                <option>Comic Book</option> {/* ✅ NEW */}
-              </select>
-            </div>
-
               <div className="form-group">
                 <label>Guidance Scale</label>
                 <input
@@ -323,9 +295,7 @@ console.log(data); // 👀 check structure
                   step="0.1"
                   value={params.guidance_scale}
                   onChange={(e) => {
-                    const value = parseFloat(e.target.value);
-                    console.log('Guidance Scale changed:', value);
-                    setParams({ ...params, guidance_scale: value });
+                    setParams({ ...params, guidance_scale: parseFloat(e.target.value) })
                   }}
                 />
                 <span>{params.guidance_scale.toFixed(1)}</span>
@@ -339,9 +309,7 @@ console.log(data); // 👀 check structure
                   max="50"
                   value={params.num_inference_steps}
                   onChange={(e) => {
-                    const value = parseInt(e.target.value);
-                    console.log('Inference Steps changed:', value);
-                    setParams({ ...params, num_inference_steps: value });
+                    setParams({ ...params, num_inference_steps: parseInt(e.target.value) })
                   }}
                 />
                 <span>{params.num_inference_steps}</span>
@@ -361,36 +329,6 @@ console.log(data); // 👀 check structure
                   }}
                 />
                 <span>{params.seed}</span>
-              </div>
-
-              <div className="form-group">
-                <label>Width</label>
-                <input
-                  type="number"
-                  min="64"
-                  step="8"
-                  value={params.width}
-                  onChange={(e) => {
-                    const value = parseInt(e.target.value);
-                    console.log('Width changed:', value);
-                    setParams({ ...params, width: value });
-                  }}
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Height</label>
-                <input
-                  type="number"
-                  min="64"
-                  step="8"
-                  value={params.height}
-                  onChange={(e) => {
-                    const value = parseInt(e.target.value);
-                    console.log('Height changed:', value);
-                    setParams({ ...params, height: value });
-                  }}
-                />
               </div>
             </>
           )}

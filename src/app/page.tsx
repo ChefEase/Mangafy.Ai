@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Logo from '@/public/logo.png';
 import styles from './LandingPage.module.css';
+import { useRouter } from 'next/navigation';
 
 const MANGA_SAMPLES: { pages: string[] }[] = [
   {
@@ -92,7 +93,15 @@ media: '/samples/sample3.png',
       'Design stunning manga-style cover pages using our AI-powered generator. Upload your own characters or use pre-saved ones to generate personalized covers with dynamic artwork. Once generated, customize your cover with editable text, fonts, colors, and visual effects — all in real-time. Perfect for creators who want total control over both the art and design.',
     media: '/features/feature1.mp4',
     isVideo: true
-  }      
+  },
+  
+  {
+    title: 'AI Chatbot with Image Upload',
+    description:
+      'Engage in seamless conversations with our AI chatbot that understands and responds in real-time. Upload images to ask questions or get insights based on the visual content. Supports file uploads with a size limit to ensure smooth performance. Perfect for interactive chats that combine text and images effortlessly.',
+    media: '/features/feature5.png',
+  }
+  
 ];
 
 const PRICING = [
@@ -103,7 +112,7 @@ const PRICING = [
 const FAQ = [
   {
     question: 'How does Mangafy.ai work?',
-    answer: 'Our AI takes your story input and generates manga illustrations automatically.',
+    answer: 'Our AI takes your story input, character pictures and description and generates manga illustrations automatically.',
   },
   {
     question: 'Do I need to be an artist?',
@@ -111,12 +120,27 @@ const FAQ = [
   },
   {
     question: 'What payment methods do you accept?',
-    answer: 'Stripe, PayPal, and soon more options will be available.',
+    answer: 'We accept all major credit and debit cards through our secure payment partner, Stripe.',
   },
+  {
+    question: 'What apps work well with Mangafy-Ai?',
+    answer: 'We recommend Photoshop or any editing app with text bubbles and inpainting tools.',
+  }
+  
 ];
 
 export default function LandingPage() {
   const [carouselIndex, setCarouselIndex] = useState(0);
+  const router = useRouter();
+
+  // Handler functions
+  const handleChooseFree = () => {
+    router.push('/Entire-Home-Auth-Page');
+  };
+
+  const handleChoosePro = () => {
+    router.push('/subscription');
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -286,7 +310,12 @@ export default function LandingPage() {
                   <li key={idx}>{perk}</li>
                 ))}
               </ul>
-              <button className={styles.pricingButton}>Choose {plan}</button>
+              <button
+                className={styles.pricingButton}
+                onClick={plan === 'Free' ? handleChooseFree : handleChoosePro}
+              >
+                Choose {plan}
+              </button>
             </div>
           ))}
         </div>
@@ -306,7 +335,7 @@ export default function LandingPage() {
       {/* FOOTER */}
       <footer className={styles.footer}>
         <p>
-          Contact us: <a href="mailto:hello@mangafy.ai" className={styles.footerLink}>hello@mangafy.ai</a>
+          Contact us: <a href="mailto:mangaficustomercare@gmail.com" className={styles.footerLink}>mangaficustomercare@gmail.com</a>
         </p>
         <p>
           Follow us on{' '}

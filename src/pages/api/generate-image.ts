@@ -1,76 +1,97 @@
+import { IncomingForm, Fields, Files, File } from "formidable";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Client } from "@gradio/client";
 
-const gradio = new Client("Asahina2K/animagine-xl-3.1");
+export const config = {
+  api: {
+    bodyParser: false, // allow file uploads (FormData)
+  },
+};
+
+import formidable from "formidable";
+import fs from "fs";
+
+const clientPromise = Client.connect("black-forest-labs/FLUX.1-Kontext-Dev");
+
+async function uploadToTransferSh(fileBuffer: Buffer, filename: string): Promise<string> {
+  const res = await fetch(`https://transfer.sh/${filename}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/octet-stream",
+    },
+    body: fileBuffer,
+  });
+  if (!res.ok) throw new Error(`transfer.sh upload failed: ${res.statusText}`);
+  return await res.text(); // returns the URL of the uploaded file
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST")
     return res.status(405).json({ error: "Only POST allowed" });
+  console.log("Request method:", req.method);
 
-  const {
-    prompt,
-    negative_prompt = "",
-    seed = 0,
-    custom_width = 1024,
-    custom_height = 1024,
-    guidance_scale = 13.5,
-    num_inference_steps = 28,
-    sampler = "Euler a",
-    aspect_ratio_selector = "896 x 1152",
-    style_selector = "(None)",
-    quality_selector = "Standard v3.1",
-    use_upscaler = false,
-    upscaler_strength = 0.55,
-    upscale_by = 1.5,
-    add_quality_tags = true
-  } = req.body;
+  const form = formidable({ multiples: false });
 
-  const args = [
-    prompt,
-    negative_prompt,
-    seed,
-    custom_width,
-    custom_height,
-    guidance_scale,
-    num_inference_steps,
-    sampler,
-    aspect_ratio_selector,
-    style_selector,
-    quality_selector,
-    use_upscaler,
-    upscaler_strength,
-    upscale_by,
-    add_quality_tags
-  ];
+  form.parse(req, async (err: any, fields: Fields, files: Files) => {
+    if (err) {
+      console.error("Form parsing error:", err);
+      return res.status(400).json({ error: "Error parsing form data" });
+    }
 
-  try {
-    const result = await gradio.predict(args as any, { api_name: "/run" });
-    
-    // Handle potential binary response safely
-    if (typeof result === "string") {
-      // Create a buffer to check the PNG signature safely
-      const buffer = Buffer.from(result, 'binary');
-      if (buffer[0] === 0x89 && buffer[1] === 0x50) { // 0x89 followed by 'P' (0x50)
-        res.setHeader('Content-Type', 'image/png');
-        return res.status(200).send(buffer);
+    try {
+      const prompt = Array.isArray(fields.prompt) ? fields.prompt[0] : fields.prompt ?? "";
+      const seed = parseInt(Array.isArray(fields.seed) ? fields.seed[0] : fields.seed ?? "0");
+      const guidance_scale = parseFloat(Array.isArray(fields.guidance_scale) ? fields.guidance_scale[0] : fields.guidance_scale ?? "13.5");
+      const num_inference_steps = parseInt(Array.isArray(fields.num_inference_steps) ? fields.num_inference_steps[0] : fields.num_inference_steps ?? "35");
+
+      if (!files.image || Array.isArray(files.image)) {
+        return res.status(400).json({ error: "Missing or invalid reference image" });
       }
+
+      const imageFile = files.image as File;
+      if (!imageFile) {
+        return res.status(400).json({ error: "Missing or invalid reference image" });
+      }
+
+      const imagePath = imageFile.filepath;
+      const imageBlob = fs.readFileSync(imagePath); // <-- use imageBlob, not imageBuffer
+      const imageType = imageFile.mimetype || "image/png";
+
+      // Upload to transfer.sh and get public URL
+      const publicUrl = await uploadToTransferSh(imageBlob, imageFile.originalFilename || "upload.png");
+
+      const client = await clientPromise;
+
+      const result = await client.predict("/infer", {
+        input_image: {
+          path: imagePath,
+          url: publicUrl,
+          orig_name: imageFile.originalFilename || "upload.png",
+          size: imageBlob.length,  // use imageBlob here too
+          mime_type: imageType,
+          meta: { _type: "gradio.FileData" },
+        },
+        prompt,
+        seed,
+        randomize_seed: false,
+        guidance_scale,
+        steps: num_inference_steps,
+      });
+
+      const [imageBase64] = result.data as string[];
+
+      if (!imageBase64) {
+        return res.status(500).json({ error: "No image returned" });
+      }
+
+      const buffer = Buffer.from(imageBase64.split(",")[1], "base64");
+
+      res.setHeader("Content-Type", "image/png");
+      return res.status(200).send(buffer);
+
+    } catch (error: any) {
+      console.error("Generation error:", error);
+      return res.status(500).json({ error: error.message || "Unknown error" });
     }
-
-    // Handle structured response
-    const [images, metadata] = result as unknown as [{ image: { url: string } }[], Record<string, any>];
-
-    if (!images?.[0]?.image?.url) {
-      return res.status(500).json({ error: "No image url returned" });
-    }
-
-    const imageResp = await fetch(images[0].image.url);
-    const imageBuffer = await imageResp.arrayBuffer();
-    res.setHeader('Content-Type', 'image/png');
-    return res.status(200).send(Buffer.from(imageBuffer));
-
-  } catch (err: any) {
-    console.error("❌ Gradio API error:", err);
-    res.setHeader('Content-Type', 'application/json');
-    return res.status(500).json({ error: err.message || "unknown error" });
-  }
+  });
 }

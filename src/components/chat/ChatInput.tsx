@@ -21,6 +21,12 @@ export default function ChatInput({ onSendMessage, isLoading, costPerMessage }: 
     const file = e.target.files?.[0];
     if (!file) return;
   
+     // ✅ Reject non-image files
+  if (!file.type.startsWith('image/')) {
+    alert("Cannot upload file. Only image types are allowed.");
+    e.target.value = ""; // Reset input
+    return;
+  }
     if (file.size > MAX_FILE_SIZE_BYTES) {
       alert(`Image is too large! Maximum size is ${MAX_FILE_SIZE_MB} MB.`);
       return;
