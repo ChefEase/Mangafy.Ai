@@ -84,22 +84,14 @@ export default function CoverGenerator() {
       Scene description: "${processedTitle}".
       High contrast, detailed composition.`;
 
-      const imageBlob = await aiService.generateTextToImage({
+      const imageBlob = await aiService.generateTextToImageReplicate({
         prompt,
         negative_prompt: negativePrompt || "text errors, blurry, watermark, deformed, bad anatomy",
         width: 1008,
         height: 1792,
-        guidance_scale: 13.5,
+        cfg_scale: 13.5,
+        steps: 35,
         seed: Math.floor(Math.random() * 10000000),
-        sampler: "Euler a",
-        aspect_ratio: "768 x 1344",
-        num_inference_steps: 35,
-        style: "Anime",
-        quality: "Standard v3.1",
-        use_upscaler: true,
-        upscaler_strength: 0.55,
-        upscale_by: 1.5,
-        add_quality_tags: true,
       });
       
 
