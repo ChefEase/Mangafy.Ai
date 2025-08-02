@@ -1,7 +1,7 @@
 import formidable from "formidable";
 import fs from "fs";
 import { Client } from "@gradio/client";
-import { Blob }from "buffer";
+import { Blob } from "fetch-blob"; // ✅ correct Blob shim for Node
 
 export const config = {
   api: {
@@ -28,8 +28,8 @@ export default async function handler(req, res) {
     if (!imageArray || !Array.isArray(imageArray) || imageArray.length === 0) {
       return res.status(400).json({ error: "Missing or invalid reference image" });
     }
-    const imageFile = imageArray[0];
 
+    const imageFile = imageArray[0];
     const prompt = (fields.prompt && fields.prompt[0]) || "";
     const guidance_scale = parseFloat((fields.guidance_scale && fields.guidance_scale[0]) || "7.5");
     const num_inference_steps = parseInt((fields.num_inference_steps && fields.num_inference_steps[0]) || "20");
@@ -38,40 +38,39 @@ export default async function handler(req, res) {
     try {
       const imagePath = imageFile.filepath;
       const imageBuffer = fs.readFileSync(imagePath);
-      const imageBlob = new Blob([imageBuffer], { type: imageFile.mimetype || "image/png" });
+      const imageBlob = new Blob([imageBuffer], { type: imageFile.mimetype || "image/png" }); // ✅ correct Blob now
 
       const client = await clientPromise;
 
       const result = await client.predict("/infer", {
-        input_image: imageBlob,
+        input_image: imageBuffer,
         prompt,
         seed,
         randomize_seed: false,
         guidance_scale,
         steps: num_inference_steps,
       });
+      console.log("Gradio raw result:", JSON.stringify(result, null, 2));
 
-      console.log("Gradio response data:", result.data);
-      console.log("Type of result.data[0]:", typeof result.data[0]);
-      console.log("Is Buffer:", Buffer.isBuffer(result.data[0]));
+      const resultData = result.data?.[0];
 
-      if (!result.data || result.data.length === 0) {
-        throw new Error("No data returned from model");
+      if (typeof resultData === "string" && resultData.startsWith("data:image")) {
+        const buffer = Buffer.from(resultData.split(",")[1], "base64");
+        res.setHeader("Content-Type", "image/png");
+        return res.status(200).send(buffer);
+      }
+      
+      if (typeof resultData === "object" && resultData.url) {
+        // Fetch image from the provided URL
+        const imageResponse = await fetch(resultData.url);
+        const imageBuffer = await imageResponse.arrayBuffer();
+      
+        res.setHeader("Content-Type", "image/png");
+        return res.status(200).send(Buffer.from(imageBuffer));
       }
 
-      let outputImageBuffer;
-
-      if (typeof result.data[0] === "string" && result.data[0].startsWith("data:image")) {
-        outputImageBuffer = Buffer.from(result.data[0].split(",")[1], "base64");
-      } else if (Buffer.isBuffer(result.data[0])) {
-        outputImageBuffer = result.data[0];
-      } else {
-        console.error("Unexpected result.data content:", result.data[0]);
-        throw new Error("Unexpected image data format from model");
-      }
-
-      res.setHeader("Content-Type", "image/png");
-      return res.status(200).send(outputImageBuffer);
+      console.error("Unexpected image format from model:", resultData);
+      return res.status(500).json({ error: "Unexpected image data format from model" });
 
     } catch (error) {
       console.error("Generation error:", error);

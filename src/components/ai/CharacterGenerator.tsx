@@ -40,22 +40,14 @@ export default function CharacterGenerator() {
       let result: Blob | String;
       if (mode === 'text') {
         const fullPrompt = `${params.prompt}, ${getStylePrompt(params.textStyle)}, high quality character design`;
-        result = await aiService.generateTextToImage({
+        result = await aiService.generateTextToImageReplicate({
           prompt: fullPrompt,
           negative_prompt: params.negative_prompt,
           width: params.width,
           height: params.height,
-          guidance_scale: params.guidance_scale,
+          cfg_scale: 13.5,
+          steps: 35,
           seed: Math.floor(Math.random() * 2_000_000) + 1,
-          num_inference_steps: 35,
-          sampler: "Euler a",
-          aspect_ratio: aiService.mapToClosestAspectRatio(params.width, params.height),
-          style: "Anime",
-          quality: "Standard v3.1",
-          use_upscaler: true,
-          upscaler_strength: 0.55,
-          upscale_by: 1.5,
-          add_quality_tags: true,
         }) as Blob | String;
         
         console.log("result:", result);

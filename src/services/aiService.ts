@@ -1,6 +1,10 @@
 // Add at the top of aiService.ts
 import { HfInference, } from "@huggingface/inference";
+import Replicate from "replicate";
 
+const replicate = new Replicate({
+  auth: process.env.REPLICATE_API_TOKEN,
+});
 
 interface Panel {
   id: string;
@@ -167,56 +171,45 @@ export class AIService {
   }
   
   
-  async generateTextToImage(opts: {
+  async generateTextToImageReplicate(opts: {
     prompt: string;
-    negative_prompt?: string;
-    steps?: number;
-    width?: number;
-    height?: number;
-    guidance_scale?: number;
-    sampler?: string;
-    aspect_ratio?: string;
-    style?: string;
-    quality?: string;
-    use_upscaler?: boolean;
-    upscaler_strength?: number;
-    upscale_by?: number;
-    add_quality_tags?: boolean;
-    seed?:number;
-    num_inference_steps?: number; 
+  negative_prompt?: string;
+  width?: number;
+  height?: number;
+  seed?: number;
+  steps?: number;
+  cfg_scale?: number; 
   }): Promise<Blob> {
-    const response = await fetch("https://129ebba2e694.ngrok-free.app/generate-image", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    const response = await replicate.run(
+      "aisha-ai-official/animagine-xl-4.0:057e2276ac5dcd8d1575dc37b131f903df9c10c41aed53d47cd7d4f068c19fa5",
+    {
+      input: {
+        model: "Animagine-XL-4.0",
+        vae: "default",
         prompt: opts.prompt,
-        negative_prompt: opts.negative_prompt ?? "",
+        negative_prompt: opts.negative_prompt ?? "nsfw, naked",
         width: opts.width ?? 1024,
         height: opts.height ?? 1024,
-        guidance_scale: opts.guidance_scale ?? 13.5,
-        seed: opts.seed ?? Math.floor(Math.random() * 10000000),
-        sampler: opts.sampler ?? "Euler a",
-        aspect_ratio: opts.aspect_ratio, // fallback default if not mappe
-        num_inference_steps: 35,
-        style: opts.style,
-        quality: opts.quality ?? "Standard v3.1",
-        use_upscaler: opts.use_upscaler ?? true,
-        upscaler_strength: opts.upscaler_strength ?? 0.55,
-        upscale_by: opts.upscale_by ?? 1.5,
-        add_quality_tags: opts.add_quality_tags ?? true,
-      }),
-    });
-    let json;
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`Failed to generate image: ${response.status}`);
+        steps: opts.steps ?? 35,
+        cfg_scale: opts.cfg_scale ?? 13,
+        seed: opts.seed ?? -1,
+        guidance_rescale: 0.5,
+        batch_size: 1,
+        clip_skip: 1,
+        scheduler: "Euler a",
+        pag_scale: 3,
+        prepend_preprompt: true,
+      }
+    }) as string[];
+    const url = response?.[0];
+    if (!url || typeof url !== "string") {
+      throw new Error("Invalid response from Replicate");
     }
-    const blob = await response.blob(); // Directly get Blob from response
-    if (blob.type !== 'image/png') {
-      throw new Error(`Unexpected content type: ${blob.type}`);
-    }
-    console.log('Response Content-Type:', response.headers.get('content-type'));
-    return blob;
+  
+    const imageResponse = await fetch(url);
+    if (!imageResponse.ok) throw new Error("Failed to fetch image from Replicate");
+  
+    return await imageResponse.blob();
   }
 
   async generateTextToImageFluxDev(payload: {
@@ -343,22 +336,14 @@ async generatePanel(payload: {
     const randomSeed = Math.floor(Math.random() * 10000000); // ✅ Random seed between 0 and 99999
     const shortenedPrompt = await this.compressPrompt(cleanPrompt);
       // Replace HF calls with Gradio integration
-      const blob = await aiService.generateTextToImage({
+      const blob = await aiService.generateTextToImageReplicate({
         prompt: shortenedPrompt,
         negative_prompt: negativePrompt,
         width: payload.width!,
         height: payload.height!,
-        guidance_scale: 13.5,
+        cfg_scale: 13.5,
+        steps: 35,
         seed: randomSeed,
-        sampler: "Euler a",
-        aspect_ratio: this.mapToClosestAspectRatio(payload.width!, payload.height!),
-        num_inference_steps: 35,
-        style: payload.gradioStyle,
-        quality: "Standard v3.1",
-        use_upscaler: true,
-        upscaler_strength: 0.55,
-        upscale_by: 1.5,
-        add_quality_tags: true,
       });
       const url = URL.createObjectURL(blob);
       // Call Gradio API

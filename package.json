@@ -46,6 +46,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-konva": "^19.0.6",
+    "replicate": "^1.0.1",
     "stores": "^1.0.0",
     "stripe": "^18.3.0",
     "use-image": "^1.1.4",
