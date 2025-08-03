@@ -106,30 +106,26 @@ export default function CharacterGenerator() {
     method: "POST",
     body: formData,
   });
-  const data = await res.json();
-  console.log("👉 Full response data:", data);
-  console.log("Reference image before sending:", referenceImage);
 
-  if (!res.ok || !data?.image?.url) {
-    if (data.error?.includes("exceeded your GPU quota")) {
-      alert("⏳ You've hit the GPU limit on the backend model. Please try again in a few hours.");
-    } else {
-      alert(data.error || "Image generation failed.");
-    }
-    throw new Error("No image URL returned from server");
+  if (!res.ok) {
+    const error = await res.text(); // try to parse plain error
+    throw new Error(error || "Image generation failed");
   }
+
+  const blob = await res.blob();
+  const imageUrl = URL.createObjectURL(blob);
+  console.log("👉 Full response data:", blob);
+  console.log("Reference image before sending:", referenceImage);
 
   const deductionSuccess = await deductCredits(CHARACTER_COST);
   if (!deductionSuccess) {
     throw new Error("Credit deduction failed");
   }
   creditsDeducted = true; // ✅ TRACK IT HERE
-  setGeneratedImage(data.image.url);
+  setGeneratedImage(imageUrl);
 
-console.log(data); // 👀 check structure
-  console.log("data.image:", data.image);
-  console.log("typeof data.image:", typeof data.image);
-  
+  console.log(blob); // 👀 check structure
+  console.log("typeof blob:", typeof blob);
       }
   
     } catch (err: any) {
