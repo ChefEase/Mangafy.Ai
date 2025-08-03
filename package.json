@@ -44,12 +44,14 @@
     "react-dom": "^19.0.0",
     "react-konva": "^19.0.6",
     "stores": "^1.0.0",
+    "stripe": "^18.4.0",
     "use-image": "^1.1.4",
     "uuid": "^11.0.5",
     "vercel": "^44.2.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/formidable": "^3.4.5",
     "@types/node": "^20",
     "@types/paper": "^0.11.14",
     "@types/react": "^19",
@@ -57,7 +59,6 @@
     "@types/webpack": "^5.28.5",
     "eslint": "^9",
     "eslint-config-next": "15.1.7",
-    "@types/formidable": "^3.4.5",
     "typescript": "^5"
   }
 }
