@@ -5,7 +5,6 @@ import { useCredits } from '@/context/CreditContext';
 import { CharacterService } from '@/services/CharacterService';
 import './styles/coverGenerator.css';
 import {enforceNoDialogueAndStyle} from '@/utils/promptUtils'
-import FontFaceObserver from 'fontfaceobserver';
 
 const artStyles = {
   'Vinland Saga': `vinland saga art style, dramatic, bold linework, sharp eyes, cel-shading, high contrast, dynamic perspective`,
