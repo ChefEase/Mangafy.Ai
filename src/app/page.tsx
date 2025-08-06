@@ -77,7 +77,7 @@ media: '/samples/sample3.png',
     title: 'Image-to-Image Transformation',
     description:
       'Upload your own sketches or character art and watch them come to life as polished manga-style illustrations. Mangafy.ai enhances your visuals with AI while preserving core details like pose, expression, and costume perfect for refining concept art or adapting existing characters into manga format.',
-    media: '/features/image-to-image.mp4',
+    media: '/features/feature5.mp4',
     isVideo: true
   },
   {
@@ -125,8 +125,7 @@ const FAQ = [
   {
     question: 'What apps work well with Mangafy-Ai?',
     answer: 'We recommend Photoshop or any editing app with text bubbles and inpainting tools.',
-  }
-  
+  }  
 ];
 
 export default function LandingPage() {

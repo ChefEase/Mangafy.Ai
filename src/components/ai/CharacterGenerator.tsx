@@ -12,14 +12,14 @@ export default function CharacterGenerator() {
   const [mode, setMode] = useState<'text' | 'image'>('text');
   const [params, setParams] = useState({
     prompt: '',
-    negative_prompt: 'nsfw, text, deformed, mutated, worst quality',
+    negative_prompt: 'nsfw, text, deformed, mutated, worst quality, deformed hands, deformed body parts',
     textStyle: 'anime',
     imageStyle: 'Ghibli',
     guidance_scale: 13.5,
     num_inference_steps: 35,
     seed: 42,
     width: 1024,
-    height: 1820,
+    height: 1816,
   });
   const [referenceImage, setReferenceImage] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null); // Add error state
@@ -39,15 +39,16 @@ export default function CharacterGenerator() {
     try {
       let result: Blob | String;
       if (mode === 'text') {
-        const fullPrompt = `${params.prompt}, ${getStylePrompt(params.textStyle)}, high quality character design`;
+        const fullPrompt = `${params.prompt}, ${getStylePrompt(params.textStyle)}, white background, high quality character design`;
         result = await aiService.generateTextToImageReplicate({
           prompt: fullPrompt,
           negative_prompt: params.negative_prompt,
           width: params.width,
           height: params.height,
-          cfg_scale: 13.5,
-          steps: 35,
+          cfg_scale: 7,
+          steps: 28,
           seed: Math.floor(Math.random() * 2_000_000) + 1,
+          style_selector: "Anime"
         }) as Blob | String;
         
         console.log("result:", result);
@@ -153,22 +154,22 @@ export default function CharacterGenerator() {
 
   const getStylePrompt = (style: string) => {
     const styles = {
-      vinlandSaga: 'Vinland Saga style, gritty realism, detailed armor and clothing, Norse aesthetic, expressive faces, muted tones',
-      promisedNeverland: 'Promised Neverland style, soft lines, large expressive eyes, eerie lighting, delicate features, suspenseful atmosphere',
-      dandadan: 'Dandadan style, high-energy action, sharp features, intricate supernatural designs, intense motion lines, vivid color pops',
-      quintessentialQuintuplets: 'Quintessential Quintuplets style, romantic comedy aesthetic, bright colors, glossy eyes, soft shading, detailed school uniforms',
-      jujutsuKaisen: 'Jujutsu Kaisen style, edgy linework, modern urban feel, dynamic action poses, cursed energy effects, gritty yet stylish',
-      tokyoRevengers: 'Tokyo Revengers style, sharp and clean line art, gang fashion, expressive emotion, time-travel edge, street-style tone',
-      onePiece: 'One Piece style, exaggerated expressions, cartoonish proportions, vibrant color palette, adventurous and whimsical elements',
-      myHeroAcademia: 'My Hero Academia style, comic-inspired layout, dynamic action poses, flashy powers, clean shading, modern superhero vibe',
-      bleach: 'Bleach style, sleek character designs, flowing clothing, spiritual energy effects, dramatic contrasts, monochrome and color blends',
-      chainsawMan: 'Chainsaw Man style, gritty and raw, chaotic energy, horror-influenced design, sketchy linework, intense emotion',
-      comicBook: 'American comic book style (Marvel/DC), bold outlines, muscular anatomy, dramatic poses, vibrant color blocking, classic superhero aesthetic',
-      waifu: 'Waifu style, ultra-polished anime look, perfect skin, big sparkly eyes, glossy hair, soft lighting, idealized beauty, more appeal',
-      swordArtOnline: 'Sword Art Online style, sleek character designs, glowing digital effects, fantasy-meets-sci-fi armor, ethereal lighting',
-      naruto: 'Naruto style, sharp angular features, chakra effects, ninja gear, hand signs, dynamic motion lines, emotional intensity',
-      dragonBall: 'Dragon Ball style, bold muscles, energy auras, spiky hair, explosive action scenes, classic shounen aesthetic',
-      reZero: 'Re:Zero style, detailed fantasy clothing, emotional expressions, soft pastel colors, dramatic lighting, isekai charm'
+      vinlandSaga: 'Vinland Saga Art style, detailed armor and clothing, expressive faces,',
+      promisedNeverland: 'Promised Neverland Art style, soft lines, large expressive eyes,',
+      dandadan: 'Dandadan Art style, sharp features, intricate supernatural designs,',
+      quintessentialQuintuplets: 'Quintessential Quintuplets Art style, soft shading,',
+      jujutsuKaisen: 'Jujutsu Kaisen Art style, edgy linework,',
+      tokyoRevengers: 'Tokyo Revengers Art style, sharp and clean line art, street-style tone',
+      onePiece: 'One Piece Art style, cartoonish proportions,',
+      myHeroAcademia: 'My Hero Academia Art style, clean shading,',
+      bleach: 'Bleach Art style, sleek character designs, flowing clothing, dramatic contrasts,',
+      chainsawMan: 'Chainsaw Man Art style, sketchy linework,',
+      comicBook: 'American comic book style (Marvel/DC), bold outlines, muscular anatomy,',
+      waifu: 'Waifu, medium breast, wide hips, medium ass, ultra-polished anime look, big sparkly eyes, glossy hair,',
+      swordArtOnline: 'Sword Art Online Art style, sleek character designs, glowing digital effects,',
+      naruto: 'Naruto Art style, sharp angular features, ninja gear,',
+      dragonBall: 'Dragon Ball Art style, bold muscles,',
+      reZero: 'Re:Zero Art style, detailed fantasy clothing,'
     };        
     return styles[style as keyof typeof styles] || '';
   };

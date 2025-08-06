@@ -605,6 +605,10 @@ const updateCreditsInBackend = async (newCredits: number) => {
   }
 };
 
+function floorToMultipleOf8(n: number): number {
+  return Math.floor(n / 8) * 8;
+}
+
     const handleGenerateManga = async () => {
       if (typeof window === 'undefined') return;
       const cost = getCostForPanelType(selectedPanelType);
@@ -685,14 +689,21 @@ const updateCreditsInBackend = async (newCredits: number) => {
               status: `Generating image ${i + 1}/${processedPanels.length}`
             });
             const dimensions = getPanelDimensions(i);
+            const targetWidth = dimensions.width;
+            const targetHeight = dimensions.height;
             const panelData = processedPanels[i];
+
+            const requestWidth = floorToMultipleOf8(targetWidth / 2);
+            const requestHeight = floorToMultipleOf8(targetHeight / 2);
+            
+            console.log(`Sending to Replicate: ${requestWidth} x ${requestHeight}`);
             const panelImage = await aiService.generatePanel({
               scene: panelData.scene,
               characters: characters.filter(c => c.image),
               style: selectedStyle,
               cameraAngle: panelData.cameraAngle,
-              width: dimensions.width,
-              height: dimensions.height,
+              width: requestWidth,
+              height: requestHeight,
               color: selectedColor, // ✅ Fix: Include this
               gradioStyle: selectedPreset, // ✅ Also needed if using Gradio
             });
@@ -706,9 +717,13 @@ const updateCreditsInBackend = async (newCredits: number) => {
               throw new Error("Empty or corrupted image blob");
             }
             
+            let blob = panelImage; // that's the smaller blob
+            const upscaledBlob = await upscaleBlob(panelImage, targetWidth, targetHeight);
+
+
             newPanels.push({
-              url: URL.createObjectURL(panelImage),
-              dimensions,
+              url: URL.createObjectURL(upscaledBlob),
+              dimensions: { width: targetWidth, height: targetHeight },
               dialogue: panelData.dialogue
             });
             console.log("Panel Dimensions:", dimensions);
@@ -747,6 +762,26 @@ const updateCreditsInBackend = async (newCredits: number) => {
         setIsGenerating(false);
       }
     };
+
+    async function upscaleBlob(blob: Blob, width: number, height: number): Promise<Blob> {
+      const imgBitmap = await createImageBitmap(blob);
+    
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d')!;
+    
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(imgBitmap, 0, 0, width, height);
+    
+      return await new Promise((resolve, reject) => {
+        canvas.toBlob((b) => {
+          if (b) resolve(b);
+          else reject(new Error("Upscale failed"));
+        }, "image/png");
+      });
+    }
     
     const getPanelDimensions = (index: number) => {
       const margin = 140;

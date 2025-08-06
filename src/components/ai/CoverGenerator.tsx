@@ -4,19 +4,21 @@ import { aiService } from '@/services/aiService';
 import { useCredits } from '@/context/CreditContext';
 import { CharacterService } from '@/services/CharacterService';
 import './styles/coverGenerator.css';
+import {enforceNoDialogueAndStyle} from '@/utils/promptUtils'
+import FontFaceObserver from 'fontfaceobserver';
 
 const artStyles = {
-  'Vinland Saga': `anime, vinland saga art style, dramatic, bold linework, sharp eyes, expressive poses, snowy battlefield, nordic theme, cel-shading, high contrast, dynamic perspective`,
-  'The Promised Neverland': `anime, promised neverland art style, cinematic, soft shading, childlike features, eerie atmosphere, candlelight, ruins, deep shadows, symbolic imagery, tension`,
-  'Dandadan': `surreal, high-detail, Dandadan art style, dramatic lighting, chaotic atmosphere, supernatural energy, dynamic poses, abstract shapes, vivid color, anime manga`,
-  'Quintessential Quintuplets': `soft, romantic, manga cover, Quintessential Quintuplets art style, delicate features, pastel tones, dreamy, warm background, emotional focus, anime romance`,
-  'Jujutsu Kaisen': `dark, intense, Jujutsu Kaisen art style, manga cover, heavy shading, deep shadows, battle-ready stance, cursed energy, moody atmosphere, tension, gritty, cinematic anime`,
-  'Tokyo Revengers': `stylish, modern, anime manga cover, Tokyo Revengers art style, semi-muted colors, street aesthetic, confident pose, motion blur, city background, gang theme, action shot`,
-  'One Piece': `vibrant, energetic, One Piece art style, exaggerated expressions, whimsical characters, cel-shaded, pirate theme, dynamic action poses, chaotic composition, colorful world`,
-  'My Hero Academia': `bold, heroic, My Hero Academia art style, sharp cel-shading, comic-style motion lines, bright uniforms, dramatic angles, emotional expressions, stylized anime`,
-  'Bleach': `cool-toned, spiritual, Bleach art style, sharp eyes, flowing clothing, detailed hair, ethereal effects, zanpakuto weapons, calm yet intense atmosphere, manga-style linework`,
-  'Chainsaw Man': `gritty, chaotic, Chainsaw Man art style, violent energy, intense contrast, dynamic blood splatter, horror-fantasy, sharp shading, urban decay, cinematic anime`,
-  'Comic Book (Marvel/DC)': `comic book art style, Marvel, DC Comics, bold lines, dramatic lighting, heroic poses, halftone shading, vibrant color, dynamic action`,
+  'Vinland Saga': `vinland saga art style, dramatic, bold linework, sharp eyes, cel-shading, high contrast, dynamic perspective`,
+  'The Promised Neverland': `The promised neverland art style, cinematic, soft shading,`,
+  'Dandadan': `surreal, high-detail, Dandadan art style, vivid color,`,
+  'Quintessential Quintuplets': `soft, romantic, Quintessential Quintuplets art style, delicate features,`,
+  'Jujutsu Kaisen': `dark, intense, Jujutsu Kaisen art style, heavy shading, deep shadows, cinematic`,
+  'Tokyo Revengers': `Tokyo Revengers art style, motion blur, gang theme,`,
+  'One Piece': `vibrant color, One Piece art style, exaggerated expressions, cel-shaded,`,
+  'My Hero Academia': `bold linework, My Hero Academia art style, sharp cel-shading, comic-style motion lines, dramatic angles,`,
+  'Bleach': `cool-toned, spiritual, Bleach art style, sharp eyes, flowing clothing, detailed hair, ethereal effects, manga-style linework`,
+  'Chainsaw Man': `gritty, Chainsaw Man art style, intense contrast, sharp shading, cinematic`,
+  'Comic Book (Marvel/DC)': `American comic book art style, bold lines, halftone shading, vibrant color,`,
   'Custom Art Style': '',
 };
 
@@ -55,46 +57,49 @@ export default function CoverGenerator() {
     return value && typeof value === 'object' && typeof value.arrayBuffer === 'function';
   }
 
-  const generateCover = async () => {
+  const generateCover = async () => { 
     if (!title.trim()) return setError("Please enter a cover description");
     if (credits < COVER_COST) return setError(`You need ${COVER_COST} credits to generate cover art`);
-
+  
     setIsGenerating(true);
     setError(null);
     setCoverImage(null);
     let creditsWereDeducted = false;
-
+  
     try {
       const deductionSuccess = await deductCredits(COVER_COST);
       if (!deductionSuccess) throw new Error("Credit deduction failed");
       creditsWereDeducted = true;
-
+  
       const characters = await CharacterService.getCharacters();
       const processedTitle = characters.reduce((acc, character) => {
         const regex = new RegExp(`\\b${character.name}\\b`, 'gi');
         return acc.replace(regex, character.description);
       }, title);
-
+  
       const styleDescription = selectedStyle === 'Custom Art Style'
         ? `A manga cover in a unique, user-defined art style: ${customStyleText}`
         : artStyles[selectedStyle as keyof typeof artStyles];
-
-      const prompt = `Manga cover in the style of ${selectedStyle}.
-      ${styleDescription}
-      Scene description: "${processedTitle}".
-      High contrast, detailed composition.`;
-
+  
+      const stylePrompt = selectedStyle === 'Custom Art Style' 
+        ? customStyleText 
+        : selectedStyle;
+  
+      const promptForCompression = `${stylePrompt}, ${processedTitle}`;
+      let compressedPrompt = await aiService.compressPrompt(promptForCompression);
+      compressedPrompt = enforceNoDialogueAndStyle(compressedPrompt, stylePrompt);
+  
       const imageBlob = await aiService.generateTextToImageReplicate({
-        prompt,
+        prompt: compressedPrompt,
         negative_prompt: negativePrompt || "text errors, blurry, watermark, deformed, bad anatomy",
         width: 1008,
         height: 1792,
-        cfg_scale: 13.5,
-        steps: 35,
+        cfg_scale: 7,
+        steps: 28,
         seed: Math.floor(Math.random() * 10000000),
+        style_selector: "Anime",
       });
-      
-
+  
       let imageUrl: string;
       if (isBlob(imageBlob)) {
         imageUrl = URL.createObjectURL(imageBlob);
@@ -103,7 +108,7 @@ export default function CoverGenerator() {
       } else {
         throw new Error('Unsupported image format');
       }
-
+  
       setCoverImage(imageUrl);
     } catch (error: any) {
       if (creditsWereDeducted) await addCredits(COVER_COST);
@@ -112,7 +117,7 @@ export default function CoverGenerator() {
       setIsGenerating(false);
     }
   };
-
+  
   const drawCanvas = () => {
     const canvas = canvasRef.current;
     if (!canvas || !coverImage) return;
@@ -400,9 +405,10 @@ lines.forEach((line, i) => {
         };
   };
 
-  useEffect(() => {
+ useEffect(() => {
+  if (!coverImage) return;
     drawCanvas();
-  }, [coverImage, textOverlay, textEffect, advancedText, advancedTextStyle, textFont, textRotation, textColor, textPosition, fontSize]);
+}, [coverImage, textOverlay, textEffect, advancedText, advancedTextStyle, textFont, textRotation, textColor, textPosition, fontSize]);
 
   const downloadCover = () => {
     if (!canvasRef.current) return;
@@ -475,7 +481,11 @@ lines.forEach((line, i) => {
             <label>
               Text Font
             <select value={textFont} onChange={(e) => setTextFont(e.target.value)}>
-              {fontOptions.map(font => <option key={font} value={font}>{font}</option>)}
+            {fontOptions.map(font => (
+    <option key={font} value={font} style={{ fontFamily: font }}>
+      {font}
+    </option>
+  ))}
             </select>
             </label>
             <label>Font Size: <input type="range" min="50" max="200" value={fontSize} onChange={(e) => setFontSize(+e.target.value)} /></label>

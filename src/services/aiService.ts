@@ -1,10 +1,6 @@
 // Add at the top of aiService.ts
 import { HfInference, } from "@huggingface/inference";
-import Replicate from "replicate";
-
-const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_TOKEN,
-});
+import {enforceNoDialogueAndStyle} from '@/utils/promptUtils'
 
 interface Panel {
   id: string;
@@ -40,7 +36,42 @@ export type ArtStyle = keyof AIService['ART_STYLES'];
 type ColorOption = "colored" | "black_white";
 type GradioStyle = "(None)" | "Cinematic" | "Photographic" | "Anime" | "Manga" | "Digital Art" | "Pixel art" | "Fantasy art" | "Neonpunk" | "3D Model";
 
-// Gradio API Configuration
+const GRADIO_TO_REPLICATE_STYLE: Record<GradioStyle, string> = {
+  "(None)": "(None)",
+  "Manga": "Manga",
+  "Anime": "Anime",
+  "Cinematic": "Cinematic",
+  "Photographic": "Photographic",
+  "Digital Art": "Digital Art",
+  "Pixel art" : "Pixel art",
+  "Fantasy art": "Fantasy art",
+  "Neonpunk":  "Neonpunk",
+  "3D Model": "3D Model"
+};
+
+function sanitizeScenePrompt(raw: string): string {
+  // Remove quoted dialogue like "..." or ‘...’
+  let cleaned = raw.replace(/["“”‘’][^"“”‘’]*["“”‘’]/g, "");
+
+  // Collapse repeated descriptors (simple heuristic: split by commas, dedupe while preserving order)
+  const parts = cleaned
+    .split(",")
+    .map(p => p.trim())
+    .filter(p => p.length > 0);
+  const seen = new Set<string>();
+  const deduped: string[] = [];
+  for (const part of parts) {
+    const lower = part.toLowerCase();
+    if (!seen.has(lower)) {
+      seen.add(lower);
+      deduped.push(part);
+    }
+  }
+
+  return deduped.join(", ");
+}
+// Added log to show the mapping for debugging
+console.log("GRADIO_TO_REPLICATE_STYLE mapping:", GRADIO_TO_REPLICATE_STYLE);
 export class AIService {
   private hf: HfInference;
   private readonly TEXT_MODEL = "black-forest-labs/FLUX.1-dev";
@@ -62,43 +93,43 @@ export class AIService {
   // Art style configurations without model references
   private readonly ART_STYLES = {
     default: {
-      prompt: "black and white manga, screentone shading, hand-drawn ink lines, minimal color, Japanese comic layout, dramatic paneling",
-      negative_prompt: "color, 3D, CGI, photorealistic, painterly, soft gradients, western comic style"
+      prompt: "black and white manga, screentone shading, hand-drawn ink lines,",
+      negative_prompt: "color, 3D, CGI, photorealistic, painterly, soft gradients, western comic style, deformed hands, deformed body parts"
     },
   
     "one-piece": {
-      prompt: "one piece art style, exaggerated expressions, cartoony anatomy, bold black outlines, bright cel-shading, dynamic action poses, whimsical designs, chaotic energy",
+      prompt: "one piece art style",
       negative_prompt: "photorealistic, 3D, CGI, hyperrealistic, blurred, low detail, child-like drawing, watermark, signature, duplicate heads, text errors, out-of-focus, poorly drawn anatomy, plain background, pastel art style"
     },
   
     "jujutsu-kaisen": {
-      prompt: "jujutsu kaisen art style, dark tone, heavy shadows, cursed energy effects, sharp linework, serious expressions, anime action, gritty atmosphere",
-      negative_prompt: "bright colors, overly simplified designs, clean digital look, soft pastels, cute expressions"
+      prompt: "jujutsu kaisen art style",
+      negative_prompt: "bright colors, overly simplified designs, clean digital look, soft pastels, cute expressions, deformed hands, deformed body parts"
     },
   
     "my-hero-academia": {
-      prompt: "my hero academia art style, sharp cel-shading, comic-style motion lines, heroic poses, colorful uniforms, expressive faces, bold outlines, dynamic panels",
-      negative_prompt: "realistic, washed-out tones, low detail, grayscale, horror style"
+      prompt: "my hero academia art style",
+      negative_prompt: "realistic, washed-out tones, low detail, grayscale, horror style, deformed hands, deformed body parts"
     },
   
     "dandadan": {
-      prompt: "dandadan art style, surreal atmosphere, eerie lighting, detailed linework, supernatural elements, chaotic composition, dramatic expressions, anime horror-fantasy fusion",
-      negative_prompt: "orderly, too clean, flat linework, pastel tones, generic backgrounds"
+      prompt: "dandadan art style, surreal atmosphere, eerie lighting, detailed linework,",
+      negative_prompt: "orderly, too clean, flat linework, pastel tones, generic backgrounds, deformed hands, deformed body parts"
     },
   
     "quintessential-quintuplets": {
-      prompt: "quintessential quintuplets art style, romantic atmosphere, soft lighting, pastel palette, gentle expressions, clean thin line art, bright warm backgrounds, anime romance vibe",
-      negative_prompt: "dark themes, excessive contrast, rough inking, horror elements, strong shadows"
+      prompt: "quintessential quintuplets art style, romantic atmosphere, clean thin line art",
+      negative_prompt: "dark themes, excessive contrast, rough inking, horror elements, strong shadows, deformed hands, deformed body parts"
     },
   
     "tokyo-revengers": {
-      prompt: "tokyo revengers art style, urban street vibe, thin line art, confident stances, semi-muted colors, gang fashion, action blur, cityscape backgrounds, gritty youth drama",
-      negative_prompt: "clean, overly polished, soft shading, 3D rendering, overly detailed fantasy backgrounds"
+      prompt: "tokyo revengers art style, thin line art",
+      negative_prompt: "clean, overly polished, soft shading, 3D rendering, overly detailed fantasy backgrounds, deformed hands, deformed body parts"
     },
   
     "comic-book": {
-      prompt: "comic book style, Marvel, DC Comics, heroic proportions, bold black outlines, halftone texture, dramatic lighting, vibrant colors, inked shading, dynamic pose, American superhero comics",
-      negative_prompt: "anime, watercolor, grayscale, painterly, photorealistic, manga, screentones"
+      prompt: "comic book style, Marvel, DC Comics, bold black outlines, halftone texture, inked shading",
+      negative_prompt: "anime, watercolor, grayscale, painterly, photorealistic, manga, screentones, deformed hands, deformed body parts"
     }
   } as const;
   
@@ -141,25 +172,41 @@ export class AIService {
 
   async compressPrompt(prompt: string): Promise<string> {
     const systemInstruction = `
-  You are a prompt optimization assistant for AI image generation.
-  - You receive a raw prompt that may be too long or redundant.
-  - Your job is to reduce it under 77 tokens.
-  - Keep only visually important keywords: actions, camera angle, art style, colors, clothing, body language, lighting.
-  - Remove fluff, repetition, and minor details.
-  - Focus on the *main action* and distinctive traits.
-  Return only the optimized prompt.
-  `;
-  
+    You are a prompt compression tool for AI image generation.
+    Convert a natural-language scene description into a concise, comma-separated list of visual tags under 77 tokens.
+    
+    Requirements:
+    1. Only include the character(s) explicitly mentioned in the input. If only 1boy is mentioned, do not add any 1girl or others If 1girl is mentioned don't add 1boy.
+    1. For each character, start with "1boy" or "1girl", followed by distinctive traits (hairstyle, eye color, clothing), their action, and camera angle. Do not merge character traits.
+    2. Include the specified art style as the first style tag (e.g., "one piece art style", "manga").
+    3. Include environment/setting tags (city, medium shot, lighting, etc.).
+    4. REMOVE any dialogue or quoted speech completely. Do not output any spoken text, quotes, or implied conversation.
+    5. Eliminate duplicate descriptors; each visual concept should appear only once.
+    6. Output only comma-separated tags. No explanations, no full sentences, no extra text.
+    
+    Example for Only One Person If it's 1boy Explicitly mentioned:
+    1boy, wolf cut hairstyle, blue eyes, black suit, walking, busy city street, medium shot, one piece art style, greyscale
+
+    Example for Only One Person If it's 1boy Explicitly mentioned:
+    1girl, wolf cut hairstyle, blue eyes, black suit, walking, busy city street, medium shot, one piece art style, greyscale
+
+    Example for More than One Person Explicitly mentioned:
+    1boy, wolf cut hairstyle, blue eyes, black suit, walking, busy city street, medium shot, one piece art style, greyscale
+    1girl, long brown hair in bun, white baggy shirt, blue jeans, walking, busy city street, medium shot, one piece art style, greyscale
+
+    This are Just examples u don't need to include it verbatim in the prompt. Just use the description of the character and what the user wants.
+    `;
+    
     const result = await this.hf.chatCompletion({
-      model: "mistralai/Mixtral-8x7B-Instruct-v0.1", // or another chat-compatible model
+      model: "mistralai/Mixtral-8x7B-Instruct-v0.1",
       messages: [
         { role: "system", content: systemInstruction },
         { role: "user", content: `Prompt:\n${prompt}` }
       ],
       parameters: {
         max_new_tokens: 80,
-        temperature: 0.7,
-        top_p: 0.95
+        temperature: 0.6,
+        top_p: 0.9
       }
     });
   
@@ -170,48 +217,65 @@ export class AIService {
     return result.choices[0].message.content.trim();
   }
   
-  
-  async generateTextToImageReplicate(opts: {
-    prompt: string;
-  negative_prompt?: string;
-  width?: number;
-  height?: number;
-  seed?: number;
-  steps?: number;
-  cfg_scale?: number; 
-  }): Promise<Blob> {
-    const response = await replicate.run(
-      "aisha-ai-official/animagine-xl-4.0:057e2276ac5dcd8d1575dc37b131f903df9c10c41aed53d47cd7d4f068c19fa5",
-    {
-      input: {
-        model: "Animagine-XL-4.0",
-        vae: "default",
-        prompt: opts.prompt,
-        negative_prompt: opts.negative_prompt ?? "nsfw, naked",
-        width: opts.width ?? 1024,
-        height: opts.height ?? 1024,
-        steps: opts.steps ?? 35,
-        cfg_scale: opts.cfg_scale ?? 13,
-        seed: opts.seed ?? -1,
-        guidance_rescale: 0.5,
-        batch_size: 1,
-        clip_skip: 1,
-        scheduler: "Euler a",
-        pag_scale: 3,
-        prepend_preprompt: true,
+    // ✅ FRONTEND — safe to call your own backend API
+    async generateTextToImageReplicate(opts: {
+      prompt: string;
+      negative_prompt?: string;
+      width?: number;
+      height?: number;
+      seed?: number;
+      steps?: number;
+      cfg_scale?: number;
+      style_selector?: string; // e.g., "Manga" or "Anime"
+    }): Promise<Blob> {
+      const res = await fetch("/api/replicate-generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: opts.prompt,
+          negative_prompt: opts.negative_prompt ?? "nsfw, naked",
+          width: opts.width ?? 1024,
+          height: opts.height ?? 1024,
+          steps: opts.steps ?? 35,
+          cfg_scale: opts.cfg_scale ?? 7,
+          seed: opts.seed ?? 28,
+          style_selector: opts.style_selector ?? "Anime", // default fallback
+        }),
+      });
+    
+      const data = await res.json();
+    
+      if (!res.ok || !data?.image?.url) {
+        console.error("Backend error response:", data);
+        throw new Error(data.error || "Image generation failed");
       }
-    }) as string[];
-    const url = response?.[0];
-    if (!url || typeof url !== "string") {
-      throw new Error("Invalid response from Replicate");
-    }
-  
-    const imageResponse = await fetch(url);
-    if (!imageResponse.ok) throw new Error("Failed to fetch image from Replicate");
-  
-    return await imageResponse.blob();
-  }
+    
+      const imageUrl = data.image.url;
+    
+      // 🖼️ Fetch the actual image
+      const imageResponse = await fetch(imageUrl);
+if (!imageResponse.ok) {
+  const bodyText = await imageResponse.text();
+  console.error("Image fetch failed:", bodyText);
+  throw new Error("Failed to fetch image blob");
+}
+const contentType = imageResponse.headers.get("content-type") || "";
+if (!contentType.startsWith("image/")) {
+  const bodyText = await imageResponse.text();
+  console.error("Expected image, got:", contentType, bodyText.slice(0, 500));
+  throw new Error("Blob is not an image");
+}
+const blob = await imageResponse.blob();
 
+      // Final check
+      if (!(blob instanceof Blob) || !blob.type.startsWith("image/")) {
+        console.error("Returned blob is invalid:", blob);
+        throw new Error("Blob is not an image");
+      }
+    
+      return blob;
+    }
+    
   async generateTextToImageFluxDev(payload: {
     prompt: string;
     negative_prompt?: string;
@@ -316,7 +380,7 @@ async generatePanel(payload: {
   color: ColorOption;
   gradioStyle: GradioStyle;
 }) {
-  return this.withRetry(async () => {
+  {
     const styleConfig = this.ART_STYLES[payload.style] ?? this.ART_STYLES.default; 
     const colorKey = payload.color ?? "black_white"; 
     const colorConfig = this.COLOR_OPTIONS[colorKey];
@@ -328,23 +392,42 @@ async generatePanel(payload: {
     }
     
     // Prompt generation logic preserved
-    const cleanedScene = payload.scene.replace(/\(Camera:.*?\)/gi, '').trim();
-    const negativePrompt = `${styleConfig.negative_prompt}, ${colorConfig.negative_prompt}`;
+    const rawScene = payload.scene;
+const sanitizedScene = sanitizeScenePrompt(rawScene);
 
-    const cleanPrompt = ` Camera: ${payload.cameraAngle} ${this.generateSceneSpecificPrompt(payload.scene, styleConfig)},
+    const cleanedScene = sanitizedScene.replace(/\(Camera:.*?\)/gi, '').trim();
+    const negativePrompt = `${styleConfig.negative_prompt}, ${colorConfig.negative_prompt}`;
+    const styleSelector = GRADIO_TO_REPLICATE_STYLE[payload.gradioStyle] ?? "Anime";
+    const stylePromptTag = styleConfig.prompt; // e.g., "one piece art style"
+    const cleanPrompt = `Camera: ${payload.cameraAngle} ${this.generateSceneSpecificPrompt(sanitizedScene, styleConfig)},
      ${colorPrompt}, Scene: ${cleanedScene}`.trim().replace(/\s+/g, ' ');
+     const fullPromptForCompression = `${stylePromptTag}, ${cleanPrompt}`;
     const randomSeed = Math.floor(Math.random() * 10000000); // ✅ Random seed between 0 and 99999
-    const shortenedPrompt = await this.compressPrompt(cleanPrompt);
+    let shortenedPrompt = await this.compressPrompt(fullPromptForCompression);
+    shortenedPrompt = enforceNoDialogueAndStyle(shortenedPrompt, styleConfig.prompt);
       // Replace HF calls with Gradio integration
       const blob = await aiService.generateTextToImageReplicate({
         prompt: shortenedPrompt,
         negative_prompt: negativePrompt,
         width: payload.width!,
         height: payload.height!,
-        cfg_scale: 13.5,
-        steps: 35,
+        cfg_scale: 7,
+        steps: 28,
         seed: randomSeed,
+        style_selector: styleSelector
       });
+
+      if (!(blob instanceof Blob)) {
+        throw new Error("Panel image is not a blob!");
+      }
+      
+      // Extra check: Confirm it's a valid image MIME
+      if (!blob.type.startsWith("image/")) {
+        const text = await blob.text(); // For debugging invalid payload
+        console.error("Returned blob is not an image:", text);
+        throw new Error("Invalid image format returned from Replicate");
+      }
+
       const url = URL.createObjectURL(blob);
       // Call Gradio API
       if (shortenedPrompt.split(/\s+/).length > 77) {
@@ -360,7 +443,7 @@ async generatePanel(payload: {
       } 
 
       return blob;
-  });
+  };
 }
 
 private async applyGrayscale(blob: Blob): Promise<Blob> {
