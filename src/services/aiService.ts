@@ -128,7 +128,7 @@ export class AIService {
     },
   
     "comic-book": {
-      prompt: "Dc comic book art style, bold black outlines, halftone texture, inked shading",
+      prompt: "comic art style, bold black outlines, halftone texture, inked shading",
       negative_prompt: "anime, watercolor, grayscale, painterly, photorealistic, manga, screentones, deformed hands, deformed body parts"
     }
   } as const;

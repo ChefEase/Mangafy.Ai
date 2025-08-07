@@ -315,9 +315,8 @@ layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
 
       // Top horizontal panel
       const topPanel = panels[0];
-       const imgTop = typeof window !== 'undefined' ? new Image() : null;
+      const imgTop = panels[0].image;
     if (!imgTop) return;
-      imgTop.src = topPanel.url;
 
       ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, A4_WIDTH, A4_HEIGHT);
@@ -335,7 +334,9 @@ layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
 
       ctx.fillStyle = 'black';
       ctx.fillRect(x - border, y - border, scaledWidth + border*2, scaledHeight + border*2);
-      ctx.drawImage(imgTop, x, y, scaledWidth, scaledHeight);
+      if (imgTop) {
+        ctx.drawImage(imgTop, x, y, scaledWidth, scaledHeight);
+      }
  if (topPanel.dialogue) {
           const bubbleX = x + 50;
           const bubbleY = y + scaledHeight - 150;
