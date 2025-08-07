@@ -26,8 +26,8 @@
     align-items: center;
     justify-content: center;
     opacity: 0.25;
-    animation: scrollHorizontal 120s linear infinite;
-    width: 3000px;
+    animation: scrollHorizontal 40s linear infinite;
+    width: 6200px;
   }
   
   @keyframes scrollHorizontal {
@@ -35,7 +35,7 @@
       transform: translateX(0);
     }
     100% {
-      transform: translateX(-1500px);
+      transform: translateX(-5900px);
     }
   }
   
@@ -276,7 +276,7 @@
     position: absolute;
     width: 42px; /* Adjust as needed */
     height: auto;
-    top: 28.3%;  /* Move vertically */
+    top: 14.8%;  /* Move vertically */
     left: 80%; /* Move horizontally */
     transform: translate(-50%, -50%) rotate(45deg) scale(1.3); /* fine tune position and tilt */
     pointer-events: none; /* mouse icon won’t interfere with interaction */
@@ -460,5 +460,17 @@
   .footerCopy {
     font-size: 0.875rem;
     opacity: 0.75;
+  }
+
+  .heroImageLeft {
+    left: 20px;
+    top: 300px;
+    transform: scale(1.1);
+  }
+
+  .heroImageRight {
+    right: 20px;
+    top: 300px;
+    transform: scale(1.1);
   }
   

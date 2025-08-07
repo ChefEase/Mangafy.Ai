@@ -133,10 +133,15 @@ export default function CharacterGenerator() {
       if (creditsDeducted) {
         await addCredits(CHARACTER_COST);
       }
-       setError(
-         err.message || 
-         "Generation failed. Credits have been refunded. Please try again."
-       );
+      const isTooLarge = err.message?.toLowerCase().includes("entity too large") || 
+                     err.message?.toLowerCase().includes("function_payload_too_large");
+
+  // Show user-friendly error message
+  setError(isTooLarge 
+    ? "The image you uploaded is too large. Please upload a smaller image (try under 4MB)." 
+    : err.message || "Generation failed. Credits have been refunded. Please try again."
+  );
+    
       console.error("Generation error:", err);
       
       alert("Generation failed. Please try again.");
@@ -167,7 +172,7 @@ export default function CharacterGenerator() {
       comicBook: 'American comic book style (Marvel/DC), bold outlines, muscular anatomy,',
       waifu: 'Waifu, medium breast, wide hips, medium ass, ultra-polished anime look, big sparkly eyes, glossy hair,',
       swordArtOnline: 'Sword Art Online Art style, sleek character designs, glowing digital effects,',
-      naruto: 'Naruto Art style, sharp angular features, ninja gear,',
+      naruto: 'Naruto Art style, sharp angular features,',
       dragonBall: 'Dragon Ball Art style, bold muscles,',
       reZero: 'Re:Zero Art style, detailed fantasy clothing,'
     };        

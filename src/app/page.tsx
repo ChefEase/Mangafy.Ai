@@ -16,9 +16,9 @@ const MANGA_SAMPLES: { pages: string[] }[] = [
   },
   {
     pages: [
-      /*'/samples/sample2-left.png',
-      '/samples/sample2-center.png',
-      '/samples/sample2-right.png',*/
+      '/samples/page 4.png',
+      '/samples/page 5.png',
+      '/samples/page 6.jpg',
     ],
   },
   {
@@ -49,7 +49,20 @@ const CAROUSEL_IMAGES = [
   '/samples/sample15.png', 
   '/samples/sample16.png', 
   '/samples/sample17.png', 
-  // ... add up to 30*/
+  '/samples/sample18.png',
+  '/samples/sample19.png',
+  '/samples/sample20.png',  
+  '/samples/sample21.png',  
+  '/samples/sample22.png',
+  '/samples/sample23.png', 
+  '/samples/sample 24.jpeg', 
+  '/samples/sample 24.png', 
+  '/samples/sample 25.png', 
+  '/samples/sample 26.png', 
+  '/samples/sample 27.png', 
+  '/samples/sample 28.jpeg', 
+  '/samples/sample 29.jpeg', 
+  '/samples/sample 30.png',  
 ];
 
 const FEATURES = [
@@ -144,7 +157,7 @@ export default function LandingPage() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCarouselIndex((idx) => (idx + 1) % CAROUSEL_IMAGES.length);
-    }, 4000);
+    }, 6000);
     return () => clearInterval(interval);
   }, []);
 
@@ -173,7 +186,7 @@ export default function LandingPage() {
       {/* HEADER */}
       <header className={styles.header}>
         <div className={styles.logoContainer}>
-          <Image src={Logo} alt="Mangafy.ai Logo" width={48} height={48} />
+          <Image src={Logo} alt="Mangafy.ai Logo" width={48} height={48}/>
           <span className={styles.logoText}>Mangafy.ai</span>
         </div>
       </header>
