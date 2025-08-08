@@ -21,13 +21,6 @@ const MANGA_SAMPLES: { pages: string[] }[] = [
       '/samples/page 6.jpg',
     ],
   },
-  {
-    pages: [
-      /*'/samples/sample3-left.png',
-      '/samples/sample3-center.png',
-      '/samples/sample3-right.png',*/
-    ],
-  },
 ];
 
 
