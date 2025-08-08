@@ -345,7 +345,7 @@ export default function LandingPage() {
         <p>
           Follow us on{' '}
           <a
-            href="https://instagram.com/mangafy.ai"
+            href="https://www.instagram.com/mangafy.ai/"
             target="_blank"
             rel="noopener noreferrer"
             className={styles.footerLink}
