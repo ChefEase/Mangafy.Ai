@@ -998,10 +998,11 @@ const CreditIcon = ({ cost }: { cost: number }) => (
                 document.addEventListener("mouseup", handleMouseUp);
               }}
             />
-            <button className="toggle-button" onClick={toggleCharactersPage}>
+          </div>
+
+          <button className="toggle-button" onClick={toggleCharactersPage}>
               {isCharactersPageOpen ? "◄" : "►"}
             </button>
-          </div>
   
           {/* Script Editor */}
           <div className="script-editor-container">

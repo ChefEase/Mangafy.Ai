@@ -352,7 +352,7 @@ body {
   .toggle-button {
   position: fixed !important; /* force it out of transformed parent */
   top: 130px;
-  left: calc(env(safe-area-inset-left) + 10px); /* keeps it clear of notch */
+  left: calc(env(safe-area-inset-left) + 30px); /* keeps it clear of notch */
   z-index: 9999; /* jump to top of all stacking contexts */
 }
 
