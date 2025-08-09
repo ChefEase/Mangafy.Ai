@@ -185,14 +185,14 @@ export class AIService {
     6. Output only comma-separated tags. No explanations, no full sentences, no extra text.
     
     Example for Only One Person If it's 1boy Explicitly mentioned:
-    1boy, wolf cut hairstyle, blue eyes, black suit, walking, busy city street, medium shot, one piece art style, greyscale
+    1boy, wolf cut hairstyle, blue eyes, black suit, walking, busy city street, medium shot, one piece art style, 
 
     Example for Only One Person If it's 1boy Explicitly mentioned:
-    1girl, wolf cut hairstyle, blue eyes, black suit, walking, busy city street, medium shot, one piece art style, greyscale
+    1girl, wolf cut hairstyle, blue eyes, black suit, walking, busy city street, medium shot, one piece art style,
 
     Example for More than One Person Explicitly mentioned:
-    1boy, wolf cut hairstyle, blue eyes, black suit, walking, busy city street, medium shot, one piece art style, greyscale
-    1girl, long brown hair in bun, white baggy shirt, blue jeans, walking, busy city street, medium shot, one piece art style, greyscale
+    1boy, wolf cut hairstyle, blue eyes, black suit, walking, busy city street, medium shot, one piece art style,
+    1girl, long brown hair in bun, white baggy shirt, blue jeans, walking, busy city street, medium shot, one piece art style, 
 
     This are Just examples u don't need to include it verbatim in the prompt. Just use the description of the character and what the user wants.
     `;
