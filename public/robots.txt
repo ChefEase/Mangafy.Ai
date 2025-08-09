@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://mangafy-ai.vercel.app
+
+# Sitemaps
+Sitemap: https://mangafy-ai.vercel.app/sitemap.xml
