@@ -31,6 +31,8 @@ module.exports = withPWA({
 
 // next.config.js
 module.exports = {
+  siteUrl: 'https://mangafy-ai.vercel.app',
+  generateRobotsTxt: true,
   eslint: {
     ignoreDuringBuilds: true, // ✅ TEMP disable build-breaking lint
   },
