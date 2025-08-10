@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Head from "next/head"; // import Head here
 import  supabase  from "@/utils/supabaseClient";
 import { RegisterForm } from "@/components/Auth/RegisterForm";
 import { LoginForm } from "@/components/Auth/LoginForm";
@@ -46,6 +47,37 @@ export default function AuthPage() {
 
   return (
     <div className="home">
+       <Head>
+        <title>Mangafy.Ai – Login or Register</title>
+        <meta
+          name="description"
+          content="Log in or register to Mangafy.Ai to create amazing manga panels, characters, and stories with AI-powered tools."
+        />
+
+        {/* Open Graph for Social Sharing */}
+        <meta property="og:title" content="Mangafy.Ai – Login or Register" />
+        <meta
+          property="og:description"
+          content="Join Mangafy.Ai and unlock AI tools for manga creation. Login or create your account now!"
+        />
+        <meta property="og:url" content="https://mangafy-ai.vercel.app/login" />
+        <meta
+          property="og:image"
+          content="https://mangafy-ai.vercel.app/logo.png"
+        />
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Mangafy.Ai – Login or Register" />
+        <meta
+          name="twitter:description"
+          content="Join Mangafy.Ai and unlock AI tools for manga creation. Login or create your account now!"
+        />
+        <meta
+          name="twitter:image"
+          content="https://mangafy-ai.vercel.app/logo.png"
+        />
+      </Head>
       <Navbar setActiveForm={setActiveForm} />
       <div className="form-container">
         {activeForm === "register" && <RegisterForm referrerId={referrerId}/>}

@@ -30,8 +30,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     
       <html className={inter.className} lang="en">
          <Head>
-         <title>Mangafy.Ai – Where imagination Becomes Manga</title>
-         <meta name="description" content="Mangafy.Ai – Create manga panels, characters, covers, and scripts with powerful AI tools for artists, writers, and storytellers." />
+         <title>Home - Mangafy.Ai</title>
+         <meta name="description" content="Mangafy.Ai – Create manga panels, characters, covers, and scripts with Mangafy.Ai powerful AI tools for artists, writers, and storytellers." />
 
         {/* Open Graph */}
         <meta property="og:type" content="website" />

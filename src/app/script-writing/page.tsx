@@ -1,6 +1,33 @@
 'use client';
 import ScriptWritingClient from '../../components/ScriptEditor/ScriptWritingClient';
+import Head from 'next/head';
 
 export default function Page() {
+  <Head>
+  <title>AI Manga Generate – Mangafy.Ai</title>
+  <meta
+    name="description"
+    content="Generate stunning manga panels instantly with Mangafy.Ai's AI-powered manga generator. Bring your manga stories to life with ease and creativity."
+  />
+  {/* Open Graph */}
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://mangafy-ai.vercel.app/script-writing" />
+  <meta property="og:title" content="AI Manga Generate – Mangafy.Ai" />
+  <meta
+    property="og:description"
+    content="Generate stunning manga panels instantly with Mangafy.Ai's AI-powered manga generator. Bring your manga stories to life with ease and creativity."
+  />
+  <meta property="og:image" content="https://mangafy-ai.vercel.app/logo.png" />
+
+  {/* Twitter */}
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://mangafy-ai.vercel.app/script-writing" />
+  <meta name="twitter:title" content="AI Manga Generate – Mangafy.Ai" />
+  <meta
+    name="twitter:description"
+    content="Generate stunning manga panels instantly with Mangafy.Ai's AI-powered manga generator. Bring your manga stories to life with ease and creativity."
+  />
+  <meta name="twitter:image" content="https://mangafy-ai.vercel.app/logo.png" />
+</Head>
   return <ScriptWritingClient />;
 }

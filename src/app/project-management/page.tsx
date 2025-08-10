@@ -8,6 +8,7 @@ import CreateProjectModal from "./components/CreateProjectModal";
 import ChapterList from "./components/ChapterList";
 import "./styles/projectManagement.css";
 import { fetchUserData, saveUserData } from "@/utils/airtable";
+import Head from "next/head";
 
 // ✅ Define TypeScript interfaces for Projects & Chapters
 interface Chapter {
@@ -161,6 +162,33 @@ export default function ProjectManagementPage() {
 
   return (
     <div>
+        <Head>
+  <title>Project Management – Mangafy.Ai</title>
+  <meta
+    name="description"
+    content="Manage your manga projects effortlessly on Mangafy.Ai. Create, organize, and track your manga stories and chapters with ease."
+  />
+  {/* Open Graph */}
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://mangafy-ai.vercel.app/project-management" />
+  <meta property="og:title" content="Project Management – Mangafy.Ai" />
+  <meta
+    property="og:description"
+    content="Manage your manga projects effortlessly on Mangafy.Ai. Create, organize, and track your manga stories and chapters with ease."
+  />
+  <meta property="og:image" content="https://mangafy-ai.vercel.app/logo.png" />
+
+  {/* Twitter */}
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://mangafy-ai.vercel.app/project-management" />
+  <meta name="twitter:title" content="Project Management – Mangafy.Ai" />
+  <meta
+    name="twitter:description"
+    content="Manage your manga projects effortlessly on Mangafy.Ai. Create, organize, and track your manga stories and chapters with ease."
+  />
+  <meta name="twitter:image" content="https://mangafy-ai.vercel.app/logo.png" />
+</Head>
+
       <Header />
       <div className="project-management-page">
         <ProjectSidebar

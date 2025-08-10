@@ -5,6 +5,7 @@ import Link from "next/link";
 import "./SubscriptionPage.css";
 import { useCredits } from "@/context/CreditContext"; // Adjust the path as needed
 import { useUser } from "@/context/UserContext";
+import Head from "next/head";
 
 interface Plan {
   type: string;
@@ -170,6 +171,34 @@ export default function SubscriptionPage() {
     ));
     
   return (
+    <>
+    <Head>
+  <title>Subscription – Mangafy.Ai</title>
+  <meta
+    name="description"
+    content="Manage your Mangafy.Ai subscription plans with ease. Upgrade or renew your subscription to keep creating amazing manga with AI-powered tools."
+  />
+  {/* Open Graph */}
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://mangafy-ai.vercel.app/subscription" />
+  <meta property="og:title" content="Subscription – Mangafy.Ai" />
+  <meta
+    property="og:description"
+    content="Manage your Mangafy.Ai subscription plans with ease. Upgrade or renew your subscription to keep creating amazing manga with AI-powered tools."
+  />
+  <meta property="og:image" content="https://mangafy-ai.vercel.app/logo.png" />
+
+  {/* Twitter */}
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://mangafy-ai.vercel.app/subscription" />
+  <meta name="twitter:title" content="Subscription – Mangafy.Ai" />
+  <meta
+    name="twitter:description"
+    content="Manage your Mangafy.Ai subscription plans with ease. Upgrade or renew your subscription to keep creating amazing manga with AI-powered tools."
+  />
+  <meta name="twitter:image" content="https://mangafy-ai.vercel.app/logo.png" />
+</Head>
+
     <div className="subscription-page">
       <InviteSection />
       <h1>Choose Your Plan</h1>
@@ -183,5 +212,6 @@ export default function SubscriptionPage() {
         <div className="plans-container">{renderPlans(yearlyPlans)}</div>
       </section>
     </div>
+    </>
   );
 }

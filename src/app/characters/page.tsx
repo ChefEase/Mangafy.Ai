@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import CharacterForm from "@/components/Character/CharacterForm";
 import CharacterList from "@/components/Character/CharacterList";
 import "./CharactersPage.css";
+import Head from 'next/head';
 
 interface Character {
   id: string;
@@ -109,6 +110,69 @@ export default function CharactersPage() {
 
   return (
     <div className="characters-page">
+       <Head>
+      <title>Character Creation - Mangafy.Ai</title>
+      <meta
+        name="description"
+        content="Mangafy.Ai – Create manga panels, characters, covers, and scripts with powerful AI tools for artists, writers, and storytellers."
+      />
+
+      {/* Open Graph */}
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="https://mangafy-ai.vercel.app" />
+      <meta property="og:title" content="Mangafy.Ai – AI Manga Creation Tools" />
+      <meta
+        property="og:description"
+        content="Create manga panels, characters, covers, and scripts with powerful AI tools for artists, writers, and storytellers."
+      />
+      <meta property="og:image" content="https://mangafy-ai.vercel.app/logo.png" />
+
+      {/* Twitter */}
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:url" content="https://mangafy-ai.vercel.app/" />
+      <meta name="twitter:title" content="Mangafy.Ai – AI Manga Creation Tools" />
+      <meta
+        name="twitter:description"
+        content="Create manga panels, characters, covers, and scripts with powerful AI tools for artists, writers, and storytellers."
+      />
+      <meta name="twitter:image" content="https://mangafy-ai.vercel.app/logo.png" />
+
+      {/* Structured Data: Organization + Website */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: "Mangafy.Ai",
+            url: "https://mangafy-ai.vercel.app",
+            logo: "https://mangafy-ai.vercel.app/logo.png",
+            sameAs: [
+              // Add your social profiles here (if any)
+              "https://twitter.com/yourhandle",
+              "https://facebook.com/yourpage",
+              "https://instagram.com/yourprofile"
+            ]
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            url: "https://mangafy-ai.vercel.app",
+            name: "Mangafy.Ai",
+            potentialAction: {
+              "@type": "SearchAction",
+              target: "https://mangafy-ai.vercel.app/search?q={search_term_string}",
+              "query-input": "required name=search_term_string"
+            }
+          }),
+        }}
+      />
+    </Head>
       <h1>Character Creation</h1>
       <CharacterForm onSubmit={handleAddCharacter} />
       <CharacterList
