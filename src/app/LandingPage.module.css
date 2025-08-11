@@ -295,6 +295,66 @@
     color: #4b5563; /* gray-600 */
   }
   
+  .downloadSection {
+    background: linear-gradient(135deg, #ff7e5f, #feb47b);
+    padding: 4rem 2rem;
+    text-align: center;
+    border-radius: 20px;
+    margin: 4rem auto;
+    max-width: 900px;
+    color: white;
+  }
+  
+  .downloadContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  .downloadTitle {
+    font-size: 2.5rem;
+    font-weight: bold;
+  }
+  
+  .downloadSubtitle {
+    font-size: 1.2rem;
+    max-width: 600px;
+    opacity: 0.9;
+  }
+  
+  .downloadButtons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .downloadButtonWindows,
+  .downloadButtonMac {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    padding: 0.8rem 1.5rem;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.3s ease;
+  }
+  
+  .downloadButtonWindows:hover,
+  .downloadButtonMac:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  
+  .downloadButtonWindows img,
+  .downloadButtonMac img {
+    width: 20px;
+    height: 20px;
+  }
+  
   @media (min-width: 768px) {
     .featureItem {
       flex-direction: row;

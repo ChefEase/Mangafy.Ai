@@ -137,6 +137,15 @@ const FAQ = [
 export default function LandingPage() {
   const [carouselIndex, setCarouselIndex] = useState(0);
   const router = useRouter();
+  const [isElectron, setIsElectron] = useState(false);
+
+  useEffect(() => {
+    // Detect Electron
+    if (typeof window !== "undefined") {
+      const userAgent = navigator.userAgent.toLowerCase();
+      setIsElectron(userAgent.includes("electron"));
+    }
+  }, []);
 
   // Handler functions
   const handleChooseFree = () => {
@@ -326,6 +335,23 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {!isElectron && (
+        <section className={styles.downloadSection}>
+          <div className={styles.downloadContent}>
+            <h2 className={styles.downloadTitle}>Get Mangafy.ai for Your Desktop</h2>
+            <p className={styles.downloadSubtitle}>
+              Enjoy faster performance, offline capabilities, and a smoother manga creation experience
+              with our desktop app.
+            </p>
+            <div className={styles.downloadButtons}>
+              <a href="/downloads/Mangafy.Ai Setup 1.0.0.exe" className={styles.downloadButtonWindows}>
+                <img src="/icons/windows3.svg" alt="Windows" /> Download for Windows
+              </a>
+            </div>
+          </div>
+        </section>
+      )}
+      
       {/* FAQ */}
       <section className={styles.faqSection}>
         <h2 className={styles.sectionTitleFaq}>FAQ</h2>
