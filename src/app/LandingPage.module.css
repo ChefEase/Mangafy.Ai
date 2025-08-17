@@ -414,13 +414,11 @@
     gap: 1.5rem;
   }
   
-  @media (min-width: 768px) {
     .pricingWrapper {
       flex-direction: row;
       justify-content: center;
       gap: 3rem;
     }
-  }
   
   .pricingCard {
     border: 1px solid #e2e8f0;
@@ -525,13 +523,28 @@
 
   .heroImageLeft {
     left: 20px;
-    top: 450px;
+    top: 550px;
     transform: scale(1.0);
   }
 
   .heroImageRight {
     right: 20px;
-    top: 450px;
+    top: 550px;
     transform: scale(1.0);
   }
   
+  .hero {
+    padding: 5rem 1.5rem;
+    max-width: 48rem;
+    top: 200px;
+  }
+
+  .heroTitle {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  .heroSubtitle {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
