@@ -409,13 +409,37 @@ lines.forEach((line, i) => {
     drawCanvas();
 }, [coverImage, textOverlay, textEffect, advancedText, advancedTextStyle, textFont, textRotation, textColor, textPosition, fontSize]);
 
-  const downloadCover = () => {
-    if (!canvasRef.current) return;
-    const link = document.createElement('a');
-    link.href = canvasRef.current.toDataURL();
-    link.download = 'generated_cover.png';
-    link.click();
-  };
+const downloadCover = async () => {
+  if (!canvasRef.current) return;
+
+  const dataUrl = canvasRef.current.toDataURL("image/png");
+  
+  // iOS / Mobile Safari fix → use the Web Share API if available
+  if (navigator.share) {
+    try {
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
+      const file = new File([blob], "generated_cover.png", { type: "image/png" });
+
+      await navigator.share({
+        title: "Generated Cover",
+        files: [file],
+      });
+      return;
+    } catch (err) {
+      console.error("Sharing failed, falling back:", err);
+    }
+  }
+
+  // Fallback for desktop and unsupported devices
+  const link = document.createElement("a");
+  link.href = dataUrl;
+  link.download = "generated_cover.png";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
 
   return (
     <div className="cover-generator">

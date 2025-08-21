@@ -836,19 +836,31 @@ function floorToMultipleOf8(n: number): number {
   
     const downloadAllPages = () => {
       if (typeof document === "undefined") return;
+    
       generatedPanels.forEach((pageData, index) => {
-        const link = document.createElement('a');
-        link.href = pageData;
-        link.download = `manga_page_${index + 1}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    
+        if (isIOS) {
+          // Open image in new tab, user can long-press to save
+          const newWindow = window.open();
+          if (newWindow) {
+            newWindow.document.write(`<img src="${pageData}" style="max-width:100%"/>`);
+          }
+        } else {
+          const link = document.createElement('a');
+          link.href = pageData;
+          link.download = `manga_page_${index + 1}.png`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+    
         if (index === 0) {
           sessionStorage.setItem('templateImage', LZString.compressToUTF16(pageData));
         }
       });
     };
+    
     const ColorOptionSelector = ({ 
       selectedColor,
       onChange 

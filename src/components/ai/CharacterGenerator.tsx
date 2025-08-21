@@ -157,6 +157,40 @@ export default function CharacterGenerator() {
     }
   };
 
+  const downloadImage = async () => {
+    if (!generatedImage) {
+      console.error("No image to download");
+      return;
+    }
+  
+    // If Share API is supported (iOS, Android Chrome)
+    if (navigator.share && navigator.canShare) {
+      try {
+        const response = await fetch(generatedImage); // ✅ now TS knows it's a string
+        const blob = await response.blob();
+        const file = new File([blob], `character_${Date.now()}.png`, { type: "image/png" });
+  
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            title: "My Character",
+            files: [file],
+          });
+          return;
+        }
+      } catch (err) {
+        console.error("Share failed:", err);
+      }
+    }
+  
+    // Fallback: normal download for desktop
+    const link = document.createElement("a");
+    link.href = generatedImage;
+    link.download = `character_${Date.now()}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
   const getStylePrompt = (style: string) => {
     const styles = {
       vinlandSaga: 'Vinland Saga Art style, detailed armor and clothing, expressive faces,',
@@ -348,18 +382,7 @@ export default function CharacterGenerator() {
             <div className="image-container">
               <img src={generatedImage} alt="Generated character" />
               <div className="download-options">
-                <button
-                  onClick={() => {
-                    const link = document.createElement('a');
-                    link.href = generatedImage;
-                    link.download = `character_${Date.now()}.png`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                  }}
-                >
-                  Download PNG
-                </button>
+              <button onClick={downloadImage}>Download PNG</button>
               </div>
             </div>
           </div>
