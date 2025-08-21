@@ -158,31 +158,30 @@ export default function CharacterGenerator() {
   };
 
   const downloadImage = async () => {
-    if (!generatedImage) {
-      console.error("No image to download");
-      return;
-    }
+    if (!generatedImage) return;
   
-    // If Share API is supported (iOS, Android Chrome)
-    if (navigator.share && navigator.canShare) {
-      try {
-        const response = await fetch(generatedImage); // ✅ now TS knows it's a string
-        const blob = await response.blob();
-        const file = new File([blob], `character_${Date.now()}.png`, { type: "image/png" });
+    try {
+      const response = await fetch(generatedImage);
+      const blob = await response.blob();
+      const file = new File([blob], `character_${Date.now()}.png`, { type: "image/png" });
   
-        if (navigator.canShare({ files: [file] })) {
+      // Try share, but don’t block fallback
+      if (navigator.share) {
+        try {
           await navigator.share({
             title: "My Character",
             files: [file],
           });
-          return;
+          return; // shared successfully
+        } catch (err) {
+          console.warn("Share failed, fallback to download:", err);
         }
-      } catch (err) {
-        console.error("Share failed:", err);
       }
+    } catch (err) {
+      console.error("Failed to fetch generated image:", err);
     }
   
-    // Fallback: normal download for desktop
+    // Fallback download (always works)
     const link = document.createElement("a");
     link.href = generatedImage;
     link.download = `character_${Date.now()}.png`;
