@@ -25,68 +25,103 @@ export default function CharacterGenerator() {
   const [error, setError] = useState<string | null>(null); // Add error state
   const fileInputRef = useRef<HTMLInputElement>(null);
   const CHARACTER_COST = 10; // Define character generation cost
+  const [isReferenceSheet, setIsReferenceSheet] = useState(false);
+const REFERENCE_SHEET_COST = 30;
+
+const getStylePrompt = (style: string) => {
+  const styles = {
+    vinlandSaga: 'Vinland Saga Art style, detailed clothing, expressive face,',
+    promisedNeverland: 'Promised Neverland Art style, soft lines, large expressive eyes,',
+    dandadan: 'Dandadan Art style, sharp features, intricate supernatural designs,',
+    quintessentialQuintuplets: 'Quintessential Quintuplets Art style, soft shading,',
+    jujutsuKaisen: 'Jujutsu Kaisen Art style, edgy linework,',
+    tokyoRevengers: 'Tokyo Revengers Art style, sharp and clean line art, street-style tone',
+    onePiece: 'One Piece Art style,',
+    myHeroAcademia: 'My Hero Academia Art style, clean shading,',
+    bleach: 'Bleach Art style, sleek designs, dramatic contrasts,',
+    chainsawMan: 'Chainsaw Man Art style, sketchy linework,',
+    comicBook: 'American comic book style (Marvel/DC), bold outlines,',
+    waifu: 'Waifu, medium breast, wide hips, medium ass, ultra-polished anime look, big sparkly eyes, glossy hair,',
+    swordArtOnline: 'Sword Art Online Art style, sleek character designs, glowing digital effects,',
+    naruto: 'Naruto Art style, sharp angular features,',
+    dragonBall: 'Dragon Ball Art style,',
+    reZero: 'Re:Zero Art style, detailed clothing,'
+  };        
+  return styles[style as keyof typeof styles] || '';
+};
 
   const generateCharacter = async () => {
     setIsGenerating(true);
     setError(null);
     // Check credits before proceeding
     let creditsDeducted = false; // 👈 Track if we deducted
-    if (credits < CHARACTER_COST) {
-      setError(`You need ${CHARACTER_COST} credits to generate a character`);
+
+    const cost = isReferenceSheet ? REFERENCE_SHEET_COST : CHARACTER_COST;
+
+    if (credits < cost) {
+      setError(`You need ${cost} credits to generate a character`);
       setIsGenerating(false);
       return;
     }
     try {
-      let result: Blob | String;
-      if (mode === 'text') {
-        const fullPrompt = `${params.prompt}, ${getStylePrompt(params.textStyle)}, white background, high quality character design`;
-        result = await aiService.generateTextToImageReplicate({
-          prompt: fullPrompt,
-          negative_prompt: params.negative_prompt,
-          width: params.width,
-          height: params.height,
-          cfg_scale: 7,
-          steps: 28,
-          seed: Math.floor(Math.random() * 2_000_000) + 1,
-          style_selector: "Anime"
-        }) as Blob | String;
-        
-        console.log("result:", result);
-        console.log("typeof result:", typeof result);
-      
-        let imageUrl: string;
+      if (mode === "text") {
+        const seed = Math.floor(Math.random() * 2_000_000) + 1;
+        const styleText = getStylePrompt(params.textStyle).trim().replace(/,$/, '');
+        if (isReferenceSheet) {
+          // ✅ Generate front, side, back with SAME SEED
+          const basePrompt = `${params.prompt ? params.prompt + ', ' : ''}${styleText}, high quality character design, white background, no objects, no shadows, solo`;
 
-        // Fix: TypeScript error with 'instanceof' on 'Blob'
-        // Use a safer check for Blob: check for 'object', 'type' property, and 'slice' method
-        if (
-          typeof result === 'object' &&
-          result !== null &&
-          typeof (result as Blob).type === 'string' &&
-          typeof (result as Blob).slice === 'function'
-        ) {
-          // ✅ Case 1: Blob object
-          imageUrl = URL.createObjectURL(result as Blob);
-          console.log("Image generated as Blob, created object URL:", imageUrl);
-        } else if (typeof result === 'string') {
-          // ✅ Case 2: string — base64 or URL
-          if (result.startsWith('data:image/')) {
-            imageUrl = result; // Already a data URL
-          } else if (result.startsWith('http://') || result.startsWith('https://')) {
-            imageUrl = result; // Image URL
-          } else {
-            imageUrl = `data:image/png;base64,${result}`; // Raw base64 string
+          const views = [
+            `${basePrompt}, front view`,
+            `${basePrompt}, side view`,
+            `${basePrompt}, back view`
+          ];
+          const negativePrompt = `${params.negative_prompt}  background objects, scenery, patterns, textures, floor, wall, furniture, landscape`
+          const results: string[] = [];
+  
+          for (let view of views) {
+            const blob = await aiService.generateTextToImageReplicate({
+              prompt: view,
+              negative_prompt: negativePrompt,
+              width: params.width,
+              height: params.height,
+              cfg_scale: 7,
+              steps: 28,
+              seed, // ✅ SAME SEED for consistency
+              style_selector: "Anime"
+            });
+            const url = URL.createObjectURL(blob);
+            results.push(url);
           }
+  
+          const deductionSuccess = await deductCredits(cost);
+          if (!deductionSuccess) throw new Error("Credit deduction failed");
+          creditsDeducted = true;
+  
+          setGeneratedImage(results.join("|")); // Store joined
+          setIsGenerating(false);
         } else {
-          throw new Error('Unsupported image format returned from AI service.');
+          // ✅ Normal single image generation
+          const fullPrompt = `${params.prompt ? params.prompt + ', ' : ''}${styleText}, white background, high quality character design`;
+          const blob = await aiService.generateTextToImageReplicate({
+            prompt: fullPrompt,
+            negative_prompt: params.negative_prompt,
+            width: params.width,
+            height: params.height,
+            cfg_scale: 7,
+            steps: 28,
+            seed: Math.floor(Math.random() * 2_000_000) + 1,
+            style_selector: "Anime"
+          });
+          const imageUrl = URL.createObjectURL(blob);
+  
+          const deductionSuccess = await deductCredits(cost);
+          if (!deductionSuccess) throw new Error("Credit deduction failed");
+          creditsDeducted = true;
+  
+          setGeneratedImage(imageUrl);
+          setIsGenerating(false);
         }
-
-        const deductionSuccess = await deductCredits(CHARACTER_COST);
-        if (!deductionSuccess) {
-          throw new Error("Credit deduction failed");
-        }
-        creditsDeducted = true; // ✅ TRACK IT HERE
-        setGeneratedImage(imageUrl);
-        setIsGenerating(false);
       } else {
         // ✅ IMAGE-TO-IMAGE — UPDATED TO USE /api/generate-image
         if (!referenceImage) throw new Error("Please upload a reference image");
@@ -130,9 +165,7 @@ export default function CharacterGenerator() {
       }
   
     } catch (err: any) {
-      if (creditsDeducted) {
-        await addCredits(CHARACTER_COST);
-      }
+      if (creditsDeducted) await addCredits(isReferenceSheet ? REFERENCE_SHEET_COST : CHARACTER_COST);
       const isTooLarge = err.message?.toLowerCase().includes("entity too large") || 
                      err.message?.toLowerCase().includes("function_payload_too_large");
 
@@ -160,58 +193,63 @@ export default function CharacterGenerator() {
   const downloadImage = async () => {
     if (!generatedImage) return;
   
-    try {
-      const response = await fetch(generatedImage);
-      const blob = await response.blob();
-      const file = new File([blob], `character_${Date.now()}.png`, { type: "image/png" });
+    const urls = generatedImage.includes("|") ? generatedImage.split("|") : [generatedImage];
   
-      // Try share, but don’t block fallback
-      if (navigator.share) {
-        try {
-          await navigator.share({
-            title: "My Character",
-            files: [file],
-          });
-          return; // shared successfully
-        } catch (err) {
-          console.warn("Share failed, fallback to download:", err);
-        }
+    // Detect device type
+    const ua = navigator.userAgent;
+    const isIOS = /iPad|iPhone|iPod/.test(ua);
+    const isAndroid = /Android/.test(ua);
+    const isMobile = isIOS || isAndroid;
+  
+    if (isIOS && navigator.share) {
+      // iOS Web Share
+      try {
+        const files = await Promise.all(
+          urls.map(async (url, idx) => {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            return new File([blob], `character_${idx}_${Date.now()}.png`, { type: "image/png" });
+          })
+        );
+        await navigator.share({ title: "My Character", files });
+        return;
+      } catch (err) {
+        console.warn("iOS Web Share failed, falling back to desktop download:", err);
       }
-    } catch (err) {
-      console.error("Failed to fetch generated image:", err);
     }
   
-    // Fallback download (always works)
-    const link = document.createElement("a");
-    link.href = generatedImage;
-    link.download = `character_${Date.now()}.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // Desktop / Android / fallback
+    for (let idx = 0; idx < urls.length; idx++) {
+      try {
+        const response = await fetch(urls[idx]);
+        const blob = await response.blob();
+        const file = new File([blob], `character_${idx}_${Date.now()}.png`, { type: "image/png" });
+  
+        if (isAndroid && navigator.share) {
+          // Optional: Android Web Share
+          try {
+            await navigator.share({ title: "My Character", files: [file] });
+            continue;
+          } catch {
+            // fallback to download
+          }
+        }
+  
+        // Desktop / fallback download
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(file);
+        link.download = file.name;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+  
+      } catch (err) {
+        console.error("Failed to fetch generated image:", err);
+      }
+    }
   };
   
-  const getStylePrompt = (style: string) => {
-    const styles = {
-      vinlandSaga: 'Vinland Saga Art style, detailed armor and clothing, expressive faces,',
-      promisedNeverland: 'Promised Neverland Art style, soft lines, large expressive eyes,',
-      dandadan: 'Dandadan Art style, sharp features, intricate supernatural designs,',
-      quintessentialQuintuplets: 'Quintessential Quintuplets Art style, soft shading,',
-      jujutsuKaisen: 'Jujutsu Kaisen Art style, edgy linework,',
-      tokyoRevengers: 'Tokyo Revengers Art style, sharp and clean line art, street-style tone',
-      onePiece: 'One Piece Art style, cartoonish proportions,',
-      myHeroAcademia: 'My Hero Academia Art style, clean shading,',
-      bleach: 'Bleach Art style, sleek character designs, flowing clothing, dramatic contrasts,',
-      chainsawMan: 'Chainsaw Man Art style, sketchy linework,',
-      comicBook: 'American comic book style (Marvel/DC), bold outlines, muscular anatomy,',
-      waifu: 'Waifu, medium breast, wide hips, medium ass, ultra-polished anime look, big sparkly eyes, glossy hair,',
-      swordArtOnline: 'Sword Art Online Art style, sleek character designs, glowing digital effects,',
-      naruto: 'Naruto Art style, sharp angular features,',
-      dragonBall: 'Dragon Ball Art style, bold muscles,',
-      reZero: 'Re:Zero Art style, detailed fantasy clothing,'
-    };        
-    return styles[style as keyof typeof styles] || '';
-  };
-
+  
   return (
     <div className="character-generator">
       <div className="mode-selector">
@@ -230,13 +268,14 @@ export default function CharacterGenerator() {
       </div>
       <div className="generation-form">
       {mode === 'text' && (
+        <>
   <div className="form-group">
     <label>Art Style</label>
     <select
       value={params.textStyle}
       onChange={(e) => setParams({...params, textStyle: e.target.value})}
     >
-     <option value="vinlandSaga">Vinland Saga</option>
+<option value="vinlandSaga">Vinland Saga</option>
 <option value="promisedNeverland">Promised Neverland</option>
 <option value="dandadan">Dandadan</option>
 <option value="quintessentialQuintuplets">Quintessential Quintuplets</option>
@@ -255,6 +294,18 @@ export default function CharacterGenerator() {
 
     </select>
   </div>
+
+    <div className="form-group">
+      <label>
+        <input
+          type="checkbox"
+          checked={isReferenceSheet}
+          onChange={(e) => setIsReferenceSheet(e.target.checked)}
+        />
+        Generate Character Reference Sheet (Front / Side / Back)
+      </label>
+    </div>
+    </>
 )}
         {mode === 'image' && (
           <div>
@@ -370,22 +421,38 @@ export default function CharacterGenerator() {
             'Generating...'
           ) : (
             <>
-              Generate Character <span className="credit-cost">{CHARACTER_COST}</span>
-              <img src="/credit-icon.png" alt="Credits" className="credit-icon" />
-            </>
+            {isReferenceSheet ? "Generate Reference Sheet" : "Generate Character"} 
+            <span className="credit-cost">
+              {isReferenceSheet ? REFERENCE_SHEET_COST : CHARACTER_COST}
+            </span>
+            <img src="/credit-icon.png" alt="Credits" className="credit-icon" />
+          </>
           )}
         </button>
         {error && <div className="error-message">{error}</div>}
         {generatedImage && (
-          <div className="result-panel">
-            <div className="image-container">
-              <img src={generatedImage} alt="Generated character" />
-              <div className="download-options">
-              <button onClick={downloadImage}>Download PNG</button>
-              </div>
-            </div>
+  <div className="result-panel">
+    {isReferenceSheet ? (
+      <div className="sheet-grid">
+        {generatedImage.split("|").map((url, idx) => (
+          <div key={idx} className="image-container">
+            <img src={url} alt={`View ${idx}`} />
           </div>
-        )}
+        ))}
+      </div>
+    ) : (
+      <div className="image-container">
+        <img src={generatedImage} alt="Generated character" />
+      </div>
+    )}
+     <div style={{ textAlign: 'center', marginTop: '12px' }}>
+      <button onClick={downloadImage} className="download-button">
+        Download Image
+      </button>
+    </div>
+  </div>
+
+)}
       </div>
     </div>
   );

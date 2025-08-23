@@ -379,6 +379,7 @@ async generatePanel(payload: {
   height?: number;
   color: ColorOption;
   gradioStyle: GradioStyle;
+  seed: number; // ✅ added
 }) {
   {
     const styleConfig = this.ART_STYLES[payload.style] ?? this.ART_STYLES.default; 
@@ -402,7 +403,6 @@ const sanitizedScene = sanitizeScenePrompt(rawScene);
     const cleanPrompt = `Camera: ${payload.cameraAngle} ${this.generateSceneSpecificPrompt(sanitizedScene, styleConfig)},
      ${colorPrompt}, Scene: ${cleanedScene}`.trim().replace(/\s+/g, ' ');
      const fullPromptForCompression = `${stylePromptTag}, ${cleanPrompt}`;
-    const randomSeed = Math.floor(Math.random() * 10000000); // ✅ Random seed between 0 and 99999
     let shortenedPrompt = await this.compressPrompt(fullPromptForCompression);
     shortenedPrompt = enforceNoDialogueAndStyle(shortenedPrompt, styleConfig.prompt);
       // Replace HF calls with Gradio integration
@@ -413,7 +413,7 @@ const sanitizedScene = sanitizeScenePrompt(rawScene);
         height: payload.height!,
         cfg_scale: 7,
         steps: 28,
-        seed: randomSeed,
+        seed: payload.seed,
         style_selector: styleSelector
       });
 

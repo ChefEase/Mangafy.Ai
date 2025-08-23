@@ -610,6 +610,30 @@ function floorToMultipleOf8(n: number): number {
   return Math.floor(n / 8) * 8;
 }
 
+function getOrUpdateSeed(currentScript: string): number {
+  const storedScript = localStorage.getItem("lastScript");
+  const storedSeed = localStorage.getItem("lastSeed");
+
+  let seed: number;
+
+  if (storedScript && storedScript === currentScript && storedSeed) {
+    // Same script → regenerate with a NEW seed
+    seed = Math.floor(Math.random() * 1_000_000_000);
+    localStorage.setItem("lastSeed", seed.toString());
+  } else {
+    // New script → reuse existing seed if available, else make one
+    if (storedSeed) {
+      seed = parseInt(storedSeed, 10);
+    } else {
+      seed = Math.floor(Math.random() * 1_000_000_000);
+      localStorage.setItem("lastSeed", seed.toString());
+    }
+    localStorage.setItem("lastScript", currentScript);
+  }
+
+  return seed;
+}
+
     const handleGenerateManga = async () => {
       if (typeof window === 'undefined') return;
       const cost = getCostForPanelType(selectedPanelType);
@@ -696,6 +720,7 @@ function floorToMultipleOf8(n: number): number {
 
             const requestWidth = floorToMultipleOf8(targetWidth / 2);
             const requestHeight = floorToMultipleOf8(targetHeight / 2);
+            const seed = getOrUpdateSeed(panelData.scene);
             
             console.log(`Sending to Replicate: ${requestWidth} x ${requestHeight}`);
             const panelImage = await aiService.generatePanel({
@@ -707,6 +732,7 @@ function floorToMultipleOf8(n: number): number {
               height: requestHeight,
               color: selectedColor, // ✅ Fix: Include this
               gradioStyle: selectedPreset, // ✅ Also needed if using Gradio
+              seed, // ✅ pass the managed seed
             });
 
             if (!(panelImage instanceof Blob)) {

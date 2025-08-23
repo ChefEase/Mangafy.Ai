@@ -215,7 +215,42 @@ textarea:-webkit-autofill {
   margin: 0 auto;
 }
 
+.sheet-grid {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap; /* Wrap on smaller screens */
+}
+
+.sheet-grid .image-container {
+  flex: 1 1 250px; /* Grow, shrink, min width */
+  max-width: 300px;
+  margin-bottom: 12px;
+}
+
+.sheet-grid .image-container img {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  object-fit: cover;
+}
+
 @media (max-width: 768px) {
+  .sheet-grid {
+    gap: 8px;
+  }
+
+  .sheet-grid .image-container {
+    flex: 1 1 100%; /* full width on small screens */
+    max-width: 100%;
+  }
+
+  .sheet-grid .image-container img {
+    border-radius: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+  }
+
   .character-generator {
     padding: 1rem;
   }
