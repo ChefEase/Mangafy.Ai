@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { aiService } from '@/services/aiService';
-
+import {getOrUpdateSeed} from '../../components/ScriptEditor/ScriptWritingClient'; // ✅ fixed import
 interface Character {
   id: string;
   name: string;
@@ -29,13 +29,15 @@ export default function PanelLayoutCreator({ characters }: PanelLayoutCreatorPro
 
   const generatePanelImages = async () => {
     for (const panel of panels) {
+      const seed = getOrUpdateSeed(sceneDescription); // ✅ stable per scene
       const panelImage = await aiService.generatePanel({
         scene: sceneDescription,
         characters: panel.characters.map(id => characters.find(c => c.id === id) || {}),
         style: 'default',
         cameraAngle: panel.cameraAngle,
         color: 'colored',
-        gradioStyle: '(None)'
+        gradioStyle: '(None)',
+        seed,
       });
 
       setPanels((prev) =>
