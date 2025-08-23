@@ -1,9 +1,12 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { aiService, ArtStyle } from '../../services/aiService';
+import {getOrUpdateSeed} from '../../components/ScriptEditor/ScriptWritingClient'; // ✅ fixed import
 
 type GradioStyle = "(None)" | "Cinematic" | "Photographic" | "Anime" | "Manga" | "Digital Art" | "Pixel art" | "Fantasy art" | "Neonpunk" | "3D Model";
 type ColorOption = "colored" | "black_white";
+
+console.log("AiImageGenerator.tsx: Imports loaded, getOrUpdateSeed imported as default."); // log added
 
 interface Character {
     id: string;
@@ -49,6 +52,7 @@ export default function AIImageGenerator({ scriptOutline, characters, onPanelsGe
       for (let i = 0; i < scenes.length; i++) {
         const scene = scenes[i];
         const dimensions = panelDimensions[i % panelDimensions.length];
+        const seed = getOrUpdateSeed(scene); 
         const panelImage = await aiService.generatePanel({
           scene,
           characters,
@@ -57,7 +61,8 @@ export default function AIImageGenerator({ scriptOutline, characters, onPanelsGe
           width: dimensions.width,
           height: dimensions.height,
           color: selectedColor,
-          gradioStyle: selectedPreset
+          gradioStyle: selectedPreset,
+          seed,
         });
 
         newPanels.push(URL.createObjectURL(panelImage));

@@ -618,14 +618,14 @@ function getOrUpdateSeed(currentScript: string): number {
 
   if (storedScript && storedScript === currentScript && storedSeed) {
     // Same script → regenerate with a NEW seed
-    seed = Math.floor(Math.random() * 1_000_000_000);
+    seed = Math.floor(Math.random() * 2_000_000_000);
     localStorage.setItem("lastSeed", seed.toString());
   } else {
     // New script → reuse existing seed if available, else make one
     if (storedSeed) {
       seed = parseInt(storedSeed, 10);
     } else {
-      seed = Math.floor(Math.random() * 1_000_000_000);
+      seed = Math.floor(Math.random() * 2_000_000_000);
       localStorage.setItem("lastSeed", seed.toString());
     }
     localStorage.setItem("lastScript", currentScript);
@@ -1213,3 +1213,11 @@ const CreditIcon = ({ cost }: { cost: number }) => (
     );
   }
   
+  const seedCache: Record<string, number> = {};
+
+export function getOrUpdateSeed(scene: string): number {
+  if (!seedCache[scene]) {
+    seedCache[scene] = Math.floor(Math.random() * 2_000_000); // new seed
+  }
+  return seedCache[scene];
+}
