@@ -69,7 +69,7 @@ const getStylePrompt = (style: string) => {
         const styleText = getStylePrompt(params.textStyle).trim().replace(/,$/, '');
         if (isReferenceSheet) {
           // ✅ Generate front, side, back with SAME SEED
-          const basePrompt = `${params.prompt ? params.prompt + ', ' : ''}${styleText}, high quality character design, white background, no objects, no shadows, no clouds, no designs, no patterns, solo`;
+          const basePrompt = `${params.prompt ? params.prompt + ', ' : ''}${styleText}, high quality character design, white background, standing, no objects, no shadows, no clouds, no designs, no patterns, solo`;
 
           const views = [
             `${basePrompt}, front view`,
