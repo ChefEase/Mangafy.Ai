@@ -107,22 +107,35 @@
       }
 
       .chatbot-plus {
-        width: 45px;
-        height: 45px;
+        width: 35px;
+        height: 35px;
         font-size: 26px;
       }
 
       .chatbot-panel {
-        position: absolute !important;  /* ✅ not fixed so user can move */
+        position: realtive !important;  /* ✅ not fixed so user can move */
         top: 100px !important;
-        left: 35% !important;
-        width: 50% !important;
-        height: 30% !important;
+        left: 25% !important;
+        width: 60% !important;
+        height: 60% !important;
       }
 
       .chatbot-resize-handle {
         display: none;
       }
+
+      .chatbot-close {
+        width: 28px;
+        height: 28px;
+        font-size: 18px;
+        top: 5px;   /* slightly adjust position */
+        left: 5px;  /* slightly adjust position */
+    }
+
+    .chatbot-close::before {
+        font-size: 20px;
+        line-height: 28px;
+    }
   
     .chatbot-label {
       font-size: 11px;

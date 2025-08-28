@@ -52,6 +52,21 @@ export default function CoverGenerator() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const COVER_COST = 10;
 
+  const artStylePreviews: Record<string, [string, string]> = {
+    'Vinland Saga': ['/samples/vinlandsaga1.png', '/samples/vinlandsaga2.png'],
+    'The Promised Neverland': ['/samples/promised1.png', '/samples/promised2.png'],
+    'Dandadan': ['/sampeles/dandadan1.png', '/dandadan2.jpg'],
+    'Jujutsu Kaisen': ['/jujutsukaisen1.jpg', '/jujutsukaisen2.jpg'],
+    'Quintessential Quintuplets': ['/samples/quint1.jpeg', '/quint2.jpg'],
+    'Tokyo Revengers': ['/revengers1.jpg', '/revengers2.jpg'],
+    'One Piece': ['/samples/onepiece.jpg', '/samples/onepiece2.png'],
+    'Bleach': ['/bleach1.jpg', '/bleach2.jpg'],
+    'My Hero Academia': ['/samples/MHA1.png', '/MHA2.jpg'],
+    'Chainsaw Man': ['/samples/chainsawman1.png', '/chainsawman2.jpg'],
+    'Comic Book (Marvel/Dc)': ['/comicbook1.jpg', '/comicbook2.jpg'],
+    'Custom Art Style': ['/custom1.jpg', '/custom2.jpg'],
+  };
+  
   function isBlob(value: any): value is Blob {
     return value && typeof value === 'object' && typeof value.arrayBuffer === 'function';
   }
@@ -420,11 +435,14 @@ lines.forEach((line, i) => {
 
 const downloadCover = async () => {
   if (!canvasRef.current) return;
-
   const dataUrl = canvasRef.current.toDataURL("image/png");
-  
-  // iOS / Mobile Safari fix → use the Web Share API if available
-  if (navigator.share) {
+
+  // iOS detection
+  // @ts-ignore: MSStream is not standard but used for iOS detection
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+  console.log("iOS detection result:", isIOS);
+
+  if (isIOS && navigator.share) {
     try {
       const response = await fetch(dataUrl);
       const blob = await response.blob();
@@ -436,11 +454,11 @@ const downloadCover = async () => {
       });
       return;
     } catch (err) {
-      console.error("Sharing failed, falling back:", err);
+      console.error("Sharing failed, fallback:", err);
     }
   }
 
-  // Fallback for desktop and unsupported devices
+  // Normal download for Chrome, Android, PC
   const link = document.createElement("a");
   link.href = dataUrl;
   link.download = "generated_cover.png";
@@ -452,110 +470,172 @@ const downloadCover = async () => {
 
   return (
     <div className="cover-generator">
-      {error && <div className="error-message">{error}</div>}
-
-      <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Describe the cover scene..." />
-      <input value={negativePrompt} onChange={(e) => setNegativePrompt(e.target.value)} placeholder="Negative keywords (optional)" className="negative-prompt-input" />
-
-      <label>
-        Art Style
-      <select value={selectedStyle} onChange={(e) => setSelectedStyle(e.target.value)}>
-        {Object.keys(artStyles).map((style) => (
-          <option key={style} value={style}>{style}</option>
-        ))}
-      </select>
-      </label>
-      {selectedStyle === 'Custom Art Style' && (
-        <input value={customStyleText} onChange={(e) => setCustomStyleText(e.target.value)} placeholder="Describe your custom style" />
-      )}
-
-<button
-        onClick={generateCover}
-        disabled={isGenerating || credits < COVER_COST}
-        className="generate-button"
-      >
-        {isGenerating ? 'Generating...' : (
-          <>
-            Generate Cover Art <span className="credit-cost">{COVER_COST}</span>
-            <img src="/credit-icon.png" alt="Credits" className="credit-icon" />
-          </>
-        )}
-      </button>
-
-
-      {coverImage && (
-        <div className="cover-preview-wrapper" style={{ marginTop: '2rem' }}>
-         <canvas ref={canvasRef} className="cover-canvas" />
-          <div className="text-editor-panel">
-          <label>
-            Overlay Text
-            <textarea
-              className="modern-textarea"
-              rows={3}
-              value={textOverlay}
-              onChange={(e) => setTextOverlay(e.target.value)}
-              placeholder="Enter overlay text"
-            />
-          </label>
-
-          <label>
-            Text Position
-            <select value={textPosition} onChange={(e) => setTextPosition(e.target.value)}>
-              <option value="top left">Top Left</option>
-              <option value="top center">Top Center</option>
-              <option value="top right">Top Right</option>
-              <option value="bottom left">Bottom Left</option>
-              <option value="bottom center">Bottom Center</option>
-              <option value="bottom right">Bottom Right</option>
-            </select>
-            </label>
-
-            <label>
-              Text Font
-            <select value={textFont} onChange={(e) => setTextFont(e.target.value)}>
-            {fontOptions.map(font => (
-    <option key={font} value={font} style={{ fontFamily: font }}>
-      {font}
-    </option>
+    {error && <div className="error-message">{error}</div>}
+  
+    <div className="generator-layout">
+      {/* Left Controls */}
+      <div className="input-container">
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Describe the cover scene..."
+          className="cover-input"
+        />
+        <input
+          value={negativePrompt}
+          onChange={(e) => setNegativePrompt(e.target.value)}
+          placeholder="Negative keywords (optional)"
+          className="negative-prompt-input"
+        />
+  
+        <label>
+          Art Style
+          <select
+            value={selectedStyle}
+            onChange={(e) => setSelectedStyle(e.target.value)}
+            className="style-select"
+          >
+            {Object.keys(artStyles).map((style) => (
+              <option key={style} value={style}>
+                {style}
+              </option>
+            ))}
+          </select>
+        </label>
+  
+        {/* Art Style Preview (only show if style selected) */}
+        <div className="artstyle-preview">
+          <label> Preview of Art Style</label>
+  {artStylePreviews[selectedStyle]?.map((src, idx) => (
+    <img key={idx} src={src} alt={`Preview ${idx + 1}`} className="preview-img" />
   ))}
-            </select>
-            </label>
-            <label>Font Size: <input type="range" min="50" max="200" value={fontSize} onChange={(e) => setFontSize(+e.target.value)} /></label>
-            <label>Rotation: <input type="range" min={-45} max={45} value={textRotation} onChange={(e) => setTextRotation(+e.target.value)} /></label>
+</div>
 
-            <label>
-              Text Color
-            <select value={textColor} onChange={(e) => setTextColor(e.target.value)}>
-              <option value="white">White</option>
-              <option value="black">Black</option>
-              <option value="red">Red</option>
-              <option value="yellow">Yellow</option>
-              <option value="blue">Blue</option>
-            </select>
-            </label>
+  
+        {selectedStyle === "Custom Art Style" && (
+          <input
+            value={customStyleText}
+            onChange={(e) => setCustomStyleText(e.target.value)}
+            placeholder="Describe your custom style"
+          />
+        )}
+  
+        <button
+          onClick={generateCover}
+          disabled={isGenerating || credits < COVER_COST}
+          className="generate-button"
+        >
+          {isGenerating ? "Generating..." : "Generate Cover Art"}
+        </button>
+      </div>
+  
+      {/* Center Generated Result */}
+      <div className="center-panel">
+  {isGenerating && <div className="loading-spinner">⏳</div>}
+  {!coverImage && !isGenerating && <span>Generated Image</span>}
+  {coverImage && <canvas ref={canvasRef} className="cover-canvas" />}
+</div>
 
-            <label>
-              Text Effect
-            <select value={textEffect} onChange={(e) => setTextEffect(e.target.value)}>
-              {textEffects.map(effect => <option key={effect} value={effect}>{effect}</option>)}
-            </select>
-            </label>
-            <label>
-              <input type="checkbox" checked={advancedText} onChange={() => setAdvancedText(!advancedText)} /> 
-              Advanced Effect: On     
-            </label>
+  
+      {/* Right Text Editor */}
+      {coverImage && (
+        <div
+        className={`right-panel ${
+          coverImage || window.innerWidth > 600 ? 'active' : ''
+        }`}
+      >
+       <div className="text-editor-panel">
+  <label>
+    Overlay Text
+    <textarea
+      className="modern-textarea"
+      rows={3}
+      value={textOverlay}
+      onChange={(e) => setTextOverlay(e.target.value)}
+      placeholder="Enter overlay text"
+    />
+  </label>
 
-            <label>
-            {advancedText && (
-              <select value={advancedTextStyle} onChange={(e) => setAdvancedTextStyle(e.target.value)}>
-                {advancedTextOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-              </select>
-            )}
-            </label>
-            <button onClick={downloadCover}>Download</button>
-          </div>
-        </div>
+  <label>
+    Font
+    <select value={textFont} onChange={(e) => setTextFont(e.target.value)}>
+      {fontOptions.map((f) => (
+        <option key={f} value={f}>{f}</option>
+      ))}
+    </select>
+  </label>
+
+  <label>
+    Effect
+    <select value={textEffect} onChange={(e) => setTextEffect(e.target.value)}>
+      {textEffects.map((fx) => (
+        <option key={fx} value={fx}>{fx}</option>
+      ))}
+    </select>
+  </label>
+
+  <label>
+    Advanced Style
+    <select value={advancedTextStyle} onChange={(e) => setAdvancedTextStyle(e.target.value)}>
+      {advancedTextOptions.map((fx) => (
+        <option key={fx} value={fx}>{fx}</option>
+      ))}
+    </select>
+  </label>
+
+  <label>
+    Font Size
+    <input
+      type="range"
+      min="20"
+      max="120"
+      value={fontSize}
+      onChange={(e) => setFontSize(Number(e.target.value))}
+    />
+  </label>
+
+  <label>
+    Rotation
+    <input
+      type="range"
+      min="-45"
+      max="45"
+      value={textRotation}
+      onChange={(e) => setTextRotation(Number(e.target.value))}
+    />
+  </label>
+
+  <label>
+    Color
+    <input
+      type="color"
+      value={textColor}
+      onChange={(e) => setTextColor(e.target.value)}
+    />
+  </label>
+
+  <label>
+    Text Position
+    <select
+      value={textPosition}
+      onChange={(e) => setTextPosition(e.target.value)}
+    >
+      <option value="top left">Top Left</option>
+      <option value="top center">Top Center</option>
+      <option value="top right">Top Right</option>
+      <option value="bottom left">Bottom Left</option>
+      <option value="bottom center">Bottom Center</option>
+      <option value="bottom right">Bottom Right</option>
+    </select>
+  </label>
+
+  <button onClick={downloadCover}>Download</button>
+</div>
+
+      </div>
       )}
     </div>
+  </div>
+  
   );
 }

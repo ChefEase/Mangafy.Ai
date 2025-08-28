@@ -271,7 +271,136 @@
   box-shadow: 0 0 8px rgba(108, 92, 231, 0.5);
 }
 
+/* PC layout: three panels */
+.generator-layout {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2rem;
+  width: 100%;
+}
+
+/* Left panel: inputs, dropdowns, buttons */
+.left-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 250px;
+  max-width: 300px;
+}
+
+.artstyle-preview {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: center; /* center on PC */
+  flex-wrap: wrap;       /* allows wrapping if more than 2 images */
+}
+
+.preview-img {
+  width: 100%;
+  max-width: 100px; /* ✅ reduce size on desktop */
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease-in-out;
+}
+
+.preview-img:hover {
+  transform: scale(1.05);
+}
+
+.loading-spinner {
+  position: absolute;
+  font-size: 2rem;
+  color: #fff;
+  animation: spin 1.2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Right panel: text editor */
+.right-panel {
+  min-width: 300px;
+  max-width: 350px;
+}
+
+.input-container {
+  border: 1px solid black;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 400px;
+  height: 520px;
+}
+
+/* Generated image placeholder area */
+.center-panel {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  min-width: 400px;
+  min-height: 400px;
+  background-color: #555; /* grey background */
+  border-radius: 12px;
+}
+
+.center-panel span {
+  color: #ccc;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* Ensure canvas fits area */
+.cover-canvas {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 12px;
+}
+
 @media (max-width: 600px) {
+  .right-panel {
+    display: none;
+  }
+
+  .right-panel.active {
+    display: block;
+    width: 100%;
+  }
+
+  .generator-layout {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .left-panel, .center-panel, .right-panel {
+    width: 100%;
+    max-width: none;
+  }
+
+  /* Show preview images below art style dropdown only */
+  .artstyle-preview {
+    flex-direction: row;
+    gap: 1rem;
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+
+  .preview-img {
+    width: 120px;   /* ✅ smaller on mobile */
+    max-width: none;
+    flex-shrink: 0;
+  }
+
   .cover-generator {
     padding: 1rem;
     min-height: auto;
@@ -339,3 +468,4 @@
     padding: 10px;
   }
 }
+
