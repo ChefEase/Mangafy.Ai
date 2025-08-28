@@ -5,7 +5,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { autoSave, loadSavedContent } from "../../utils/autoSave";
 import { validateScript } from "../../utils/scriptValidation";
 import ScriptEditorWrapper from "../ScriptEditorWrapper/ScriptEditorWrapper";
-import AIGenerateSection from "../ai/AiGenerateSection";
 import { aiService, ArtStyle } from "../../services/aiService";
 import  '../../app/script-writing/styles/GenerationFeedback.css'
 import '../../app/script-writing/styles/MangaPage.css'
@@ -17,6 +16,8 @@ import supabase from "@/utils/supabaseClient";
 import { useCredits } from "@/context/CreditContext";
 import { CharacterService, Character } from "@/services/CharacterService";
 import  CharactersPage  from "../../app/characters/page";
+import "./chatbot.css";
+import ChatInterface from "../../components/chat/ChatInterface"
 
   interface PanelData {
     url: string;
@@ -459,6 +460,111 @@ layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
 const [selectedColor, setSelectedColor] = useState<ColorOption>('black_white');
 const { credits, deductCredits } = useCredits();
 const { user } = useUser();
+// Inside ScriptWritingPage component, add state:
+const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+const panelRef = useRef<HTMLDivElement>(null);
+
+let touchTimer: NodeJS.Timeout | null = null;
+let isTouchDragging = false;
+let offsetX = 0;
+let offsetY = 0;
+
+// Desktop mouse drag (unchanged)
+const startDrag = (e: React.MouseEvent) => {
+  if (window.innerWidth < 768) return; // disable on mobile
+  const panel = panelRef.current;
+  if (!panel) return;
+
+  const startX = e.clientX;
+  const startY = e.clientY;
+  const rect = panel.getBoundingClientRect();
+  const offX = startX - rect.left;
+  const offY = startY - rect.top;
+
+  const handleMouseMove = (ev: MouseEvent) => {
+    panel.style.left = ev.clientX - offX + "px";
+    panel.style.top = ev.clientY - offY + "px";
+  };
+
+  const handleMouseUp = () => {
+    document.removeEventListener("mousemove", handleMouseMove);
+    document.removeEventListener("mouseup", handleMouseUp);
+  };
+
+  document.addEventListener("mousemove", handleMouseMove);
+  document.addEventListener("mouseup", handleMouseUp);
+};
+
+// Mobile touch long-press
+const handleTouchStart = (e: React.TouchEvent) => {
+  if (window.innerWidth >= 768) return; // only on mobile
+  const touch = e.touches[0];
+  const panel = panelRef.current;
+  if (!panel) return;
+
+  const rect = panel.getBoundingClientRect();
+  offsetX = touch.clientX - rect.left;
+  offsetY = touch.clientY - rect.top;
+
+  // Wait 3 seconds before enabling drag
+  touchTimer = setTimeout(() => {
+    isTouchDragging = true;
+    document.addEventListener("touchmove", handleTouchMove, { passive: false });
+    document.addEventListener("touchend", handleTouchEndDoc);
+  }, 3000);
+};
+
+const handleTouchMove = (e: TouchEvent) => {
+  if (!isTouchDragging) return;
+  e.preventDefault(); // prevent scrolling while dragging
+  const touch = e.touches[0];
+  const panel = panelRef.current;
+  if (!panel) return;
+  panel.style.left = touch.clientX - offsetX + "px";
+  panel.style.top = touch.clientY - offsetY + "px";
+};
+
+const handleTouchEnd = (e: unknown) => {
+  if (touchTimer) {
+    clearTimeout(touchTimer);
+    touchTimer = null;
+  }
+};
+
+const handleTouchEndDoc = () => {
+  isTouchDragging = false;
+  document.removeEventListener("touchmove", handleTouchMove);
+  document.removeEventListener("touchend", handleTouchEndDoc);
+};
+
+// Resizing
+const startResize = (e: React.MouseEvent) => {
+  e.stopPropagation();
+  if (window.innerWidth < 768) return; // disable on mobile
+  const panel = panelRef.current;
+  if (!panel) return;
+
+  const startX = e.clientX;
+  const startY = e.clientY;
+  const startWidth = panel.offsetWidth;
+  const startHeight = panel.offsetHeight;
+
+  const handleMouseMove = (ev: MouseEvent) => {
+    const newWidth = startWidth + (ev.clientX - startX);
+    const newHeight = startHeight + (ev.clientY - startY);
+    panel.style.width = Math.max(300, newWidth) + "px";
+    panel.style.height = Math.max(300, newHeight) + "px";
+  };
+
+  const handleMouseUp = () => {
+    document.removeEventListener("mousemove", handleMouseMove);
+    document.removeEventListener("mouseup", handleMouseUp);
+  };
+
+  document.addEventListener("mousemove", handleMouseMove);
+  document.addEventListener("mouseup", handleMouseUp);
+};
+
 
 let generateA4Pages: (panels: PanelData[]) => Promise<string[]> = async () => [];
 if (typeof window !== 'undefined') {
@@ -1042,6 +1148,41 @@ const CreditIcon = ({ cost }: { cost: number }) => (
               {isCharactersPageOpen ? "◄" : "►"}
             </button>
   
+{/* Floating Chatbot Button */}
+{!isChatbotOpen && (
+  <div className="chatbot-toggle" onClick={() => setIsChatbotOpen(true)}>
+    <div className="chatbot-plus">+</div>
+    <span className="chatbot-label">Chatbot</span>
+  </div>
+)}
+
+{/* Chatbot Panel */}
+{/* Chatbot Panel */}
+{isChatbotOpen && (
+  <div
+    className="chatbot-panel"
+    ref={panelRef}
+    onMouseDown={(e) => startDrag(e)}
+    onTouchStart={(e) => handleTouchStart(e)}  // 👈 add this
+  onTouchEnd={(e) => handleTouchEnd(e)}      // 👈 add this
+  >
+    <button
+      className="chatbot-close"
+      onClick={() => setIsChatbotOpen(false)}
+    >
+    </button>
+    <div className="chatbot-iframe">
+      <ChatInterface />
+    </div>
+
+    {/* Resize handle */}
+    <div
+      className="chatbot-resize-handle"
+      onMouseDown={(e) => startResize(e)}
+    />
+  </div>
+)}
+
           {/* Script Editor */}
           <div className="script-editor-container">
             <h2>Script Box</h2>
@@ -1204,9 +1345,6 @@ const CreditIcon = ({ cost }: { cost: number }) => (
     </tbody>
   </table>
 </div>
-            {pathname === "/script-writing/ai-generate" && (
-              <AIGenerateSection onGenerate={handleGenerateScript} />
-            )}
           </div>
         </div>
       </div>

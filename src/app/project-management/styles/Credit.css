@@ -51,6 +51,32 @@
   border-radius: 20px;
 }
 
+.site-title {
+  display: flex;
+  align-items: center;
+}
+
+/* Website name with glow and glossy effect */
+.site-title h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-right: 50px; /* space between title and Projects Tab */
+  background: linear-gradient(45deg, #FFA500, #D4A017, #B56500); /* darker, less bright */
+  background-clip: text;    
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+  text-shadow: 0 0 5px #FFA500, 0 0 10px #FFD700, 0 0 15px #FF8C00;
+  transition: all 0.3s ease;
+}
+
+/* Optional: glow grows on hover */
+.site-title h1:hover {
+  text-shadow: 0 0 10px #FFA500, 0 0 20px #FFD700, 0 0 30px #FF8C00;
+  transform: scale(1.05);
+}
+
+
 @media (max-width: 768px) {
 
   .user-credit-container {

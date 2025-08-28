@@ -1,7 +1,6 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import Header from "../script-writing/Header";
 import Head from 'next/head';      // Import Head here
 
 // Dynamically import to prevent SSR issues with CSS modules
@@ -43,7 +42,6 @@ export default function ChatPage() {
   </Head>
 
     <div className="h-screen bg-gray-900">
-      <Header />
       <ChatInterface />
     </div>
     </>

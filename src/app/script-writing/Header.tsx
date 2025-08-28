@@ -41,14 +41,12 @@ const Header = () => {
   }, [user]);
   return (
     <div className="header">
-      <h1>Manga Script Writer</h1>
+      <h1>Mangafy.Ai</h1>
       <nav>
         <Link href="/script-writing">Script Box</Link>
         <Link href="/script-writing/templates">Script Templates</Link>
-        <Link href="/script-writing/ai-generate">AI Generate</Link>
         <Link href="/script-writing/generate-character">Generate Character</Link>
         <Link href="/script-writing/generate-cover">Generate Cover</Link>
-        <Link href="/chat">Ai ChatBot</Link>
       </nav>
       <div className="user-credit-container">
         <div className="credit-pill">

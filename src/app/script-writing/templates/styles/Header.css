@@ -8,20 +8,31 @@
     justify-content: space-between;
     position: relative;
     border-bottom: 1px solid #eee;
+    overflow: visible;
   }
   
   .header h1 {
     font-size: 1.8rem;
     font-weight: 700;
-    color: #1a1a1a;
     margin: 0;
     letter-spacing: -0.5px;
-    background: linear-gradient(45deg, #2b00ff, #8f00ff);
+    line-height: 1.2; /* ensures letters with tails fit properly */
+    background: linear-gradient(45deg, #ffa500, #ffb347); /* simple orange gradient */
     -webkit-background-clip: text;
-    background-clip: text;
     -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 3px #ffa500, 0 0 5px #ffb347; /* subtle glow only */
+    transition: all 0.3s ease;
+    display: inline-block; /* prevents clipping from flex container */
   }
   
+  /* Optional: gentle hover glow */
+  .header h1:hover {
+    text-shadow: 0 0 4px #ffa500, 0 0 6px #ffb347;
+    transform: scale(1.02); /* very slight scale for effect */
+  }
+  
+
   .header nav {
     display: flex;
     gap: 2rem;

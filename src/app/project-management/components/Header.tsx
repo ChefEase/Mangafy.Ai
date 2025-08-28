@@ -42,6 +42,11 @@ export default function Header() {
 
   return (
     <header className="header">
+      
+      <div className="site-title">
+    <h1>Mangafy.ai</h1>
+  </div>
+
       <nav className="nav">
         <Link href="/project-management">Projects Tab</Link>
       </nav>

@@ -88,6 +88,15 @@ export default function CoverGenerator() {
       let compressedPrompt = await aiService.compressPrompt(promptForCompression);
       compressedPrompt = enforceNoDialogueAndStyle(compressedPrompt, stylePrompt);
   
+      let seed: number;
+    const storedSeed = localStorage.getItem("lastSeed");
+    if (storedSeed) {
+      seed = parseInt(storedSeed, 10);
+    } else {
+      seed = Math.floor(Math.random() * 10_000_000);
+      localStorage.setItem("lastSeed", seed.toString());
+    }
+
       const imageBlob = await aiService.generateTextToImageReplicate({
         prompt: compressedPrompt,
         negative_prompt: negativePrompt || "text errors, blurry, watermark, deformed, bad anatomy",
@@ -95,7 +104,7 @@ export default function CoverGenerator() {
         height: 1792,
         cfg_scale: 7,
         steps: 28,
-        seed: Math.floor(Math.random() * 10000000),
+        seed,
         style_selector: "Anime",
       });
   
