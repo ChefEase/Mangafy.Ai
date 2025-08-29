@@ -47,7 +47,6 @@ const Header = () => {
         <Link href="/script-writing/templates">Script Templates</Link>
         <Link href="/script-writing/generate-character">Generate Character</Link>
         <Link href="/script-writing/generate-cover">Generate Cover</Link>
-        <Link href="/chat">Ai ChatBot</Link>
       </nav>
       <div className="user-credit-container">
         <div className="credit-pill">

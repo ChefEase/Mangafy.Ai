@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useMemo, useRef, useState } from "react";
 import Header from "../../app/script-writing/Header";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { autoSave, loadSavedContent } from "../../utils/autoSave";
 import { validateScript } from "../../utils/scriptValidation";
 import ScriptEditorWrapper from "../ScriptEditorWrapper/ScriptEditorWrapper";
@@ -441,7 +441,7 @@ layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
   }
 
   export default function ScriptWritingPage() {
-    const [content, setContent] = useState("");
+    const [content, setContent] = useState<string>("");
     const [errors, setErrors] = useState<string[]>([]);
     const pathname = usePathname(); // Get the current route
     const [isCharactersPageOpen, setIsCharactersPageOpen] = useState(false); // Toggle for characters panel
@@ -464,6 +464,7 @@ const { user } = useUser();
 // Inside ScriptWritingPage component, add state:
 const [isChatbotOpen, setIsChatbotOpen] = useState(false);
 const panelRef = useRef<HTMLDivElement>(null);
+const searchParams = useSearchParams();
 
 let touchTimer: NodeJS.Timeout | null = null;
 let isTouchDragging = false;
@@ -685,6 +686,22 @@ let initialContent = "";
       };
       loadCharacters();
     }, []);
+    
+    useEffect(() => {
+      if (!searchParams) return; // 👈 prevent null access
+    
+      const source = searchParams.get("source");
+      if (source === "template") {
+        const tpl = localStorage.getItem("selected-template");
+        if (tpl) {
+          setContent(tpl);                           // put template into editor state
+          localStorage.setItem("saved-script", tpl); // optional: keep as last saved
+          localStorage.removeItem("selected-template");
+        }
+        // Clean up URL so refresh won't re-apply
+        router.replace("/script-writing");
+      }
+    }, [searchParams, router]);
     
     const handleSave = () => {
       const validationErrors = validateScript(content);
@@ -1220,7 +1237,7 @@ const CreditIcon = ({ cost }: { cost: number }) => (
               content={content}
               onContentChange={setContent}
               onSave={handleSave}
-              initialContent={content}
+              initialContent={undefined}
             />
     <div className={styles.controls}>
       <StylePresetSelector

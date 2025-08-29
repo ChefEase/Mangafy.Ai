@@ -630,7 +630,7 @@ const downloadCover = async () => {
     </select>
   </label>
 
-  <button onClick={downloadCover}>Download</button>
+  <button className="generate-button" onClick={downloadCover}>Download</button>
 </div>
 
       </div>
