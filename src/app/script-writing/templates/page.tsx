@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import Header from "../Header";
 import "./ScriptTemplates.css";
+import MobileNav from "../../../components/ScriptEditor/MobileNav"
 
 const templates = [
   { id: 1, name: "Shounen Action", content: "<h1>Fists of Determination</h1><p>Ryo clenched his fists. \"I won’t lose!\" He dashed forward, dodging a barrage of attacks before delivering a powerful punch.</p>" },
@@ -50,6 +51,9 @@ export default function TemplatesPage() {
       <Header />
       <div className="templates-section">
         <h2>Script Template Ideas</h2>
+        <div>
+        <MobileNav /> {/* Only visible on mobile */}
+        </div>
         <div className="templates-grid">
           {templates.map((template) => (
             <div

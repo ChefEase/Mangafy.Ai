@@ -208,7 +208,7 @@ textarea:-webkit-autofill {
 .result-panel .image-container img,
 .character-generator img,
 .preview {
-  max-width: 100%;
+  max-width: 50%;
   height: auto;
   object-fit: contain;
   display: block;
@@ -236,7 +236,69 @@ textarea:-webkit-autofill {
   object-fit: cover;
 }
 
+.artstyle-preview {
+  display: flex;
+  flex-direction: column; /* label on top, previews below */
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Make this the flex container for images */
+.preview-images {
+  display: flex;
+  flex-direction: row; /* ✅ side by side */
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;     /* allow wrap if not enough space */
+}
+
+/* Individual image styles */
+.preview-img {
+  width: 140px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease-in-out;
+  object-fit: cover;
+}
+
+.preview-img:hover {
+  transform: scale(1.05);
+}
+
 @media (max-width: 768px) {
+  .preview-images {
+    display: flex;           /* ✅ make it a flex container */
+    flex-direction: row;     /* keep side by side */
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: nowrap;       /* prevent wrapping on mobile */
+    overflow-x: auto;        /* ✅ allow horizontal scroll if too many */
+    -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
+  }
+  
+  .artstyle-preview {
+    display: flex;
+    flex-direction: column; /* label on top, previews below */
+    gap: 0.5rem;
+    width: 100%;
+  }
+  
+  .preview-img {
+    width: 100px;     /* thumbnail size */
+    height: auto;
+    max-width: none;
+    flex-shrink: 0;   /* ✅ prevents squishing in scroll */
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease-in-out;
+    object-fit: cover;
+  }
+  
+  .preview-img:hover {
+    transform: scale(1.05);
+  }
   .sheet-grid {
     gap: 8px;
   }

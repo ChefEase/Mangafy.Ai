@@ -42,11 +42,12 @@ const Header = () => {
   return (
     <div className="header">
       <h1>Mangafy.Ai</h1>
-      <nav>
+      <nav className="desktop-nav">
         <Link href="/script-writing">Script Box</Link>
         <Link href="/script-writing/templates">Script Templates</Link>
         <Link href="/script-writing/generate-character">Generate Character</Link>
         <Link href="/script-writing/generate-cover">Generate Cover</Link>
+        <Link href="/chat">Ai ChatBot</Link>
       </nav>
       <div className="user-credit-container">
         <div className="credit-pill">

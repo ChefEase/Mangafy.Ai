@@ -5,6 +5,7 @@ import { useCredits } from '@/context/CreditContext';
 import { CharacterService } from '@/services/CharacterService';
 import './styles/coverGenerator.css';
 import {enforceNoDialogueAndStyle} from '@/utils/promptUtils'
+import MobileNav from "../../components/ScriptEditor/MobileNav"
 
 const artStyles = {
   'Vinland Saga': `vinland saga art style, dramatic, bold linework, sharp eyes, cel-shading, high contrast, dynamic perspective`,
@@ -17,7 +18,7 @@ const artStyles = {
   'My Hero Academia': `bold linework, My Hero Academia art style, sharp cel-shading, comic-style motion lines, dramatic angles,`,
   'Bleach': `cool-toned, spiritual, Bleach art style, sharp eyes, flowing clothing, detailed hair, ethereal effects, manga-style linework`,
   'Chainsaw Man': `gritty, Chainsaw Man art style, intense contrast, sharp shading, cinematic`,
-  'Comic Book (Marvel/DC)': `American comic book art style, bold lines, halftone shading, vibrant color,`,
+  'Comic Book': `American comic book art style, bold lines, halftone shading, vibrant color,`,
   'Custom Art Style': '',
 };
 
@@ -55,16 +56,16 @@ export default function CoverGenerator() {
   const artStylePreviews: Record<string, [string, string]> = {
     'Vinland Saga': ['/samples/vinlandsaga1.png', '/samples/vinlandsaga2.png'],
     'The Promised Neverland': ['/samples/promised1.png', '/samples/promised2.png'],
-    'Dandadan': ['/sampeles/dandadan1.png', '/dandadan2.jpg'],
-    'Jujutsu Kaisen': ['/jujutsukaisen1.jpg', '/jujutsukaisen2.jpg'],
-    'Quintessential Quintuplets': ['/samples/quint1.jpeg', '/quint2.jpg'],
-    'Tokyo Revengers': ['/revengers1.jpg', '/revengers2.jpg'],
+    'Dandadan': ['/samples/dandadan1.png', '/samples/dandadan2.png'],
+    'Jujutsu Kaisen': ['/samples/jujutsukaisen1.png', '/samples/jujutsukaisen2.png'],
+    'Quintessential Quintuplets': ['/samples/quint1.jpeg', '/samples/quint2.png'],
+    'Tokyo Revengers': ['/samples/revengers1.png', '/samples/revengers2.png'],
     'One Piece': ['/samples/onepiece.jpg', '/samples/onepiece2.png'],
-    'Bleach': ['/bleach1.jpg', '/bleach2.jpg'],
-    'My Hero Academia': ['/samples/MHA1.png', '/MHA2.jpg'],
-    'Chainsaw Man': ['/samples/chainsawman1.png', '/chainsawman2.jpg'],
-    'Comic Book (Marvel/Dc)': ['/comicbook1.jpg', '/comicbook2.jpg'],
-    'Custom Art Style': ['/custom1.jpg', '/custom2.jpg'],
+    'Bleach': ['/samples/bleach1.png', '/samples/bleach2.png'],
+    'My Hero Academia': ['/samples/MHA1.png', '/samples/MHA2.png'],
+    'Chainsaw Man': ['/samples/chainsawman1.png', '/samples/chainsawman2.png'],
+    'Comic Book': ['/samples/comic1.png', '/samples/comic2.png'],
+    'Custom Art Style': ['/samples/custom1.png', '/samples/custom2.png'],
   };
   
   function isBlob(value: any): value is Blob {
@@ -634,6 +635,7 @@ const downloadCover = async () => {
 
       </div>
       )}
+      <MobileNav /> {/* Only visible on mobile */}
     </div>
   </div>
   

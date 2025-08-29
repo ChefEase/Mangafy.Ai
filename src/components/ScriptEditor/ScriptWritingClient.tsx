@@ -18,6 +18,7 @@ import { CharacterService, Character } from "@/services/CharacterService";
 import  CharactersPage  from "../../app/characters/page";
 import "./chatbot.css";
 import ChatInterface from "../../components/chat/ChatInterface"
+import MobileNav from "../../components/ScriptEditor/MobileNav"
 
   interface PanelData {
     url: string;
@@ -538,7 +539,7 @@ const handleTouchEndDoc = () => {
 };
 
 // Resizing
-const startResize = (e: React.MouseEvent) => {
+const startResize = (e: React.MouseEvent, corner: "tl" | "tr" | "bl" | "br") => {
   e.stopPropagation();
   if (window.innerWidth < 768) return; // disable on mobile
   const panel = panelRef.current;
@@ -548,12 +549,34 @@ const startResize = (e: React.MouseEvent) => {
   const startY = e.clientY;
   const startWidth = panel.offsetWidth;
   const startHeight = panel.offsetHeight;
+  const startLeft = panel.offsetLeft;
+  const startTop = panel.offsetTop;
 
   const handleMouseMove = (ev: MouseEvent) => {
-    const newWidth = startWidth + (ev.clientX - startX);
-    const newHeight = startHeight + (ev.clientY - startY);
-    panel.style.width = Math.max(300, newWidth) + "px";
-    panel.style.height = Math.max(300, newHeight) + "px";
+    let newWidth = startWidth;
+    let newHeight = startHeight;
+    let newLeft = startLeft;
+    let newTop = startTop;
+
+    if (corner.includes("r")) {
+      newWidth = Math.max(300, startWidth + (ev.clientX - startX));
+    }
+    if (corner.includes("b")) {
+      newHeight = Math.max(300, startHeight + (ev.clientY - startY));
+    }
+    if (corner.includes("l")) {
+      newWidth = Math.max(300, startWidth - (ev.clientX - startX));
+      newLeft = startLeft + (ev.clientX - startX);
+    }
+    if (corner.includes("t")) {
+      newHeight = Math.max(300, startHeight - (ev.clientY - startY));
+      newTop = startTop + (ev.clientY - startY);
+    }
+
+    panel.style.width = newWidth + "px";
+    panel.style.height = newHeight + "px";
+    panel.style.left = newLeft + "px";
+    panel.style.top = newTop + "px";
   };
 
   const handleMouseUp = () => {
@@ -1176,11 +1199,11 @@ const CreditIcon = ({ cost }: { cost: number }) => (
     </div>
 
     {/* Resize handle */}
-    <div
-      className="chatbot-resize-handle"
-      onMouseDown={(e) => startResize(e)}
-    />
-  </div>
+    <div className="resize-handle top-left"    onMouseDown={(e) => startResize(e, "tl")} />
+  <div className="resize-handle top-right"   onMouseDown={(e) => startResize(e, "tr")} />
+  <div className="resize-handle bottom-left" onMouseDown={(e) => startResize(e, "bl")} />
+  <div className="resize-handle bottom-right"onMouseDown={(e) => startResize(e, "br")} />
+</div>
 )}
 
           {/* Script Editor */}
@@ -1345,8 +1368,10 @@ const CreditIcon = ({ cost }: { cost: number }) => (
     </tbody>
   </table>
 </div>
+
           </div>
         </div>
+        <MobileNav /> {/* Only visible on mobile */}
       </div>
     );
   }

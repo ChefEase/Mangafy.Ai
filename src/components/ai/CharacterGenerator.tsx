@@ -4,6 +4,7 @@ import { aiService } from '../../services/aiService';
 import Image from 'next/image';
 import './styles/CharacterGenerator.css';
 import { useCredits } from '@/context/CreditContext'; // Add this import
+import MobileNav from "../../components/ScriptEditor/MobileNav"
 
 export default function CharacterGenerator() {
   const { credits, deductCredits, addCredits } = useCredits(); // Get credit functions
@@ -48,6 +49,26 @@ const getStylePrompt = (style: string) => {
     reZero: 'Re:Zero Art style, detailed clothing,'
   };        
   return styles[style as keyof typeof styles] || '';
+};
+
+// Add this near the top of CharacterGenerator (outside component)
+const artStylePreviews: Record<string, [string, string]> = {
+  vinlandSaga: ["/samples/vinlandsaga1.png", "/samples/vinlandsaga2.png"],
+  promisedNeverland: ["/samples/promised1.png", "/samples/promised2.png"],
+  dandadan: ["/samples/dandadan1.png", "/samples/dandadan2.png"],
+  quintessentialQuintuplets: ["/samples/quint1.jpeg", "/samples/quint2.png"],
+  jujutsuKaisen: ["/samples/jujutsukaisen1.png", "/samples/jujutsukaisen2.png"],
+  tokyoRevengers: ["/samples/revengers1.png", "/samples/revengers2.png"],
+  onePiece: ["/samples/onepiece.jpg", "/samples/onepiece2.png"],
+  myHeroAcademia: ["/samples/MHA1.png", "/samples/MHA2.png"],
+  bleach: ["/samples/bleach1.png", "/samples/bleach2.png"],
+  chainsawMan: ["/samples/chainsawman1.png", "/samples/chainsawman2.png"],
+  comicBook: ["/samples/comic1.png", "/samples/comic2.png"],
+  waifu: ["/samples/waifu1.png", "/samples/waifu2.png"],
+  swordArtOnline: ["/samples/SAO1.png", "/samples/SAO2.png"],
+  naruto: ["/samples/naruto1.png", "/samples/naruto2.png"],
+  dragonBall: ["/samples/dbz1.png", "/samples/dbz2.png"],
+  reZero: ["/samples/rezero1.png", "/samples/rezero2.png"],
 };
 
   const generateCharacter = async () => {
@@ -295,6 +316,16 @@ const getStylePrompt = (style: string) => {
     </select>
   </div>
 
+{/* Art Style Preview */}
+<div className="artstyle-preview">
+  <label>Preview of Art Style</label>
+  <div className="preview-images">
+    {artStylePreviews[params.textStyle]?.map((src, idx) => (
+      <img key={idx} src={src} alt={`Preview ${idx + 1}`} className="preview-img" />
+    ))}
+  </div>
+</div>
+
     <div className="form-group">
       <label>
         <input
@@ -453,6 +484,7 @@ const getStylePrompt = (style: string) => {
   </div>
 
 )}
+ <MobileNav /> {/* Only visible on mobile */}
       </div>
     </div>
   );
