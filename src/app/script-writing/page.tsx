@@ -1,8 +1,11 @@
 'use client';
 import ScriptWritingClient from '../../components/ScriptEditor/ScriptWritingClient';
 import Head from 'next/head';
+import { Suspense } from "react";
 
 export default function Page() {
+  return (
+    <>
   <Head>
   <title>AI Manga Generate – Mangafy.Ai</title>
   <meta
@@ -29,5 +32,9 @@ export default function Page() {
   />
   <meta name="twitter:image" content="https://mangafy-ai.vercel.app/logo.png" />
 </Head>
-  return <ScriptWritingClient />;
+  <Suspense fallback={<div>Loading script editor...</div>}>
+  <ScriptWritingClient />
+</Suspense>
+</>
+  );
 }
