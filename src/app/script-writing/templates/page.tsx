@@ -6,37 +6,107 @@ import "./ScriptTemplates.css";
 import MobileNav from "../../../components/ScriptEditor/MobileNav"
 
 const templates = [
-  { id: 1, name: "Shounen Action", content: "<h1>Fists of Determination</h1><p>Ryo clenched his fists. \"I won’t lose!\" He dashed forward, dodging a barrage of attacks before delivering a powerful punch.</p>" },
-  { id: 2, name: "Romance", content: "<h1>Blossoms of Love</h1><p>Under the cherry blossoms, Aiko hesitated. \"I... I like you.\" Kento blinked in surprise before a warm smile formed. \"Me too.\"</p>" },
-  { id: 3, name: "Isekai", content: "<h1>Awakening in Another World</h1><p>Kenji awoke in a field of glowing mushrooms. A notification appeared: [Welcome to Eldoria, Hero]. \"What... is this?\"</p>" },
-  { id: 4, name: "Horror", content: "<h1>Whispers in the Dark</h1><p>The hallway stretched longer with every step. Shadows whispered his name. He turned... but nothing was there. Yet.</p>" },
-  { id: 5, name: "Mystery", content: "<h1>The Clue That Didn't Fit</h1><p>A torn letter, a missing watch, and a locked door. Detective Reina’s eyes narrowed. \"Something doesn’t add up.\"</p>" },
-  { id: 6, name: "Fantasy", content: "<h1>Spell of the Ancients</h1><p>The dragon’s eyes gleamed. Lyra raised her staff, chanting. The runes glowed, and with a gust of wind, magic roared to life.</p>" },
-  { id: 7, name: "Sci-Fi", content: "<h1>Crash Landing on Titan</h1><p>The ship's alarms blared. Captain Juno gritted her teeth. \"Hyperdrive failure! Prepare for emergency landing on Titan!\"</p>" },
-  { id: 8, name: "Slice of Life", content: "<h1>The Cake Dilemma</h1><p>Hana sighed, staring at the last piece of cake. Sharing it with her little brother or eating it? The toughest decision yet.</p>" },
-  { id: 9, name: "Comedy", content: "<h1>Soda Disaster</h1><p>Yuto tripped, launching his soda into the air. It landed... on the principal’s head. The entire cafeteria fell silent.</p>" },
-  { id: 10, name: "Supernatural", content: "<h1>The Shadow That Moved</h1><p>Kei’s shadow moved... but he hadn’t. \"Did you just sigh?\" The shadow nodded. Kei screamed.</p>" },
-  { id: 11, name: "Psychological", content: "<h1>Unseen Watcher</h1><p>Every message in his phone had been read. He hadn’t opened them. Someone was watching.</p>" },
-  { id: 12, name: "Thriller", content: "<h1>Red or Blue?</h1><p>One minute until the bomb detonated. Haru’s hands trembled as he cut the wire. Red or blue?</p>" },
-  { id: 13, name: "Mecha", content: "<h1>The First Step</h1><p>The cockpit sealed shut. \"Launch sequence, go!\" The giant robot roared to life, taking its first step onto the battlefield.</p>" },
-  { id: 14, name: "Historical", content: "<h1>The Last Samurai's Stand</h1><p>The samurai drew his blade, facing the setting sun. \"This will be my final battle.\"</p>" },
-  { id: 15, name: "Sports", content: "<h1>The Game Winning Shot</h1><p>The ball soared through the air. The entire stadium held its breath. \"Will it go in?!\"</p>" },
-  { id: 16, name: "Tragedy", content: "<h1>Too Late</h1><p>Raindrops fell on the gravestone. \"I was too late...\"</p>" },
-  { id: 17, name: "Martial Arts", content: "<h1>Strike of the Master</h1><p>Master Li moved like the wind. One strike, one victory.</p>" },
-  { id: 18, name: "Cyberpunk", content: "<h1>10 Minutes to Disappear</h1><p>The neon lights flickered. A bounty was on his head. He had 10 minutes to disappear.</p>" },
-  { id: 19, name: "Vampire", content: "<h1>Moonlit Fangs</h1><p>The girl’s eyes widened. \"You’re... a vampire?!\" He smirked, fangs glinting under the moon.</p>" },
-  { id: 20, name: "Steampunk", content: "<h1>Skybound Voyage</h1><p>The gears clicked into place. The airship rose, its brass engines hissing steam.</p>" },
-  { id: 21, name: "Survival", content: "<h1>The Hunt Begins</h1><p>They were stranded. No food. No water. And something was hunting them.</p>" },
-  { id: 22, name: "Gothic", content: "<h1>The Candle in the Dark</h1><p>The mansion loomed, cold and lifeless. Yet, a candle flickered inside.</p>" },
-  { id: 23, name: "Detective", content: "<h1>The Twisted Truth</h1><p>The evidence was clear. But the truth? Far more twisted.</p>" },
-  { id: 24, name: "Musical", content: "<h1>The Final Note</h1><p>The melody echoed in the concert hall. She strummed the final note, her heart racing.</p>" },
-  { id: 25, name: "Post-Apocalyptic", content: "<h1>Hope in the Ashes</h1><p>The world had ended. But he still had hope.</p>" },
-  { id: 26, name: "Magical Girl", content: "<h1>Moonlight Blessing</h1><p>Her wand sparkled. \"Moonlight Blessing!\"</p>" },
-  { id: 27, name: "Ghost Story", content: "<h1>Reflections of the Unknown</h1><p>The mirror reflected someone else. Someone who wasn’t there.</p>" },
-  { id: 28, name: "War", content: "<h1>The Roar of Cannons</h1><p>The battlefield was silent. Then, the cannons roared.</p>" },
-  { id: 29, name: "Crime", content: "<h1>The Vanishing Diamonds</h1><p>The vault was open. The diamonds were gone. \"We have a problem.\"</p>" },
-  { id: 30, name: "Dystopian", content: "<h1>The Last Warning</h1><p>\"Obey.\" The word flashed on every screen. \"Or disappear.\"</p>" }
+  { id: 1, name: "Shounen Action", content: `In the first panel, Ryo clenches his fists, determination burning in his eyes, with rubble scattered across the battlefield. Camera angle: low shot looking up for intensity.
+
+In the second panel, he dashes forward through a barrage of glowing strikes, background blurred with speed lines. Camera angle: dynamic tracking shot.
+
+In the third panel, Ryo delivers a powerful punch that cracks the ground beneath his enemy. Camera angle: close-up impact shot.` },
+
+  { id: 2, name: "Romance", content: `In the first panel, under a canopy of cherry blossoms, Aiko looks nervous, petals floating gently around. Camera angle: medium shot from the side.
+
+In the second panel, Kento smiles warmly, the sunlight filtering through blossoms. Camera angle: close-up on his face.` },
+
+  { id: 3, name: "Isekai", content: `In the first panel, Kenji wakes in a glowing mushroom forest, mist curling between giant fungi. Camera angle: wide shot establishing the otherworld.
+
+In the second panel, a floating notification box appears before his stunned face. Camera angle: over-the-shoulder shot.` },
+
+  { id: 4, name: "Horror", content: `In the first panel, the hallway stretches unnaturally long, shadows flickering along cracked walls. Camera angle: extreme long shot.
+
+In the second panel, he turns suddenly, sweat dripping down his face, but the hall is empty. Camera angle: close-up with Dutch angle.` },
+
+  { id: 5, name: "Mystery", content: `In the first panel, Detective Reina examines a cluttered desk with a torn letter and broken watch. Camera angle: overhead shot.
+
+In the second panel, her eyes narrow as a door in the background is shown locked tight. Camera angle: focus pull between her face and the locked door.` },
+
+  { id: 6, name: "Fantasy", content: `In the first panel, Lyra raises her staff, glowing runes swirling around her in a stormy sky. Camera angle: upward shot for grandeur.
+
+In the second panel, a dragon’s eyes gleam as magic sparks fly. Camera angle: dramatic close-up.` },
+
+  { id: 7, name: "Sci-Fi", content: `In the first panel, alarms flash red inside the spaceship, crew panicked at their stations. Camera angle: wide cockpit shot.
+
+In the second panel, Captain Juno grips the controls as Titan looms outside the viewport. Camera angle: close-up with planet filling the window.` },
+
+  { id: 8, name: "Slice of Life", content: `In the first panel, Hana stares at the last piece of cake on a kitchen table, her brother watching eagerly in the background. Camera angle: medium shot.
+
+In the second panel, a comedic close-up of Hana sweating nervously, fork trembling in her hand.` },
+
+  { id: 9, name: "Comedy", content: `In the first panel, Yuto trips in a crowded cafeteria, soda flying midair. Camera angle: exaggerated wide shot.
+
+In the second panel, the soda lands squarely on the principal’s head, dripping everywhere. Camera angle: close-up reaction.` },
+
+  { id: 10, name: "Supernatural", content: `In the first panel, Kei walks alone in a dim room, his shadow stretching unnaturally. Camera angle: overhead shot with long shadows.
+
+In the second panel, the shadow moves on its own, sighing back at him. Camera angle: eerie close-up.` },
+
+  { id: 11, name: "Psychological", content: `In the first panel, a darkened room lit only by his glowing phone, unread messages piling up. Camera angle: over-the-shoulder.
+
+In the second panel, his eyes widen in horror as the text shows “seen.” Camera angle: close-up.` },
+
+  { id: 12, name: "Thriller", content: `In the first panel, Haru’s trembling hands hover over red and blue wires, sweat dripping. Camera angle: extreme close-up of hands.
+
+In the second panel, the ticking bomb timer fills the frame, one minute left. Camera angle: tight focus shot.` },
+
+  { id: 13, name: "Mecha", content: `In the first panel, a massive cockpit seals shut around the pilot, screens lighting up. Camera angle: inside cockpit POV.
+
+In the second panel, the giant robot takes its first thunderous step onto a battlefield of smoke. Camera angle: wide exterior shot.` },
+
+  { id: 14, name: "Historical", content: `In the first panel, the samurai stands against the setting sun, sword drawn, cherry blossoms drifting. Camera angle: long shot silhouette.` },
+
+  { id: 15, name: "Sports", content: `In the first panel, the basketball arcs toward the hoop, the stadium frozen in suspense. Camera angle: dramatic upward shot.` },
+
+  { id: 16, name: "Tragedy", content: `In the first panel, rain pours over a gravestone, a lone figure kneeling before it. Camera angle: wide melancholic shot.` },
+
+  { id: 17, name: "Martial Arts", content: `In the first panel, Master Li strikes with perfect precision, wind swirling around him. Camera angle: dynamic mid-action shot.` },
+
+  { id: 18, name: "Cyberpunk", content: `In the first panel, neon lights flicker over a rain-soaked alley, bounty posters glowing. Camera angle: wide city shot.
+
+In the second panel, the fugitive pulls his hood up, eyes darting. Camera angle: close-up with neon reflections.` },
+
+  { id: 19, name: "Vampire", content: `In the first panel, under the moonlight, a boy reveals sharp fangs with a sly smirk. Camera angle: close-up dramatic shadow.` },
+
+  { id: 20, name: "Steampunk", content: `In the first panel, gears click as a massive airship lifts off, steam hissing around brass pipes. Camera angle: wide establishing shot.` },
+
+  { id: 21, name: "Survival", content: `In the first panel, a group huddles in a dark forest, empty backpacks visible. Camera angle: wide overhead.
+
+In the second panel, glowing eyes peer at them from the shadows. Camera angle: POV from the predator.` },
+
+  { id: 22, name: "Gothic", content: `In the first panel, a candle flickers in the vast emptiness of a crumbling mansion. Camera angle: long corridor shot.` },
+
+  { id: 23, name: "Detective", content: `In the first panel, Detective flips through evidence photos under a dim lamp. Camera angle: overhead.
+
+In the second panel, her face hardens as she realizes the truth is darker than expected. Camera angle: close-up with shadows.` },
+
+  { id: 24, name: "Musical", content: `In the first panel, she strums the final note on her guitar in an empty concert hall. Camera angle: wide shot from stage.` },
+
+  { id: 25, name: "Post-Apocalyptic", content: `In the first panel, ruins of skyscrapers crumble around a lone survivor holding a broken flag. Camera angle: wide shot, ash falling.` },
+
+  { id: 26, name: "Magical Girl", content: `In the first panel, her wand glows with dazzling sparkles as she shouts her attack. Camera angle: heroic low angle.` },
+
+  { id: 27, name: "Ghost Story", content: `In the first panel, a mirror shows a figure who isn’t in the room. Camera angle: eerie close-up reflection.` },
+
+  { id: 28, name: "War", content: `In the first panel, soldiers wait in silence, fog covering the battlefield. Camera angle: wide shot.
+
+In the second panel, cannons erupt in flames, shaking the ground. Camera angle: explosive low angle.` },
+
+  { id: 29, name: "Crime", content: `In the first panel, a vault door swings open, diamonds missing from their cases. Camera angle: wide overhead.
+
+In the second panel, a detective mutters, “We have a problem,” his face half in shadow. Camera angle: close-up.` },
+
+  { id: 30, name: "Dystopian", content: `In the first panel, giant holographic screens flash the word “OBEY” across a silent city. Camera angle: wide cityscape.
+
+In the second panel, a faceless enforcer looms over the crowd. Camera angle: low perspective.` }
 ];
+
 
 export default function TemplatesPage() {
   const router = useRouter();

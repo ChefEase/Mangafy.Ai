@@ -147,8 +147,9 @@
     }
   
     .textInput {
-      font-size: 14px;
+      font-size: 30px;
       max-height: 100px;
+      max-width: 900px;
     }
   
     .attachButton {
