@@ -1,6 +1,6 @@
 // Add at the top of aiService.ts
 import { HfInference, } from "@huggingface/inference";
-import {enforceNoDialogueAndStyle} from '@/utils/promptUtils'
+import {enforceNoDialogueAndStyle, calculateBudget, countWordsAndCommas} from '@/utils/promptUtils'
 
 interface Panel {
   id: string;
@@ -70,6 +70,50 @@ function sanitizeScenePrompt(raw: string): string {
 
   return deduped.join(", ");
 }
+
+function escapeRegExp(s: string) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// fallback function: keep leading character tags (1boy/1girl/2boys/2girls) and then greedily add comma segments until within budgets
+function fallbackTrimPreserveChars(text: string, maxW: number, maxC: number) {
+  const { words: w0, commas: c0 } = countWordsAndCommas(text);
+  // split into segments by comma (preserve trimmed segments)
+  const segments = text.split(",").map(s => s.trim()).filter(Boolean);
+
+  // ensure first segments containing '1boy' / '1girl' are preserved
+  const preserved: string[] = [];
+  const rest: string[] = [];
+
+  // collect segments that look like character count tags first
+  for (const seg of segments) {
+    if (/^\s*(1boy|1girl|2boys|2girls)\b/i.test(seg)) {
+      preserved.push(seg);
+    } else {
+      rest.push(seg);
+    }
+  }
+
+  // now build result: start with preserved, then add rest until budgets satisfied
+  const resultSegments = [...preserved];
+  let curText = resultSegments.join(", ");
+  let curCounts = countWordsAndCommas(curText);
+
+  for (const seg of rest) {
+    const candidate = curText ? `${curText}, ${seg}` : seg;
+    const candCounts = countWordsAndCommas(candidate);
+    if (candCounts.words <= maxW && candCounts.commas <= maxC) {
+      resultSegments.push(seg);
+      curText = candidate;
+      curCounts = candCounts;
+    } else {
+      // stop when next segment would exceed budgets
+      continue;
+    }
+  }
+  return resultSegments.join(", ");
+}
+
 // Added log to show the mapping for debugging
 console.log("GRADIO_TO_REPLICATE_STYLE mapping:", GRADIO_TO_REPLICATE_STYLE);
 export class AIService {
@@ -93,43 +137,43 @@ export class AIService {
   // Art style configurations without model references
   private readonly ART_STYLES = {
     default: {
-      prompt: "black and white manga, screentone shading, hand-drawn ink lines,",
-      negative_prompt: "color, 3D, CGI, photorealistic, painterly, soft gradients, western comic style, deformed hands, deformed body parts"
+      prompt: "black and white manga, screentone shading, hand-drawn ink lines",
+      negative_prompt: "color, 3D, CGI, photorealistic, painterly, soft gradients, western comic style, deformed hands, deformed body parts, nsfw, lowres, (bad), text, error, fewer, extra, missing, worst quality, jpeg artifacts, low quality, watermark, unfinished, displeasing, oldest, early, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract]"
     },
   
     "one-piece": {
       prompt: "one piece art style",
-      negative_prompt: "photorealistic, 3D, CGI, hyperrealistic, blurred, low detail, child-like drawing, watermark, signature, duplicate heads, text errors, out-of-focus, poorly drawn anatomy, plain background, pastel art style"
+      negative_prompt: "photorealistic, 3D, CGI, hyperrealistic, blurred, low detail, child-like drawing, watermark, signature, duplicate heads, text errors, out-of-focus, poorly drawn anatomy, plain background, pastel art style, nsfw, lowres, (bad), text, error, fewer, extra, missing, worst quality, jpeg artifacts, low quality, watermark, unfinished, displeasing, oldest, early, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract]"
     },
   
     "jujutsu-kaisen": {
-      prompt: "jujutsu kaisen art style",
-      negative_prompt: "bright colors, overly simplified designs, clean digital look, soft pastels, cute expressions, deformed hands, deformed body parts"
+      prompt: "jujutsu kaisen art style,",
+      negative_prompt: "bright colors, overly simplified designs, clean digital look, soft pastels, cute expressions, deformed hands, deformed body parts, nsfw, lowres, (bad), text, error, fewer, extra, missing, worst quality, jpeg artifacts, low quality, watermark, unfinished, displeasing, oldest, early, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract]"
     },
   
     "my-hero-academia": {
-      prompt: "my hero academia art style",
-      negative_prompt: "realistic, washed-out tones, low detail, grayscale, horror style, deformed hands, deformed body parts"
+      prompt: "my hero academia art style,",
+      negative_prompt: "realistic, washed-out tones, low detail, grayscale, horror style, deformed hands, deformed body parts, nsfw, lowres, (bad), text, error, fewer, extra, missing, worst quality, jpeg artifacts, low quality, watermark, unfinished, displeasing, oldest, early, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract]"
     },
   
     "dandadan": {
       prompt: "dandadan art style, surreal atmosphere, eerie lighting, detailed linework,",
-      negative_prompt: "orderly, too clean, flat linework, pastel tones, generic backgrounds, deformed hands, deformed body parts"
+      negative_prompt: "orderly, too clean, flat linework, pastel tones, generic backgrounds, deformed hands, deformed body parts, nsfw, lowres, (bad), text, error, fewer, extra, missing, worst quality, jpeg artifacts, low quality, watermark, unfinished, displeasing, oldest, early, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract]"
     },
   
     "quintessential-quintuplets": {
-      prompt: "quintessential quintuplets art style, romantic atmosphere, clean thin line art",
-      negative_prompt: "dark themes, excessive contrast, rough inking, horror elements, strong shadows, deformed hands, deformed body parts"
+      prompt: "quintessential quintuplets art style, romantic atmosphere, clean thin line art,",
+      negative_prompt: "dark themes, excessive contrast, rough inking, horror elements, strong shadows, deformed hands, deformed body parts, nsfw, lowres, (bad), text, error, fewer, extra, missing, worst quality, jpeg artifacts, low quality, watermark, unfinished, displeasing, oldest, early, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract]"
     },
   
     "tokyo-revengers": {
-      prompt: "tokyo revengers art style, thin line art",
-      negative_prompt: "clean, overly polished, soft shading, 3D rendering, overly detailed fantasy backgrounds, deformed hands, deformed body parts"
+      prompt: "tokyo revengers art style, thin line art,",
+      negative_prompt: "clean, overly polished, soft shading, 3D rendering, overly detailed fantasy backgrounds, deformed hands, deformed body parts, nsfw, lowres, (bad), text, error, fewer, extra, missing, worst quality, jpeg artifacts, low quality, watermark, unfinished, displeasing, oldest, early, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract]"
     },
   
     "comic-book": {
-      prompt: "comic art style, bold black outlines, halftone texture, inked shading",
-      negative_prompt: "anime, watercolor, grayscale, painterly, photorealistic, manga, screentones, deformed hands, deformed body parts"
+      prompt: "comic art style, bold black outlines, halftone texture, inked shading,",
+      negative_prompt: "anime, watercolor, grayscale, painterly, photorealistic, manga, screentones, deformed hands, deformed body parts, nsfw, lowres, (bad), text, error, fewer, extra, missing, worst quality, jpeg artifacts, low quality, watermark, unfinished, displeasing, oldest, early, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract]"
     }
   } as const;
   
@@ -170,53 +214,51 @@ export class AIService {
     }
   }  
 
-  async compressPrompt(prompt: string): Promise<string> {
-    const systemInstruction = `
+  // inside AIService class in aiService.ts - replace old compressPrompt with this
+async compressPrompt(prompt: string, options?: { maxWords?: number; maxCommas?: number }): Promise<string> {
+  // base instruction (your existing rules)
+  let systemInstruction = `
     You are a prompt compression tool for AI image generation.
     Convert a natural-language scene description into a concise, comma-separated list of visual tags under 77 tokens.
     
     Requirements:
     1. Only include the character(s) explicitly mentioned in the input. If only 1boy is mentioned, do not add any 1girl or others If 1girl is mentioned don't add 1boy.
-    1. For each character, start with "1boy" or "1girl", followed by distinctive traits (hairstyle, eye color, clothing), their action, and camera angle. Do not merge character traits.
-    2. Include the specified art style as the first style tag (e.g., "one piece art style", "manga").
-    3. Include environment/setting tags (city, medium shot, lighting, etc.).
-    4. REMOVE any dialogue or quoted speech completely. Do not output any spoken text, quotes, or implied conversation.
-    5. Eliminate duplicate descriptors; each visual concept should appear only once.
-    6. Output only comma-separated tags. No explanations, no full sentences, no extra text.
-    
-    Example for Only One Person If it's 1boy Explicitly mentioned:
-    1boy, wolf cut hairstyle, blue eyes, black suit, walking, busy city street, medium shot, one piece art style, 
+    1. For one character mentioned only , YOU MUST START start with "1boy" or "1girl", followed by distinctive traits (hairstyle, eye color, clothing), their action, and camera angle. Do not merge character traits.
+    1. For two characters,  YOU MUST START with combined gender+count tags side by side (e.g., "1boy, 1girl", "2boys", "2girls") followed by each caharcters distinctive traits (hairstyle, eye color, clothing), action, and camera angle.
+    2. Include environment/setting tags (city, medium shot, lighting, etc.).
+    3. REMOVE any dialogue or quoted speech completely. Do not output any spoken text, quotes, or implied conversation.
+    4. Eliminate duplicate descriptors; each visual concept should appear only once.
+    5. Output only comma-separated tags. No explanations, no full sentences, no extra text.
+    6. DO NOT include the names of the characters just their description.
+  `;
 
-    Example for Only One Person If it's 1boy Explicitly mentioned:
-    1girl, wolf cut hairstyle, blue eyes, black suit, walking, busy city street, medium shot, one piece art style,
-
-    Example for More than One Person Explicitly mentioned:
-    1boy, wolf cut hairstyle, blue eyes, black suit, walking, busy city street, medium shot, one piece art style,
-    1girl, long brown hair in bun, white baggy shirt, blue jeans, walking, busy city street, medium shot, one piece art style, 
-
-    This are Just examples u don't need to include it verbatim in the prompt. Just use the description of the character and what the user wants.
-    `;
-    
-    const result = await this.hf.chatCompletion({
-      model: "mistralai/Mixtral-8x7B-Instruct-v0.1",
-      messages: [
-        { role: "system", content: systemInstruction },
-        { role: "user", content: `Prompt:\n${prompt}` }
-      ],
-      parameters: {
-        max_new_tokens: 80,
-        temperature: 0.6,
-        top_p: 0.9
-      }
-    });
-  
-    if (!result || !result.choices?.[0]?.message?.content) {
-      throw new Error("Prompt compression failed or response malformed");
-    }
-  
-    return result.choices[0].message.content.trim();
+  // Append explicit budget instruction if provided
+  if (options?.maxWords !== undefined || options?.maxCommas !== undefined) {
+    const w = options.maxWords ?? 50;
+    const c = options.maxCommas ?? 20;
+    systemInstruction += `\n\nStrict budget: compress the scene to at most ${w} words and at most ${c} commas. Do NOT include art style or final style tags in this compressed scene output.`;
   }
-  
+
+  const result = await this.hf.chatCompletion({
+    model: this.COMPRESS_MODEL, // use your text/compression model
+    messages: [
+      { role: "system", content: systemInstruction },
+      { role: "user", content: `Prompt:\n${prompt}` }
+    ],
+    parameters: {
+      max_new_tokens: 80,
+      temperature: 0.6,
+      top_p: 0.9
+    }
+  });
+
+  if (!result || !result.choices?.[0]?.message?.content) {
+    throw new Error("Prompt compression failed or response malformed");
+  }
+
+  return result.choices[0].message.content.trim();
+}
+
     // ✅ FRONTEND — safe to call your own backend API
     async generateTextToImageReplicate(opts: {
       prompt: string;
@@ -380,6 +422,9 @@ async generatePanel(payload: {
   color: ColorOption;
   gradioStyle: GradioStyle;
   seed: number; // ✅ added
+  guidanceScale?: number;   // ✅ new
+  isMangafy?: boolean;      // ✅ new
+  customStyle?: string | null; // ✅ new
 }) {
   {
     const styleConfig = this.ART_STYLES[payload.style] ?? this.ART_STYLES.default; 
@@ -399,19 +444,168 @@ const sanitizedScene = sanitizeScenePrompt(rawScene);
     const cleanedScene = sanitizedScene.replace(/\(Camera:.*?\)/gi, '').trim();
     const negativePrompt = `${styleConfig.negative_prompt}, ${colorConfig.negative_prompt}`;
     const styleSelector = GRADIO_TO_REPLICATE_STYLE[payload.gradioStyle] ?? "Anime";
-    const stylePromptTag = styleConfig.prompt; // e.g., "one piece art style"
-    const cleanPrompt = `Camera: ${payload.cameraAngle} ${this.generateSceneSpecificPrompt(sanitizedScene, styleConfig)},
-     ${colorPrompt}, Scene: ${cleanedScene}`.trim().replace(/\s+/g, ' ');
-     const fullPromptForCompression = `${stylePromptTag}, ${cleanPrompt}`;
-    let shortenedPrompt = await this.compressPrompt(fullPromptForCompression);
-    shortenedPrompt = enforceNoDialogueAndStyle(shortenedPrompt, styleConfig.prompt);
+    const artStyleTag = styleConfig.prompt.trim(); // this must come FIRST
+    const stylePromptTag = payload.customStyle 
+    ? payload.customStyle.trim() 
+    : (this.ART_STYLES[payload.style]?.prompt ?? "").trim();
+  
+    let finalStylePromptTag = stylePromptTag;
+// ✅ If Mangafy + one-piece style → append extra description
+if (payload.isMangafy && payload.style === "one-piece") {
+  finalStylePromptTag +=
+    ", Black and white manga, high-contrast ink, clean linework, bold outlines, hatching, monochrome, Japanese aesthetic, dynamic";
+}
+
+if (payload.isMangafy && payload.style === "jujutsu-kaisen") {
+  finalStylePromptTag +=
+    ", Manga-style black & white illustration, distinct outfit, sharp lines, high-contrast shading, dramatic monochrome";
+}
+
+if (payload.isMangafy && payload.style === "my-hero-academia") {
+  finalStylePromptTag +=
+    ", black and white manga, high-contrast line art, screentone shading, expressive characters, dynamic poses, cinematic framing, minimal background, balanced light and dark";
+}
+
+if (payload.isMangafy && payload.style === "dandadan") {
+  finalStylePromptTag +=
+    ", High-contrast black-and-white manga style, expressive characters, detailed backgrounds, dramatic shading with cross-hatching, stippling, and screentones, cinematic composition, dark grayscale palette.";
+}
+
+if (payload.isMangafy && payload.style === "quintessential-quintuplets") {
+  finalStylePromptTag +=
+    ", Light slice-of-life manga style, clean black-and-white with soft grayscale, expressive characters, detailed backgrounds, minimal heavy blacks, mid-tone screentones, casual warm tone.";
+}
+
+if (payload.isMangafy && payload.style === "tokyo-revengers") {
+  finalStylePromptTag +=
+    ", Japanese manga style, black and white ink, sharp linework, screentone shading, expressive faces, dramatic close-ups, detailed backgrounds, cinematic composition, dark and gritty tone.";
+}
+
+if (artStyleTag) {
+  finalStylePromptTag = finalStylePromptTag
+    .replace(new RegExp(`\\b${escapeRegExp(artStyleTag)}\\b`, 'gi'), '') // strip exact phrase
+    .replace(/\s*,\s*/g, ', ')         // normalize commas
+    .replace(/(^,|,$)/g, '')           // trim leading/trailing commas
+    .trim();
+}
+
+finalStylePromptTag = finalStylePromptTag ? finalStylePromptTag.trim() : "";
+
+// --- prepare the scene that we WILL compress ---
+// include character descriptions (if you pass them in payload.characters) so compressor can't drop them
+let charactersText = "";
+if (Array.isArray(payload.characters) && payload.characters.length > 0) {
+  // assume each character has a `description` string (adjust field name if different)
+  charactersText = payload.characters
+    .map((c: any) => (typeof c === 'string' ? c : (c.description ?? "")))
+    .filter(Boolean)
+    .join(", ");
+}
+
+// sanitizedScene already deduped by sanitizeScenePrompt earlier
+const sceneToCompress = [charactersText, cleanedScene].filter(Boolean).join(", ").trim();
+
+// compute budgets from art+final style text
+const { wordBudget, commaBudget } = calculateBudget(`${artStyleTag}${finalStylePromptTag ? ", " + finalStylePromptTag : ""}`);
+
+// Now compress ONLY the scene (sceneToCompress) with budgets so characters are preserved
+const compressedScene = await this.compressPrompt(sceneToCompress, { maxWords: wordBudget, maxCommas: commaBudget });
+
+let assembled = `${artStyleTag}`;
+if (compressedScene && compressedScene.trim()) assembled += `, ${compressedScene.trim()}`;
+if (finalStylePromptTag) assembled += `, ${finalStylePromptTag.trim()}`;
+
+// Final cleanup & enforce ordering: ensure art style at start and final style tags at end
+const finalPrompt = enforceNoDialogueAndStyle(assembled, artStyleTag, finalStylePromptTag);
+
+    let shortenedPrompt = finalPrompt.trim();
+
+    // -------------------- Mangafy: second-pass compression (replace existing block) --------------------
+if (payload.isMangafy) {
+  // Count current words/commas
+  const totalCounts = countWordsAndCommas(shortenedPrompt);
+
+  // If it's already within the stricter mangafy limits, skip
+  if (totalCounts.words > 50 || totalCounts.commas > 20) {
+    console.warn("⚠️ Mangafy prompt too long, re-compressing...");
+
+    // Build the middle string to compress: remove artStyleTag and finalStylePromptTag
+    // Use regex-safe escape
+    const artEsc = escapeRegExp(artStyleTag || "");
+    const finalEsc = escapeRegExp(finalStylePromptTag || "");
+
+    // Remove the leading artStyleTag and trailing finalStylePromptTag from shortenedPrompt
+    // (we'll compress only the middle)
+    let middle = shortenedPrompt
+      .replace(new RegExp(`^\\s*${artEsc}\\s*,?\\s*`, "i"), "")     // strip artStyle at start
+      .replace(new RegExp(`,?\\s*${finalEsc}\\s*$`, "i"), "")     // strip finalStyle at end
+      .trim();
+
+    // If middle is empty (unexpected), fallback to the earlier compressedScene
+    if (!middle) {
+      middle = compressedScene || cleanedScene || sceneToCompress || "";
+    }
+
+    // compute budgets so final overall words/comma <= 50/20
+    const styleCounts = countWordsAndCommas(`${artStyleTag}${finalStylePromptTag ? ", " + finalStylePromptTag : ""}`);
+    const remainingWordBudget = Math.max(1, 50 - styleCounts.words);   // at least 1
+    const remainingCommaBudget = Math.max(0, 20 - styleCounts.commas); // can be 0
+
+    // Run the compressor only on the middle with strict budgets
+    let recompressedMiddle = await this.compressPrompt(middle, {
+      maxWords: remainingWordBudget,
+      maxCommas: remainingCommaBudget
+    });
+
+    // If compressor returned empty or included style fragments, strip them again
+    if (recompressedMiddle) {
+      // ensure it does NOT contain art/final style phrases
+      if (artStyleTag) recompressedMiddle = recompressedMiddle.replace(new RegExp(escapeRegExp(artStyleTag), "gi"), "");
+      if (finalStylePromptTag) recompressedMiddle = recompressedMiddle.replace(new RegExp(escapeRegExp(finalStylePromptTag), "gi"), "");
+      recompressedMiddle = recompressedMiddle.replace(/(^,|,$)/g, "").trim();
+    }
+
+    // Deterministic fallback trimming if still too big (model sometimes ignores strictness)
+    const recombinedAttempt = `${artStyleTag}${recompressedMiddle ? ", " + recompressedMiddle : ""}${finalStylePromptTag ? ", " + finalStylePromptTag : ""}`.trim();
+    const attemptCounts = countWordsAndCommas(recombinedAttempt);
+    if (attemptCounts.words > 50 || attemptCounts.commas > 20) {
+      console.warn("⚠️ Re-compressed still too long, applying deterministic trim fallback.");
+
+      // compute necessary budgets for middle (same calculation as before)
+      const trimmedMiddle = fallbackTrimPreserveChars(
+        recompressedMiddle || middle,
+        Math.max(1, 50 - styleCounts.words),
+        Math.max(0, 20 - styleCounts.commas)
+      );
+
+      recompressedMiddle = trimmedMiddle;
+    }
+
+    // Reassemble
+    let reassembled = artStyleTag;
+    if (recompressedMiddle) reassembled += `, ${recompressedMiddle}`;
+    if (finalStylePromptTag) reassembled += `, ${finalStylePromptTag}`;
+
+    // Final enforcement & cleaning
+    shortenedPrompt = enforceNoDialogueAndStyle(reassembled, artStyleTag, finalStylePromptTag).trim();
+
+    console.log("✅ Mangafy re-compressed final prompt:", shortenedPrompt);
+  } // end if too-long
+} // end if payload.isMangafy
+// -------------------- end Mangafy block --------------------
+
+    // optional: debug/log length & commas
+    console.log("Final prompt:", shortenedPrompt);
+    console.log("Words:", shortenedPrompt.split(/\s+/).length, "Commas:", (shortenedPrompt.match(/,/g)||[]).length);
+    
+    
       // Replace HF calls with Gradio integration
       const blob = await aiService.generateTextToImageReplicate({
         prompt: shortenedPrompt,
         negative_prompt: negativePrompt,
         width: payload.width!,
         height: payload.height!,
-        cfg_scale: 7,
+        cfg_scale: payload.guidanceScale,  // ✅ dynamic
         steps: 28,
         seed: payload.seed,
         style_selector: styleSelector

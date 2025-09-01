@@ -20,6 +20,14 @@ import "./chatbot.css";
 import ChatInterface from "../../components/chat/ChatInterface"
 import MobileNav from "../../components/ScriptEditor/MobileNav"
 
+
+interface User {
+  id: string;
+  credits: number;
+  subscription_tier: "free" | "starter" | "ultimate" | "starter_yearly" | "ultimate_yearly";
+  // add others if needed
+}
+
   interface PanelData {
     url: string;
     dimensions: { width: number; height: number };
@@ -465,6 +473,11 @@ const { user } = useUser();
 const [isChatbotOpen, setIsChatbotOpen] = useState(false);
 const panelRef = useRef<HTMLDivElement>(null);
 const searchParams = useSearchParams();
+const [isMangafy, setIsMangafy] = useState(false);
+const [guidanceScaleInput, setGuidanceScaleInput] = useState(""); // string for typing
+const [seedInput, setSeedInput] = useState(""); // string for typing
+const [useCustomStyle, setUseCustomStyle] = useState(false);
+const [customStyleDescription, setCustomStyleDescription] = useState("");
 
 let touchTimer: NodeJS.Timeout | null = null;
 let isTouchDragging = false;
@@ -866,8 +879,13 @@ function getOrUpdateSeed(currentScript: string): number {
 
             const requestWidth = floorToMultipleOf8(targetWidth / 2);
             const requestHeight = floorToMultipleOf8(targetHeight / 2);
-            const seed = getOrUpdateSeed(panelData.scene);
-            
+            const parsedGuidance = parseInt(guidanceScaleInput, 10);
+            const guidanceScale = !isNaN(parsedGuidance) ? parsedGuidance : 7;            
+          
+          const seed = seedInput
+            ? parseInt(seedInput, 10)
+            : getOrUpdateSeed(panelData.scene);
+            console.log("Guidance Scale being sent:", guidanceScale);
             console.log(`Sending to Replicate: ${requestWidth} x ${requestHeight}`);
             const panelImage = await aiService.generatePanel({
               scene: panelData.scene,
@@ -878,7 +896,10 @@ function getOrUpdateSeed(currentScript: string): number {
               height: requestHeight,
               color: selectedColor, // ✅ Fix: Include this
               gradioStyle: selectedPreset, // ✅ Also needed if using Gradio
-              seed, // ✅ pass the managed seed
+              seed,// ✅ custom or fallback
+              guidanceScale,                     // ✅ custom or fallback
+              isMangafy,
+              customStyle: useCustomStyle ? customStyleDescription : null
             });
 
             if (!(panelImage instanceof Blob)) {
@@ -1040,6 +1061,7 @@ function getOrUpdateSeed(currentScript: string): number {
       selectedColor: ColorOption;
       onChange: (color: ColorOption) => void;
     }) => (
+      <>
       <div className={styles.controlGroup}>
         <label>Color Option:</label>
         <select
@@ -1048,18 +1070,83 @@ function getOrUpdateSeed(currentScript: string): number {
           className={styles.select}
         >
           <option value="black_white">Black and White</option>
-          <option value="colored">Full Color</option>
+          <option value="colored"  disabled={isMangafy}  >Full Color</option>
         </select>
       </div>
+
+      <div className={styles.controlGroup}>
+  <label>
+    <input
+      type="checkbox"
+      checked={isMangafy}
+      disabled={selectedStyle === "default" || useCustomStyle}  // 🚫 disable if default manga
+      onChange={(e) => {
+        const checked = e.target.checked;
+        setIsMangafy(checked);
+
+        // Force black & white if mangafy checked
+        if (checked) {
+          setSelectedColor("black_white");
+        }
+      }}
+    />
+    Mangafy(Optional)
+  </label>
+
+  {/* Use Custom Art Style */}
+<div className="form-group">
+  <label>
+    <input
+      type="checkbox"
+      checked={useCustomStyle}
+      onChange={(e) => setUseCustomStyle(e.target.checked)}
+      disabled={isMangafy} // disable toggle if Mangafy is active
+    />
+    Use Custom Art Style
+  </label>
+  <textarea
+    placeholder="Enter your custom art style description..."
+    value={customStyleDescription}
+    onChange={(e) => setCustomStyleDescription(e.target.value)}
+    disabled={!useCustomStyle}
+  />
+</div>
+
+</div>
+
+<div className={styles.controlGroup}>
+  <label>Guidance Scale (1–15) (Optional):</label>
+  <input
+    type="text"
+    value={guidanceScaleInput}
+    onChange={(e) => setGuidanceScaleInput(e.target.value)}
+    className={styles.input}
+    placeholder="7"
+  />
+</div>
+
+<div className={styles.controlGroup}>
+  <label>Seed: (Optional)</label>
+  <input
+    type="text"
+    value={seedInput}
+    onChange={(e) => setSeedInput(e.target.value)}
+    className={styles.input}
+    placeholder="random"
+  />
+</div>
+</>
     );
     
-const AnimeStyleSelector = ({ selectedStyle, onChange }: StyleSelectorProps) => (
+const AnimeStyleSelector = ({ selectedStyle, onChange, disabled }: StyleSelectorProps & { disabled?: boolean }) => (
   <div className={styles.controlGroup}>
     <label>Art Style:</label>
     <select 
       value={selectedStyle} 
       onChange={(e) => onChange(e.target.value as ArtStyle)}
       className={styles.select}
+      disabled={disabled}
+      aria-disabled={disabled}
     >
       <option value="default">Default Manga</option>
       <option value="one-piece">One Piece (Eiichiro Oda)</option>
@@ -1122,6 +1209,7 @@ const StylePresetSelector = ({
       <option value="3D Model">3D Model</option>
     </select>
   </div>
+  
 );
 
 // Add getCostForPanelType function
@@ -1247,6 +1335,7 @@ const CreditIcon = ({ cost }: { cost: number }) => (
       <AnimeStyleSelector
     selectedStyle={selectedStyle}
     onChange={(style: ArtStyle) => setSelectedStyle(style)}
+    disabled={useCustomStyle}
   />
    <PanelTypeSelector 
         selectedType={selectedPanelType}

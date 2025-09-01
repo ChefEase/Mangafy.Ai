@@ -1,10 +1,46 @@
 'use client';
 import React, { useState, useRef } from 'react';
 import { aiService } from '../../services/aiService';
-import Image from 'next/image';
+import NextImage from 'next/image';
 import './styles/CharacterGenerator.css';
 import { useCredits } from '@/context/CreditContext'; // Add this import
 import MobileNav from "../../components/ScriptEditor/MobileNav"
+
+async function applyGrayscale(blob: Blob): Promise<Blob> {
+  if (typeof document === 'undefined') {
+    return Promise.reject(new Error('applyGrayscale only runs in the browser'));
+  }
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d')!;
+      ctx.drawImage(img, 0, 0);
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+
+      const contrast = 1.1;
+      const brightness = -10;
+
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i], g = data[i + 1], b = data[i + 2];
+        let lum = 0.299 * r + 0.587 * g + 0.114 * b;
+
+        lum = (lum - 128) * contrast + 128 + brightness;
+        lum = Math.max(0, Math.min(255, lum));
+
+        data[i] = data[i + 1] = data[i + 2] = lum;
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+      canvas.toBlob((grayscaleBlob) => resolve(grayscaleBlob!), 'image/png');
+    };
+    img.src = URL.createObjectURL(blob);
+  });
+}
 
 export default function CharacterGenerator() {
   const { credits, deductCredits, addCredits } = useCredits(); // Get credit functions
@@ -28,6 +64,27 @@ export default function CharacterGenerator() {
   const CHARACTER_COST = 10; // Define character generation cost
   const [isReferenceSheet, setIsReferenceSheet] = useState(false);
 const REFERENCE_SHEET_COST = 30;
+const [colorMode, setColorMode] = useState<"color" | "bw">("color");
+const [isValidSize, setIsValidSize] = useState(true); // ✅ track validity
+
+React.useEffect(() => {
+  const savedSeed = localStorage.getItem("lastSeed");
+  setParams((prev) => ({
+    ...prev,
+    seed: savedSeed ? parseInt(savedSeed) : 42, // fallback default
+    guidance_scale: 7, // default guidance
+  }));
+}, []);
+
+const validateSize = (width: number, height: number) => {
+  if (width % 8 !== 0 || height % 8 !== 0) {
+    setError("Width and height must be divisible by 8.");
+    setIsValidSize(false);
+  } else {
+    setError(null);
+    setIsValidSize(true);
+  }
+};
 
 const getStylePrompt = (style: string) => {
   const styles = {
@@ -101,7 +158,7 @@ const artStylePreviews: Record<string, [string, string]> = {
           const results: string[] = [];
   
           for (let view of views) {
-            const blob = await aiService.generateTextToImageReplicate({
+            let blob = await aiService.generateTextToImageReplicate({
               prompt: view,
               negative_prompt: negativePrompt,
               width: params.width,
@@ -111,6 +168,9 @@ const artStylePreviews: Record<string, [string, string]> = {
               seed, // ✅ SAME SEED for consistency
               style_selector: "Anime"
             });
+            if (colorMode === "bw") {
+              blob = await applyGrayscale(blob);
+            }
             const url = URL.createObjectURL(blob);
             results.push(url);
           }
@@ -170,7 +230,12 @@ const artStylePreviews: Record<string, [string, string]> = {
   }
 
   const blob = await res.blob();
-  const imageUrl = URL.createObjectURL(blob);
+  let finalBlob = blob;
+
+if (colorMode === "bw") {
+  finalBlob = await applyGrayscale(blob); // 🔥 call your function
+}
+  const imageUrl = URL.createObjectURL(finalBlob);
   console.log("👉 Full response data:", blob);
   console.log("Reference image before sending:", referenceImage);
 
@@ -326,6 +391,76 @@ const artStylePreviews: Record<string, [string, string]> = {
   </div>
 </div>
 
+<div className="form-group">
+                <label>Seed</label>
+                <input
+                  type="range"
+                  min="1"
+                  max="21000000"
+                  value={params.seed}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
+                    console.log('Seed changed:', value);
+                    setParams({ ...params, seed: value });
+                    localStorage.setItem("lastSeed", value.toString());
+                  }}
+                />
+                <span>{params.seed}</span>
+              </div>
+
+              <div className="form-group">
+                <label>Guidance Scale</label>
+                <input
+                  type="range"
+                  min="0.1"
+                  max="20"
+                  step="0.1"
+                  value={params.guidance_scale}
+                  onChange={(e) => {
+                    setParams({ ...params, guidance_scale: parseFloat(e.target.value) })
+                  }}
+                />
+                <span>{params.guidance_scale.toFixed(1)}</span>
+              </div>
+
+              <div className="form-group">
+    <label>Width</label>
+    <input
+      type="number"
+      value={params.width}
+      disabled={isReferenceSheet} // grey out if reference sheet
+      onChange={(e) => {
+        const value = parseInt(e.target.value);
+        setParams({ ...params, width: value });
+        validateSize(value, params.height); // ✅ validate both
+      }}
+    />
+  </div>
+
+  <div className="form-group">
+    <label>Height</label>
+    <input
+      type="number"
+      value={params.height}
+      disabled={isReferenceSheet} // grey out if reference sheet
+      onChange={(e) => {
+        const value = parseInt(e.target.value);
+        setParams({ ...params, height: value });
+        validateSize(params.width, value); // ✅ validate both
+      }}
+    />
+  </div>
+
+  {error && <div className="error-message">{error}</div>}
+
+  <div className="form-group">
+    <label>Color Mode</label>
+    <select value={colorMode} onChange={(e) => setColorMode(e.target.value as "color" | "bw")}>
+      <option value="color">Full Color</option>
+      <option value="bw">Black & White</option>
+    </select>
+  </div>
+
     <div className="form-group">
       <label>
         <input
@@ -445,7 +580,12 @@ const artStylePreviews: Record<string, [string, string]> = {
 
         <button 
           onClick={generateCharacter} 
-          disabled={isGenerating || credits < CHARACTER_COST || (mode === 'image' && !referenceImage)}
+          disabled={
+            isGenerating || 
+            credits < CHARACTER_COST || 
+            (mode === 'image' && !referenceImage) || 
+            !isValidSize // ✅ block button
+          }
           className="generate-button"
         >
           {isGenerating ? (
