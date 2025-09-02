@@ -63,7 +63,7 @@ export default function CharacterGenerator() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const CHARACTER_COST = 10; // Define character generation cost
   const [isReferenceSheet, setIsReferenceSheet] = useState(false);
-const REFERENCE_SHEET_COST = 30;
+const REFERENCE_SHEET_COST = 40;
 const [colorMode, setColorMode] = useState<"color" | "bw">("color");
 const [isValidSize, setIsValidSize] = useState(true); // ✅ track validity
 
@@ -151,10 +151,11 @@ const artStylePreviews: Record<string, [string, string]> = {
 
           const views = [
             `${basePrompt}, front view`,
-            `${basePrompt}, side view`,
-            `${basePrompt}, back view`
+            `${basePrompt}, profile view`,
+            `${basePrompt}, back view`,
+            `${basePrompt}, side view`
           ];
-          const negativePrompt = `${params.negative_prompt}  background objects, scenery, patterns, textures, floor, wall, furniture, landscape`
+          const negativePrompt = `${params.negative_prompt}  background objects, scenery, patterns, textures, floor, wall, furniture, landscape, nsfw, lowres, (bad), text, error, fewer, extra, missing, worst quality, jpeg artifacts, low quality, watermark, unfinished, displeasing, oldest, early, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract]`
           const results: string[] = [];
   
           for (let view of views) {
@@ -347,7 +348,10 @@ if (colorMode === "bw") {
         </button>
         <button
           className={mode === 'image' ? 'active' : ''}
-          onClick={() => setMode('image')}
+          onClick={() => {
+            setMode('image');
+            setIsReferenceSheet(false); // ✅ reset when switching
+          }}
         >
           Image to Image
         </button>
@@ -468,7 +472,7 @@ if (colorMode === "bw") {
           checked={isReferenceSheet}
           onChange={(e) => setIsReferenceSheet(e.target.checked)}
         />
-        Generate Character Reference Sheet (Front / Side / Back)
+        Generate Character Reference Sheet (Front / Side / Back /Profile)
       </label>
     </div>
     </>

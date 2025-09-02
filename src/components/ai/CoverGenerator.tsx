@@ -50,6 +50,12 @@ export default function CoverGenerator() {
   const [fontSize, setFontSize] = useState(60);
   const [textRotation, setTextRotation] = useState(0);
 
+  const [guidanceScale, setGuidanceScale] = useState<number>(7);
+  const [seed, setSeed] = useState<number>(() => {
+    const stored = localStorage.getItem("lastSeed");
+    return stored ? parseInt(stored, 10) : Math.floor(Math.random() * 2_100_000);
+  });
+
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const COVER_COST = 10;
 
@@ -98,27 +104,22 @@ export default function CoverGenerator() {
   
       const stylePrompt = selectedStyle === 'Custom Art Style' 
         ? customStyleText 
-        : selectedStyle;
+        : artStyles[selectedStyle as keyof typeof artStyles];
   
-      const promptForCompression = `${stylePrompt}, ${processedTitle}`;
+        const promptForCompression = `${processedTitle}, ${stylePrompt}`;
       let compressedPrompt = await aiService.compressPrompt(promptForCompression);
       compressedPrompt = enforceNoDialogueAndStyle(compressedPrompt, stylePrompt);
-  
-      let seed: number;
-    const storedSeed = localStorage.getItem("lastSeed");
-    if (storedSeed) {
-      seed = parseInt(storedSeed, 10);
-    } else {
-      seed = Math.floor(Math.random() * 10_000_000);
+      console.log("Final prompt:", compressedPrompt);
+
       localStorage.setItem("lastSeed", seed.toString());
-    }
+      const cfgScaleToUse = guidanceScale || 7;
 
       const imageBlob = await aiService.generateTextToImageReplicate({
         prompt: compressedPrompt,
-        negative_prompt: negativePrompt || "text errors, blurry, watermark, deformed, bad anatomy",
+        negative_prompt: negativePrompt || "nsfw, lowres, (bad), text, error, fewer, extra, missing, worst quality, jpeg artifacts, low quality, watermark, unfinished, displeasing, oldest, early, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract]",
         width: 1008,
         height: 1792,
-        cfg_scale: 7,
+        cfg_scale: cfgScaleToUse,
         steps: 28,
         seed,
         style_selector: "Anime",
@@ -504,6 +505,28 @@ const downloadCover = async () => {
           </select>
         </label>
   
+        <label>
+            Guidance Scale: {guidanceScale}
+            <input
+              type="range"
+              min="1"
+              max="15"
+              value={guidanceScale}
+              onChange={(e) => setGuidanceScale(Number(e.target.value))}
+            />
+          </label>
+  
+          <label>
+            Seed: {seed}
+            <input
+              type="range"
+              min="1"
+              max="2100000"
+              value={seed}
+              onChange={(e) => setSeed(Number(e.target.value))}
+            />
+          </label>
+
         {/* Art Style Preview (only show if style selected) */}
         <div className="artstyle-preview">
           <label> Preview of Art Style</label>

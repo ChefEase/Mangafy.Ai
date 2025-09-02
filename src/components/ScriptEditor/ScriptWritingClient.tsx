@@ -474,10 +474,11 @@ const [isChatbotOpen, setIsChatbotOpen] = useState(false);
 const panelRef = useRef<HTMLDivElement>(null);
 const searchParams = useSearchParams();
 const [isMangafy, setIsMangafy] = useState(false);
-const [guidanceScaleInput, setGuidanceScaleInput] = useState(""); // string for typing
-const [seedInput, setSeedInput] = useState(""); // string for typing
+const [guidanceScale, setGuidanceScale] = useState<number>(7); // string for typing
+const [seedValue, setSeedValue] = useState<number | null>(null); // null == random
 const [useCustomStyle, setUseCustomStyle] = useState(false);
 const [customStyleDescription, setCustomStyleDescription] = useState("");
+const customStyleRef = useRef<HTMLTextAreaElement | null>(null);
 
 let touchTimer: NodeJS.Timeout | null = null;
 let isTouchDragging = false;
@@ -879,13 +880,12 @@ function getOrUpdateSeed(currentScript: string): number {
 
             const requestWidth = floorToMultipleOf8(targetWidth / 2);
             const requestHeight = floorToMultipleOf8(targetHeight / 2);
-            const parsedGuidance = parseInt(guidanceScaleInput, 10);
-            const guidanceScale = !isNaN(parsedGuidance) ? parsedGuidance : 7;            
-          
-          const seed = seedInput
-            ? parseInt(seedInput, 10)
+            const parsedGuidance = guidanceScale;
+            const guidanceScaleToSend = !isNaN(parsedGuidance) ? parsedGuidance : 7;     
+            const seed = seedValue !== null
+            ? seedValue
             : getOrUpdateSeed(panelData.scene);
-            console.log("Guidance Scale being sent:", guidanceScale);
+            console.log("Guidance Scale being sent:", guidanceScaleToSend);
             console.log(`Sending to Replicate: ${requestWidth} x ${requestHeight}`);
             const panelImage = await aiService.generatePanel({
               scene: panelData.scene,
@@ -897,9 +897,9 @@ function getOrUpdateSeed(currentScript: string): number {
               color: selectedColor, // ✅ Fix: Include this
               gradioStyle: selectedPreset, // ✅ Also needed if using Gradio
               seed,// ✅ custom or fallback
-              guidanceScale,                     // ✅ custom or fallback
+              guidanceScale: guidanceScaleToSend,                     // ✅ custom or fallback
               isMangafy,
-              customStyle: useCustomStyle ? customStyleDescription : null
+              customStyle: useCustomStyle ? (customStyleRef.current?.value ?? customStyleDescription) : null
             });
 
             if (!(panelImage instanceof Blob)) {
@@ -1054,6 +1054,25 @@ function getOrUpdateSeed(currentScript: string): number {
       });
     };
     
+    function randomVarLengthSeed(): number {
+      // Choose a random length 1..7, produce a number of that length,
+      // BUT never exceed 2,100,000 (cap).
+      const MAX_CAP = 2100000;
+      const len = Math.floor(Math.random() * 7) + 1; // 1..7
+      const min = len === 1 ? 1 : Math.pow(10, len - 1);
+      const maxForLen = Math.pow(10, len) - 1;
+      const cappedMax = Math.min(maxForLen, MAX_CAP);
+    
+      if (min > cappedMax) {
+        // If length's min is already above the cap (shouldn't happen for len<=7),
+        // just return a uniform random within 1..MAX_CAP as a safe fallback.
+        return Math.floor(Math.random() * MAX_CAP) + 1;
+      }
+    
+      return Math.floor(Math.random() * (cappedMax - min + 1)) + min;
+    }
+    
+    
     const ColorOptionSelector = ({ 
       selectedColor,
       onChange 
@@ -1093,7 +1112,7 @@ function getOrUpdateSeed(currentScript: string): number {
     Mangafy(Optional)
   </label>
 
-  {/* Use Custom Art Style */}
+{/* Use Custom Art Style */}
 <div className="form-group">
   <label>
     <input
@@ -1104,11 +1123,17 @@ function getOrUpdateSeed(currentScript: string): number {
     />
     Use Custom Art Style
   </label>
+
+  {/* Uncontrolled textarea to avoid re-render / IME focus loss while typing */}
   <textarea
+    ref={customStyleRef}
     placeholder="Enter your custom art style description..."
-    value={customStyleDescription}
-    onChange={(e) => setCustomStyleDescription(e.target.value)}
+    defaultValue={customStyleDescription}          // uncontrolled for smooth typing
+  onInput={() => { /* keep typing fluid — don't call setState here */ }}
+  onBlur={() => setCustomStyleDescription(customStyleRef.current?.value || "")}
     disabled={!useCustomStyle}
+    rows={4}
+    style={{ width: '100%', resize: 'vertical' }}
   />
 </div>
 
@@ -1116,25 +1141,44 @@ function getOrUpdateSeed(currentScript: string): number {
 
 <div className={styles.controlGroup}>
   <label>Guidance Scale (1–15) (Optional):</label>
-  <input
-    type="text"
-    value={guidanceScaleInput}
-    onChange={(e) => setGuidanceScaleInput(e.target.value)}
-    className={styles.input}
-    placeholder="7"
-  />
+  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+<input
+type="range"
+min={1}
+max={15}
+value={guidanceScale}
+onChange={(e) => setGuidanceScale(parseInt(e.target.value, 10))}
+/>
+<span style={{ minWidth: 28, textAlign: 'center' }}>{guidanceScale}</span>
+</div>
 </div>
 
 <div className={styles.controlGroup}>
   <label>Seed: (Optional)</label>
-  <input
-    type="text"
-    value={seedInput}
-    onChange={(e) => setSeedInput(e.target.value)}
-    className={styles.input}
-    placeholder="random"
-  />
+  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+    <input
+      type="range"
+      min={1}
+      max={2100000}
+      value={seedValue ?? 1}                         // show 1 when null
+      onChange={(e) => setSeedValue(parseInt(e.target.value, 10))}
+    />
+    <input
+      type="number"
+      value={seedValue ?? ''}
+      onChange={(e) => {
+        const v = e.target.value;
+        setSeedValue(v === '' ? null : parseInt(v, 10));
+      }}
+      placeholder="random"
+      style={{ width: 120 }}
+    />
+   <button type="button" onClick={() => setSeedValue(randomVarLengthSeed())}>
+  Randomize
+</button>
+  </div>
 </div>
+
 </>
     );
     
