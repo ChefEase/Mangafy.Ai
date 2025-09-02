@@ -282,16 +282,16 @@
 }
 
 .artstyle-preview {
-  display: flex;
-  flex-direction: row;
-  gap: 0.5rem;
-  align-items: center; /* center on PC */
-  flex-wrap: wrap;       /* allows wrapping if more than 2 images */
+  display: flex !important;     /* force flexbox */
+  flex-direction: row !important;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
 }
 
 .preview-img {
-  width: 100%;
-  max-width: 100px; /* ✅ reduce size on desktop */
+  display: inline-block;
+  width: 150px;   /* fixed width so they don’t overflow */
   height: auto;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -300,6 +300,13 @@
 
 .preview-img:hover {
   transform: scale(1.05);
+}
+
+.preview-label {
+  display: block;
+  width: 100%;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
 }
 
 .loading-spinner {
@@ -329,7 +336,7 @@
   flex-direction: column;
   gap: 0.5rem;
   width: 400px;
-  height: 520px;
+  height: 700px;
 }
 
 /* Generated image placeholder area */

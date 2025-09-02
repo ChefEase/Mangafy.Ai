@@ -42,6 +42,18 @@ async function applyGrayscale(blob: Blob): Promise<Blob> {
   });
 }
 
+const styleOptions = [
+  "Manga",
+  "Anime",
+  "Cinematic",
+  "Photographic",
+  "Digital Art",
+  "Pixel art",
+  "Fantasy art",
+  "Neonpunk",
+  "3D Model",
+];
+
 export default function CharacterGenerator() {
   const { credits, deductCredits, addCredits } = useCredits(); // Get credit functions
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
@@ -66,6 +78,7 @@ export default function CharacterGenerator() {
 const REFERENCE_SHEET_COST = 40;
 const [colorMode, setColorMode] = useState<"color" | "bw">("color");
 const [isValidSize, setIsValidSize] = useState(true); // ✅ track validity
+const [selectedStyle, setSelectedStyle] = useState("Anime");
 
 React.useEffect(() => {
   const savedSeed = localStorage.getItem("lastSeed");
@@ -193,7 +206,7 @@ const artStylePreviews: Record<string, [string, string]> = {
             cfg_scale: 7,
             steps: 28,
             seed: Math.floor(Math.random() * 2_000_000) + 1,
-            style_selector: "Anime"
+            style_selector: selectedStyle
           });
           const imageUrl = URL.createObjectURL(blob);
   
@@ -393,6 +406,20 @@ if (colorMode === "bw") {
       <img key={idx} src={src} alt={`Preview ${idx + 1}`} className="preview-img" />
     ))}
   </div>
+</div>
+
+<div className="form-group">
+  <label>Style Selector</label>
+  <select
+    value={selectedStyle}
+    onChange={(e) => setSelectedStyle(e.target.value)}
+  >
+    {styleOptions.map((style) => (
+      <option key={style} value={style}>
+        {style}
+      </option>
+    ))}
+  </select>
 </div>
 
 <div className="form-group">

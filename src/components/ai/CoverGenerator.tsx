@@ -4,7 +4,7 @@ import { aiService } from '@/services/aiService';
 import { useCredits } from '@/context/CreditContext';
 import { CharacterService } from '@/services/CharacterService';
 import './styles/coverGenerator.css';
-import {enforceNoDialogueAndStyle} from '@/utils/promptUtils'
+import {enforceNoDialogueAndStyle} from '@/utils/promptUtils1'
 import MobileNav from "../../components/ScriptEditor/MobileNav"
 
 const artStyles = {
@@ -29,6 +29,18 @@ const fontOptions = [
   'Impact', 'Oswald', 'Bebas Neue', 'Anton', 'Archivo Black', 'Montserrat', 'Titillium Web', 'Russo One', 'Black Ops One', 'League Spartan',
   'Pacifico', 'Lobster', 'Amatic SC', 'Satisfy', 'Great Vibes', 'Shadows Into Light', 'Dancing Script', 'Caveat', 'Gloria Hallelujah', 'Abril Fatface'
 ];
+
+const styleSelectorOptions = {
+  "Manga": "Manga",
+  "Anime": "Anime",
+  "Cinematic": "Cinematic",
+  "Photographic": "Photographic",
+  "Digital Art": "Digital Art",
+  "Pixel art": "Pixel art",
+  "Fantasy art": "Fantasy art",
+  "Neonpunk": "Neonpunk",
+  "3D Model": "3D Model",
+};
 
 export default function CoverGenerator() {
   const { credits, deductCredits, addCredits } = useCredits();
@@ -58,6 +70,7 @@ export default function CoverGenerator() {
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const COVER_COST = 10;
+  const [styleSelector, setStyleSelector] = useState("Anime");
 
   const artStylePreviews: Record<string, [string, string]> = {
     'Vinland Saga': ['/samples/vinlandsaga1.png', '/samples/vinlandsaga2.png'],
@@ -122,7 +135,7 @@ export default function CoverGenerator() {
         cfg_scale: cfgScaleToUse,
         steps: 28,
         seed,
-        style_selector: "Anime",
+        style_selector: styleSelector,
       });
   
       let imageUrl: string;
@@ -490,6 +503,22 @@ const downloadCover = async () => {
           className="negative-prompt-input"
         />
   
+  <label>
+            Image Style
+            <select
+              value={styleSelector}
+              onChange={(e) => setStyleSelector(e.target.value)}
+              className="style-select"
+            >
+             {(Object.keys(styleSelectorOptions) as (keyof typeof styleSelectorOptions)[]).map((style) => (
+  <option key={style} value={style}>
+    {styleSelectorOptions[style]}
+  </option>
+))}
+
+            </select>
+          </label>
+
         <label>
           Art Style
           <select
