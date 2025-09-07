@@ -63,10 +63,7 @@ export default function CoverGenerator() {
   const [textRotation, setTextRotation] = useState(0);
 
   const [guidanceScale, setGuidanceScale] = useState<number>(7);
-  const [seed, setSeed] = useState<number>(() => {
-    const stored = localStorage.getItem("lastSeed");
-    return stored ? parseInt(stored, 10) : Math.floor(Math.random() * 2_100_000);
-  });
+  const [seed, setSeed] = useState<number>(Math.floor(Math.random() * 2_100_000));
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const COVER_COST = 10;
@@ -91,6 +88,18 @@ export default function CoverGenerator() {
     return value && typeof value === 'object' && typeof value.arrayBuffer === 'function';
   }
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("lastSeed");
+      if (stored) setSeed(parseInt(stored, 10));
+    }
+  }, []);
+  
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("lastSeed", seed.toString());
+    }
+  }, [seed]);
   const generateCover = async () => { 
     if (!title.trim()) return setError("Please enter a cover description");
     if (credits < COVER_COST) return setError(`You need ${COVER_COST} credits to generate cover art`);
