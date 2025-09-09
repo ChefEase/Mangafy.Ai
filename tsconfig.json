@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "types": ["@types/node", "@types/fabric"],
+    "types": [],
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
     ],
+    "typeRoots": ["./src/types", "./node_modules/@types"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
