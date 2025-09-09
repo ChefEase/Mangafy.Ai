@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { createPortal } from "react-dom"; // ✅ add this
+
 
 interface Project {
   id: string;
@@ -125,15 +125,14 @@ export default function ProjectCard({
       <img src={project.thumbnail} alt={project.title} />
       <h3>{project.title}</h3>
       <p>{project.description}</p>
-      {showContextMenu && 
-      createPortal(
+      {showContextMenu && (
         <div
           ref={contextMenuRef}
           className="context-menu"
           style={{
             position: "fixed",
-            top: `${contextMenuPosition.y}px`,
-            left: `${contextMenuPosition.x}px`,
+            top: 100,
+            left: 100,
             zIndex: 1000,
             backgroundColor: "darkgrey",
             border: "1px solid #ccc",
@@ -144,8 +143,7 @@ export default function ProjectCard({
           <button onClick={handleRename}>Rename</button>
           <button onClick={handleAddChapter}>Add Chapter</button>
           <button onClick={(e) => handleDeleteProject(e, project.id)}>Delete Project</button>
-        </div>,
-        document.body
+        </div>
       )}
     </div>
   );
