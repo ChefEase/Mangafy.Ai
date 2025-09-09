@@ -27,6 +27,7 @@ export default function ChatInput({ onSendMessage, isLoading, costPerMessage }: 
     e.target.value = ""; // Reset input
     return;
   }
+  
     if (file.size > MAX_FILE_SIZE_BYTES) {
       alert(`Image is too large! Maximum size is ${MAX_FILE_SIZE_MB} MB.`);
       return;
