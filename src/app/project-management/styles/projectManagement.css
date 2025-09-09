@@ -419,7 +419,7 @@ color: #f44336;
 
 .project-management-page {
   flex-direction: column;
-  height: auto;
+  height: 600px;
 }
 
 .project-sidebar {
