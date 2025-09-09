@@ -1,4 +1,5 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 interface Project {
   id: string;
@@ -26,6 +27,7 @@ export default function ProjectCard({
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
   const longPressTimer = useRef<number | null>(null);
+  const contextMenuRef = useRef<HTMLDivElement | null>(null);
 
   const handleRightClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -83,29 +85,57 @@ export default function ProjectCard({
     if (confirmDelete) {
       onDeleteProject(projectId);
     }
+    setShowContextMenu(false);
   };
 
-  return (
-    <div className="project-card" 
-    onClick={() => onSelect(project)} 
-    onContextMenu={handleRightClick}
-    onTouchStart={handleTouchStart}
-    onTouchEnd={handleTouchEnd}
-    onTouchMove={handleTouchMove}
+  // Close menu when clicking/tapping outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      if (
+        contextMenuRef.current &&
+        !contextMenuRef.current.contains(e.target as Node)
+      ) {
+        setShowContextMenu(false);
+      }
+    };
 
+    if (showContextMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("touchstart", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [showContextMenu]);
+
+  return (
+    <div
+      className="project-card"
+      onClick={() => onSelect(project)}
+      onContextMenu={handleRightClick}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onTouchMove={handleTouchMove}
     >
       <img src={project.thumbnail} alt={project.title} />
       <h3>{project.title}</h3>
       <p>{project.description}</p>
-      {showContextMenu && (
+      {showContextMenu && 
+      createPortal(
         <div
+          ref={contextMenuRef}
           className="context-menu"
           style={{
             position: "fixed",
-            top: "100px",
-            left: "100px",
+            top: `${contextMenuPosition.y}px`,
+            left: `${contextMenuPosition.x}px`,
             zIndex: 1000,
-            backgroundColor: "white",
+            backgroundColor: "darkgrey",
             border: "1px solid #ccc",
             padding: "8px",
             borderRadius: "4px",
@@ -114,7 +144,8 @@ export default function ProjectCard({
           <button onClick={handleRename}>Rename</button>
           <button onClick={handleAddChapter}>Add Chapter</button>
           <button onClick={(e) => handleDeleteProject(e, project.id)}>Delete Project</button>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

@@ -1463,62 +1463,6 @@ const CreditIcon = ({ cost }: { cost: number }) => (
     />
   </div>
 )}
- <div className="panel-type-note">
-  <h3>📌 Panel Layout Notes</h3>
-  <ul>
-    <li>Use <strong>vertical panels</strong> for dramatic scenes</li>
-    <li><strong>Horizontal panels</strong> work well for action sequences</li>
-    <li>Click on preview pages to inspect details</li>
-  </ul>
-
-  <h4>⚠️ Character Description Tips</h4>
-  <p>
-    When describing characters, try and keep it <strong>brief and visual</strong>.
-    Use <em>short phrases</em> instead of full sentences, and only include what
-    can actually be seen in the image.
-  </p>
-  <p>
-    <strong>Format:</strong> hair color + hair style, eye color, outfit (brief),
-    expression, pose (if relevant), extras (like accessories or props)
-  </p>
-
-  <h4>Examples:</h4>
-  <table className="prompt-table">
-    <thead>
-      <tr>
-        <th>❌ Long Sentence</th>
-        <th>✅ Efficient Prompt</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>She has long, shiny black hair and dark blue eyes.</td>
-        <td>long black hair, dark blue eyes</td>
-      </tr>
-      <tr>
-        <td>She is 5 ft 8 and slim with a confident expression.</td>
-        <td>slim, confident expression</td>
-      </tr>
-      <tr>
-        <td>She wears a white dress with a black belt.</td>
-        <td>white dress, black belt</td>
-      </tr>
-      <tr>
-        <td>She carries a handbag with both hands in front of her.</td>
-        <td>holding handbag with both hands</td>
-      </tr>
-      <tr>
-        <td>She is wearing makeup, has earrings and blush.</td>
-        <td>makeup, earrings, light blush</td>
-      </tr>
-      <tr>
-        <td>Her outfit blends traditional and modern elements.</td>
-        <td>modern-traditional fusion outfit</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
           </div>
         </div>
         <MobileNav /> {/* Only visible on mobile */}
