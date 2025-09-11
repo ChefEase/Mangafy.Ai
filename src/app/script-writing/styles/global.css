@@ -25,8 +25,8 @@
     position: absolute;
     top: 50%;
     right: -20px;
-    background: #0070f3;
-    color: white;
+    background: #ff9900;
+    color: rgb(0, 0, 0);
     border: none;
     padding: 0.5rem;
     cursor: pointer;

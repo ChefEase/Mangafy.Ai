@@ -225,8 +225,8 @@ body {
   position: fixed;
   top: 30%;
   left: 2%;
-  background: #0070f3;
-  color: white;
+  background: #ffae00;
+  color: rgb(0, 0, 0);
   border: none;
   padding: 0.5rem;
   cursor: pointer;

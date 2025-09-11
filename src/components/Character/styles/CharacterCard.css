@@ -66,15 +66,15 @@
 
 /* Primary action button */
 .actions button:first-child {
-  background-color: #0071e3; /* Apple-like blue from images */
-  color: white;
+  background-color: #ffa600; /* Apple-like blue from images */
+  color: rgb(0, 0, 0);
   border: none;
 }
 
 .actions button:hover {
   transform: translateY(-1px);
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-  background-color: #0071e3; /* Hover state */
+  background-color: #ff9900; /* Hover state */
   color: white;
 }
 

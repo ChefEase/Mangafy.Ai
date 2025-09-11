@@ -42,7 +42,7 @@
   transform: translateX(-50%);
   width: 60px;
   height: 3px;
-  background: linear-gradient(90deg, #ff6b6b 0%, #4ecdc4 100%);
+  background: linear-gradient(90deg, #ff9100 0%, #ffffff 100%);
   border-radius: 2px;
 }
 

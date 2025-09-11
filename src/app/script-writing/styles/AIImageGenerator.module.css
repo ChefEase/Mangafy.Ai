@@ -1,11 +1,11 @@
 /* AIImageGenerator.module.css */
 .container {
     font-family: 'Segoe UI', 'Roboto', sans-serif;
-    background-color: #121212;
+    background-color: #131212;
     border-radius: 16px;
     padding: 24px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    max-width: 1200px;
+    max-width: 1600px;
     margin: 0 auto;
   }
   
@@ -17,7 +17,7 @@
   .header h2 {
     font-size: 2.2rem;
     font-weight: 700;
-    background: linear-gradient(90deg, #8a2be2, #4a6cf7);
+    background: linear-gradient(90deg, #ffffff, #fca400);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -34,7 +34,7 @@
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 20px;
     margin-bottom: 30px;
-    background: #1e1e1e;
+    background: #242323;
     padding: 20px;
     border-radius: 12px;
     border: 1px solid #333;
@@ -90,7 +90,7 @@
   
   .generateButton {
     grid-column: 1 / -1;
-    background: linear-gradient(135deg, #8a2be2, #4a6cf7);
+    background: linear-gradient(135deg, #ffffff, #ff9900);
     color: white;
     border: none;
     border-radius: 8px;
@@ -180,7 +180,7 @@
   .dot {
     width: 12px;
     height: 12px;
-    background: #4a6cf7;
+    background: #ffae00;
     border-radius: 50%;
     animation: pulse 1.5s infinite ease-in-out;
   }
@@ -280,11 +280,27 @@
   }
 
   .controls {
-    grid-template-columns: 1fr; /* Make controls full width on mobile */
+    display: grid;
+    grid-template-columns: 1fr;  /* one column */
     gap: 12px;
-    padding: 16px;
+    flex-wrap: wrap;
   }
 
+  .controls button {
+    width: 100%;
+    max-width: 100%;     /* prevent overflow */
+    box-sizing: border-box; /* respect parent padding */
+    padding: 16px;
+    overflow-wrap: break-word; /* break long text if needed */
+  }
+
+  .controls input{
+    width: 100%;
+    max-width: 100%;     /* prevent overflow */
+    box-sizing: border-box; /* respect parent padding */
+    padding: 16px;
+    overflow-wrap: break-word; /* break long text if needed */
+  }
   .generateButton {
     display: flex;
     align-items: center;

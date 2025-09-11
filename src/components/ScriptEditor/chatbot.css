@@ -14,8 +14,8 @@
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background-color: #007bff; /* Blue */
-    color: white;
+    background-color: #ff9100; /* Blue */
+    color: rgb(0, 0, 0);
     font-size: 30px;
     font-weight: bold;
     display: flex;
