@@ -1109,7 +1109,7 @@ function getOrUpdateSeed(currentScript: string): number {
         }
       }}
     />
-    Mangafy(Optional)
+     <span>Mangafy (Optional)</span>
   </label>
 
 {/* Use Custom Art Style */}

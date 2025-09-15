@@ -373,7 +373,11 @@
     margin-right: 4px; /* spacing instead of flex gap */
   }
   
-
+  .controlGroup label span {
+    display: inline-block;
+    white-space: nowrap;
+  }
+  
   /* Flex containers with multiple inputs/buttons should wrap */
   .controlGroup > div {
     display: flex;
