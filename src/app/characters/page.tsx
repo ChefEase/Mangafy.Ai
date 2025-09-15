@@ -119,23 +119,23 @@ export default function CharactersPage() {
 
       {/* Open Graph */}
       <meta property="og:type" content="website" />
-      <meta property="og:url" content="https://mangafy-ai.vercel.app" />
+      <meta property="og:url" content="https://www.mangafyai.com/" />
       <meta property="og:title" content="Mangafy.Ai – AI Manga Creation Tools" />
       <meta
         property="og:description"
         content="Create manga panels, characters, covers, and scripts with powerful AI tools for artists, writers, and storytellers."
       />
-      <meta property="og:image" content="https://mangafy-ai.vercel.app/logo.png" />
+      <meta property="og:image" content="https://www.mangafyai.com//logo.png" />
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:url" content="https://mangafy-ai.vercel.app/" />
+      <meta name="twitter:url" content="https://www.mangafyai.com//" />
       <meta name="twitter:title" content="Mangafy.Ai – AI Manga Creation Tools" />
       <meta
         name="twitter:description"
         content="Create manga panels, characters, covers, and scripts with powerful AI tools for artists, writers, and storytellers."
       />
-      <meta name="twitter:image" content="https://mangafy-ai.vercel.app/logo.png" />
+      <meta name="twitter:image" content="https://www.mangafyai.com//logo.png" />
 
       {/* Structured Data: Organization + Website */}
       <script
@@ -145,8 +145,8 @@ export default function CharactersPage() {
             "@context": "https://schema.org",
             "@type": "Organization",
             name: "Mangafy.Ai",
-            url: "https://mangafy-ai.vercel.app",
-            logo: "https://mangafy-ai.vercel.app/logo.png",
+            url: "https://www.mangafyai.com/",
+            logo: "https://www.mangafyai.com//logo.png",
             sameAs: [
               // Add your social profiles here (if any)
               "https://twitter.com/yourhandle",
@@ -162,11 +162,11 @@ export default function CharactersPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebSite",
-            url: "https://mangafy-ai.vercel.app",
+            url: "https://www.mangafyai.com/",
             name: "Mangafy.Ai",
             potentialAction: {
               "@type": "SearchAction",
-              target: "https://mangafy-ai.vercel.app/search?q={search_term_string}",
+              target: "https://www.mangafyai.com//search?q={search_term_string}",
               "query-input": "required name=search_term_string"
             }
           }),

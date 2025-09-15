@@ -170,23 +170,23 @@ export default function ProjectManagementPage() {
   />
   {/* Open Graph */}
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://mangafy-ai.vercel.app/project-management" />
+  <meta property="og:url" content="https://www.mangafyai.com//project-management" />
   <meta property="og:title" content="Project Management – Mangafy.Ai" />
   <meta
     property="og:description"
     content="Manage your manga projects effortlessly on Mangafy.Ai. Create, organize, and track your manga stories and chapters with ease."
   />
-  <meta property="og:image" content="https://mangafy-ai.vercel.app/logo.png" />
+  <meta property="og:image" content="https://www.mangafyai.com//logo.png" />
 
   {/* Twitter */}
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:url" content="https://mangafy-ai.vercel.app/project-management" />
+  <meta name="twitter:url" content="https://www.mangafyai.com//project-management" />
   <meta name="twitter:title" content="Project Management – Mangafy.Ai" />
   <meta
     name="twitter:description"
     content="Manage your manga projects effortlessly on Mangafy.Ai. Create, organize, and track your manga stories and chapters with ease."
   />
-  <meta name="twitter:image" content="https://mangafy-ai.vercel.app/logo.png" />
+  <meta name="twitter:image" content="https://www.mangafyai.com//logo.png" />
 </Head>
 
       <Header />

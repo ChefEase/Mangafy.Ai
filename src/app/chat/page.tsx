@@ -28,17 +28,17 @@ export default function ChatPage() {
 
     {/* Open Graph */}
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://mangafy-ai.vercel.app/chat" />
+    <meta property="og:url" content="https://www.mangafyai.com//chat" />
     <meta property="og:title" content="Mangafy.Ai Chat – AI Manga Story Creation" />
     <meta property="og:description" content="Chat with Mangafy.Ai to create manga panels, characters, and stories using AI." />
-    <meta property="og:image" content="https://mangafy-ai.vercel.app/logo.png" />
+    <meta property="og:image" content="https://www.mangafyai.com//logo.png" />
 
     {/* Twitter */}
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content="https://mangafy-ai.vercel.app/chat" />
+    <meta name="twitter:url" content="https://www.mangafyai.com//chat" />
     <meta name="twitter:title" content="Mangafy.Ai Chat – AI Manga Story Creation" />
     <meta name="twitter:description" content="Chat with Mangafy.Ai to create manga panels, characters, and stories using AI." />
-    <meta name="twitter:image" content="https://mangafy-ai.vercel.app/logo.png" />
+    <meta name="twitter:image" content="https://www.mangafyai.com//logo.png" />
   </Head>
 
     <div className="h-screen bg-gray-900">

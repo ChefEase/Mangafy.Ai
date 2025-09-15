@@ -180,23 +180,23 @@ export default function SubscriptionPage() {
   />
   {/* Open Graph */}
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://mangafy-ai.vercel.app/subscription" />
+  <meta property="og:url" content="https://www.mangafyai.com//subscription" />
   <meta property="og:title" content="Subscription – Mangafy.Ai" />
   <meta
     property="og:description"
     content="Manage your Mangafy.Ai subscription plans with ease. Upgrade or renew your subscription to keep creating amazing manga with AI-powered tools."
   />
-  <meta property="og:image" content="https://mangafy-ai.vercel.app/logo.png" />
+  <meta property="og:image" content="https://www.mangafyai.com//logo.png" />
 
   {/* Twitter */}
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:url" content="https://mangafy-ai.vercel.app/subscription" />
+  <meta name="twitter:url" content="https://www.mangafyai.com//subscription" />
   <meta name="twitter:title" content="Subscription – Mangafy.Ai" />
   <meta
     name="twitter:description"
     content="Manage your Mangafy.Ai subscription plans with ease. Upgrade or renew your subscription to keep creating amazing manga with AI-powered tools."
   />
-  <meta name="twitter:image" content="https://mangafy-ai.vercel.app/logo.png" />
+  <meta name="twitter:image" content="https://www.mangafyai.com//logo.png" />
 </Head>
 
     <div className="subscription-page">

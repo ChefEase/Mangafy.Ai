@@ -60,10 +60,10 @@ export default function AuthPage() {
           property="og:description"
           content="Join Mangafy.Ai and unlock AI tools for manga creation. Login or create your account now!"
         />
-        <meta property="og:url" content="https://mangafy-ai.vercel.app/login" />
+        <meta property="og:url" content="https://www.mangafyai.com//login" />
         <meta
           property="og:image"
-          content="https://mangafy-ai.vercel.app/logo.png"
+          content="https://www.mangafyai.com//logo.png"
         />
 
         {/* Twitter Card */}
@@ -75,7 +75,7 @@ export default function AuthPage() {
         />
         <meta
           name="twitter:image"
-          content="https://mangafy-ai.vercel.app/logo.png"
+          content="https://www.mangafyai.com//logo.png"
         />
       </Head>
       <Navbar setActiveForm={setActiveForm} />

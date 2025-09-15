@@ -13,23 +13,23 @@ export default function GoogleLoginPage() {
     />
     {/* Open Graph */}
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://mangafy-ai.vercel.app/google-login" />
+    <meta property="og:url" content="https://www.mangafyai.com//google-login" />
     <meta property="og:title" content="Google Login – Mangafy.Ai" />
     <meta
       property="og:description"
       content="Log into with your google account and start creating amazing manga panels and stories."
     />
-    <meta property="og:image" content="https://mangafy-ai.vercel.app/logo.png" />
+    <meta property="og:image" content="https://www.mangafyai.com//logo.png" />
 
     {/* Twitter */}
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content="https://mangafy-ai.vercel.app/google-login" />
+    <meta name="twitter:url" content="https://www.mangafyai.com//google-login" />
     <meta name="twitter:title" content="Google Login – Mangafy.Ai" />
     <meta
       name="twitter:description"
       content="Log into with your google account and start creating amazing manga panels and stories."
     />
-    <meta name="twitter:image" content="https://mangafy-ai.vercel.app/logo.png" />
+    <meta name="twitter:image" content="https://www.mangafyai.com//logo.png" />
   </Head>
       <h1>Login with Google</h1>
       <GoogleLoginButton />

@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Host
-Host: https://mangafy-ai.vercel.app
+Host: https://www.mangafyai.com/
 
 # Sitemaps
-Sitemap: https://mangafy-ai.vercel.app/sitemap.xml
+Sitemap: https://www.mangafyai.com//sitemap.xml
