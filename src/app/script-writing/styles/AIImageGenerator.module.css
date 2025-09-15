@@ -283,6 +283,7 @@
     display: grid;
     grid-template-columns: 1fr;  /* one column */
     gap: 12px;
+    overflow: hidden;   /* prevent child overflow */
   }
 
   .controls button {
@@ -317,7 +318,7 @@
     color: #888888;   /* lighter gray so text is still visible */
     cursor: not-allowed;
   }
-  
+
   .generateButton {
     display: flex;
     align-items: center;
@@ -357,13 +358,22 @@
   .controlGroup label {
     display: inline-flex;
     align-items: center;
+    justify-content: flex-start;
     gap: 6px;
-    white-space: normal;   /* text can wrap if needed */
-    word-break: break-word;
-    width: 100%;           /* stays inside container */
+    flex-wrap: nowrap;       /* 👈 force text + checkbox inline */
+    width: 100%;
+    max-width: 100%;
     box-sizing: border-box;
+    overflow: hidden;        /* prevent escaping */
+    text-overflow: ellipsis; /* gracefully cut if too long */
   }
   
+  .controlGroup label::before {
+    display: inline;   /* 👈 Safari fix: make bullet inline */
+    margin-right: 4px; /* spacing instead of flex gap */
+  }
+  
+
   /* Flex containers with multiple inputs/buttons should wrap */
   .controlGroup > div {
     display: flex;
