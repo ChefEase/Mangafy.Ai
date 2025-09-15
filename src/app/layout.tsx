@@ -33,6 +33,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
          <title>Home - Mangafy.Ai</title>
          <meta name="description" content="Mangafy.Ai – Create manga panels, characters, covers, and scripts with Mangafy.Ai powerful AI tools for artists, writers, and storytellers." />
 
+  {/* Favicon */}
+  <link rel="icon" href="/favicon.ico" />
+  
         {/* Open Graph */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://www.mangafyai.com/" />
