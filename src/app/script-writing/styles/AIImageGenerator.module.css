@@ -293,13 +293,15 @@
     overflow-wrap: break-word; /* break long text if needed */
   }
 
-  .controls input{
-    width: 100%;
-    max-width: 100%;     /* prevent overflow */
-    box-sizing: border-box; /* respect parent padding */
-    padding: 16px;
-    overflow-wrap: break-word; /* break long text if needed */
+  .controls input,
+  .controls select,
+  .controls button,
+  .controls textarea {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box;
   }
+
   .generateButton {
     display: flex;
     align-items: center;
@@ -337,7 +339,20 @@
   }
 
   .controlGroup label {
-    font-size: 0.8rem;
+    white-space: normal !important;
+    word-break: break-word;
+  }
+  
+  /* Flex containers with multiple inputs/buttons should wrap */
+  .controlGroup > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .controlGroup > div > * {
+    flex: 1 1 auto; /* Let children shrink/grow */
+    min-width: 0;   /* Prevent overflow */
   }
 
   .panel-type-note {
@@ -358,5 +373,12 @@
   .creditIcon {
     width: 16px;
     height: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .controlGroup button {
+    width: 100% !important;
+    margin-top: 8px;
   }
 }

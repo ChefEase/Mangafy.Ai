@@ -4,7 +4,7 @@
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    background: linear-gradient(135deg, #1e1e2e, #15151f);
+    background: linear-gradient(135deg, #1f1f20, #161618);
     color: #fff;
     font-family: 'Poppins', sans-serif;
     text-align: center;
@@ -348,7 +348,7 @@
   position: relative;
   min-width: 400px;
   min-height: 400px;
-  background-color: #555; /* grey background */
+  background-color: #302e2e; /* grey background */
   border-radius: 12px;
 }
 
