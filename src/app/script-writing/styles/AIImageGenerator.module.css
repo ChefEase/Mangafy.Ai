@@ -360,22 +360,28 @@
     align-items: center;
     justify-content: flex-start;
     gap: 6px;
-    flex-wrap: nowrap;       /* 👈 force text + checkbox inline */
+    flex-wrap: nowrap;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
-    overflow: hidden;        /* prevent escaping */
-    text-overflow: ellipsis; /* gracefully cut if too long */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #e0e0e0 !important; /* 👈 force visible text color */
   }
   
   .controlGroup label::before {
-    display: inline;   /* 👈 Safari fix: make bullet inline */
-    margin-right: 4px; /* spacing instead of flex gap */
+    content: "•";
+    display: inline-block;
+    margin-right: 4px;
+    color: #4a6cf7; /* force bullet color */
   }
   
   .controlGroup label span {
     display: inline-block;
     white-space: nowrap;
+    color: inherit;   /* 👈 makes sure span takes the label's color */
+    z-index: 1;       /* 👈 ensure it's not layered behind pseudo */
+    position: relative; /* Safari fix */
   }
   
   /* Flex containers with multiple inputs/buttons should wrap */
