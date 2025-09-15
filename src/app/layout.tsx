@@ -35,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   {/* Favicon */}
   <link rel="icon" href="/favicon.ico" />
-  
+
         {/* Open Graph */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://www.mangafyai.com/" />
