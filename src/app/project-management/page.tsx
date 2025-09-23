@@ -162,12 +162,18 @@ export default function ProjectManagementPage() {
 
   return (
     <div>
-        <Head>
+      <Head>
   <title>Project Management – Mangafy.Ai</title>
   <meta
     name="description"
     content="Manage your manga projects effortlessly on Mangafy.Ai. Create, organize, and track your manga stories and chapters with ease."
   />
+  <meta
+    name="description"
+    lang="ja"
+    content="Mangafy.Aiでマンガプロジェクトを効率的に管理。ストーリーや章を簡単に作成・整理・追跡できます。"
+  />
+
   {/* Open Graph */}
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://www.mangafyai.com//project-management" />
@@ -175,6 +181,11 @@ export default function ProjectManagementPage() {
   <meta
     property="og:description"
     content="Manage your manga projects effortlessly on Mangafy.Ai. Create, organize, and track your manga stories and chapters with ease."
+  />
+  <meta
+    property="og:description"
+    lang="ja"
+    content="Mangafy.Aiでマンガプロジェクトを効率的に管理。ストーリーや章を簡単に作成・整理・追跡できます。"
   />
   <meta property="og:image" content="https://www.mangafyai.com//logo.png" />
 
@@ -185,6 +196,11 @@ export default function ProjectManagementPage() {
   <meta
     name="twitter:description"
     content="Manage your manga projects effortlessly on Mangafy.Ai. Create, organize, and track your manga stories and chapters with ease."
+  />
+  <meta
+    name="twitter:description"
+    lang="ja"
+    content="Mangafy.Aiでマンガプロジェクトを効率的に管理。ストーリーや章を簡単に作成・整理・追跡できます。"
   />
   <meta name="twitter:image" content="https://www.mangafyai.com//logo.png" />
 </Head>

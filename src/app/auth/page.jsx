@@ -11,6 +11,14 @@ import Head from "next/head";
   name="description"
   content="Login or sign up to Mangafy.Ai to create manga panels, characters, and scripts using AI-powered tools."
 />
+
+ {/* Japanese meta */}
+ <title lang="ja">ログイン – Mangafy.Ai</title>
+        <meta
+          name="description"
+          lang="ja"
+          content="Mangafy.Aiにログインまたはサインアップして、AIを使ってマンガのパネル、キャラクター、スクリプトを作成しましょう。"
+        />
 <meta name="robots" content="index, follow" />
 </Head>
 

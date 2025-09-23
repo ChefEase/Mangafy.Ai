@@ -16,32 +16,51 @@ export default function ProfilePage() {
 
   return (
     <>
-        <Head>
-    <title>Profile – Mangafy.Ai</title>
-    <meta
-      name="description"
-      content="Manage your Mangafy.Ai profile, subscription, and usage. Log in with Google and keep creating amazing manga panels and stories effortlessly."
-    />
-    {/* Open Graph */}
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://www.mangafyai.com//profile" />
-    <meta property="og:title" content="Profile – Mangafy.Ai" />
-    <meta
-      property="og:description"
-      content="Manage your Mangafy.Ai profile, subscription, and usage. Log in with Google and keep creating amazing manga panels and stories effortlessly."
-    />
-    <meta property="og:image" content="https://www.mangafyai.com//logo.png" />
+       <Head>
+  {/* English Meta */}
+  <title>Profile – Mangafy.Ai</title>
+  <meta
+    name="description"
+    content="Manage your Mangafy.Ai profile, subscription, and usage. Log in with Google and keep creating amazing manga panels and stories effortlessly."
+  />
 
-    {/* Twitter */}
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content="https://www.mangafyai.com//profile" />
-    <meta name="twitter:title" content="Profile – Mangafy.Ai" />
-    <meta
-      name="twitter:description"
-      content="Manage your Mangafy.Ai profile, subscription, and usage. Log in with Google and keep creating amazing manga panels and stories effortlessly."
-    />
-    <meta name="twitter:image" content="https://www.mangafyai.com//logo.png" />
-  </Head>
+  {/* Japanese Meta */}
+  <meta
+    name="description"
+    lang="ja"
+    content="Mangafy.Aiプロフィールを管理し、サブスクリプションや利用状況を確認できます。Googleでログインして、手軽に漫画パネルやストーリーを作成しましょう。"
+  />
+
+  {/* Open Graph */}
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.mangafyai.com/profile" />
+  <meta property="og:title" content="Profile – Mangafy.Ai" />
+  <meta
+    property="og:description"
+    content="Manage your Mangafy.Ai profile, subscription, and usage. Log in with Google and keep creating amazing manga panels and stories effortlessly."
+  />
+  <meta
+    property="og:description"
+    lang="ja"
+    content="Mangafy.Aiプロフィールを管理し、サブスクリプションや利用状況を確認できます。Googleでログインして、漫画制作をもっと楽しみましょう。"
+  />
+  <meta property="og:image" content="https://www.mangafyai.com/logo.png" />
+
+  {/* Twitter */}
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://www.mangafyai.com/profile" />
+  <meta name="twitter:title" content="Profile – Mangafy.Ai" />
+  <meta
+    name="twitter:description"
+    content="Manage your Mangafy.Ai profile, subscription, and usage. Log in with Google and keep creating amazing manga panels and stories effortlessly."
+  />
+  <meta
+    name="twitter:description"
+    lang="ja"
+    content="Mangafy.Aiプロフィールを管理し、サブスクリプションや利用状況をチェック。Googleでログインして、簡単に漫画パネルやストーリーを作ろう。"
+  />
+  <meta name="twitter:image" content="https://www.mangafyai.com/logo.png" />
+</Head>
     <div className="profile-page">
       <h1>Your Profile</h1>
 

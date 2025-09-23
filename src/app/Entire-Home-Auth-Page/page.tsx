@@ -47,37 +47,62 @@ export default function AuthPage() {
 
   return (
     <div className="home">
-       <Head>
-        <title>Mangafy.Ai – Login or Register</title>
-        <meta
-          name="description"
-          content="Log in or register to Mangafy.Ai to create amazing manga panels, characters, and stories with AI-powered tools."
-        />
+        <Head>
+      {/* English Meta */}
+      <title>Mangafy.Ai – Login or Register</title>
+      <meta
+        name="description"
+        content="Log in or register to Mangafy.Ai to create amazing manga panels, characters, and stories with AI-powered tools."
+      />
 
-        {/* Open Graph for Social Sharing */}
-        <meta property="og:title" content="Mangafy.Ai – Login or Register" />
-        <meta
-          property="og:description"
-          content="Join Mangafy.Ai and unlock AI tools for manga creation. Login or create your account now!"
-        />
-        <meta property="og:url" content="https://www.mangafyai.com//login" />
-        <meta
-          property="og:image"
-          content="https://www.mangafyai.com//logo.png"
-        />
+      {/* Japanese Meta */}
+      <title lang="ja">Mangafy.Ai – ログインまたは登録</title>
+      <meta
+        name="description"
+        lang="ja"
+        content="Mangafy.Aiにログインまたは登録して、AIを使った漫画のパネル、キャラクター、ストーリーを作成しましょう。"
+      />
 
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Mangafy.Ai – Login or Register" />
-        <meta
-          name="twitter:description"
-          content="Join Mangafy.Ai and unlock AI tools for manga creation. Login or create your account now!"
-        />
-        <meta
-          name="twitter:image"
-          content="https://www.mangafyai.com//logo.png"
-        />
-      </Head>
+      {/* Open Graph for Social Sharing (English) */}
+      <meta property="og:title" content="Mangafy.Ai – Login or Register" />
+      <meta
+        property="og:description"
+        content="Join Mangafy.Ai and unlock AI tools for manga creation. Login or create your account now!"
+      />
+      <meta property="og:url" content="https://www.mangafyai.com/login" />
+      <meta
+        property="og:image"
+        content="https://www.mangafyai.com/logo.png"
+      />
+
+      {/* Open Graph (Japanese) */}
+      <meta property="og:title" content="Mangafy.Ai – ログインまたは登録" lang="ja" />
+      <meta
+        property="og:description"
+        content="Mangafy.Aiに参加して、AI漫画作成ツールを使い始めましょう。今すぐアカウントを作成またはログイン！"
+        lang="ja"
+      />
+
+      {/* Twitter Card (English) */}
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content="Mangafy.Ai – Login or Register" />
+      <meta
+        name="twitter:description"
+        content="Join Mangafy.Ai and unlock AI tools for manga creation. Login or create your account now!"
+      />
+      <meta
+        name="twitter:image"
+        content="https://www.mangafyai.com/logo.png"
+      />
+
+      {/* Twitter Card (Japanese) */}
+      <meta name="twitter:title" content="Mangafy.Ai – ログインまたは登録" lang="ja" />
+      <meta
+        name="twitter:description"
+        content="Mangafy.Aiに参加して、AI漫画作成ツールを使い始めましょう。今すぐアカウントを作成またはログイン！"
+        lang="ja"
+      />
+    </Head>
       <Navbar setActiveForm={setActiveForm} />
       <div className="form-container">
         {activeForm === "register" && <RegisterForm referrerId={referrerId}/>}

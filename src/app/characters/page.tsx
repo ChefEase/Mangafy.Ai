@@ -111,31 +111,62 @@ export default function CharactersPage() {
   return (
     <div className="characters-page">
        <Head>
-      <title>Character Creation - Mangafy.Ai</title>
-      <meta
-        name="description"
-        content="Mangafy.Ai – Create manga panels, characters, covers, and scripts with powerful AI tools for artists, writers, and storytellers."
-      />
+       <title>Character Creation - Mangafy.Ai</title>
+  <meta
+    name="description"
+    content="Mangafy.Ai – Create manga panels, characters, covers, and scripts with powerful AI tools for artists, writers, and storytellers."
+    lang="en"
+  />
 
-      {/* Open Graph */}
-      <meta property="og:type" content="website" />
-      <meta property="og:url" content="https://www.mangafyai.com/" />
-      <meta property="og:title" content="Mangafy.Ai – AI Manga Creation Tools" />
-      <meta
-        property="og:description"
-        content="Create manga panels, characters, covers, and scripts with powerful AI tools for artists, writers, and storytellers."
-      />
-      <meta property="og:image" content="https://www.mangafyai.com//logo.png" />
+  {/* Japanese version */}
+  <title lang="ja">キャラクター作成 - Mangafy.Ai</title>
+  <meta
+    name="description"
+    content="Mangafy.Ai – AIツールで漫画のキャラクター、パネル、カバー、スクリプトを簡単に作成できます。"
+    lang="ja"
+  />
 
-      {/* Twitter */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:url" content="https://www.mangafyai.com//" />
-      <meta name="twitter:title" content="Mangafy.Ai – AI Manga Creation Tools" />
-      <meta
-        name="twitter:description"
-        content="Create manga panels, characters, covers, and scripts with powerful AI tools for artists, writers, and storytellers."
-      />
-      <meta name="twitter:image" content="https://www.mangafyai.com//logo.png" />
+  {/* Open Graph */}
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.mangafyai.com/" />
+
+  {/* English OG */}
+  <meta property="og:title" content="Mangafy.Ai – AI Manga Creation Tools" lang="en" />
+  <meta
+    property="og:description"
+    content="Create manga panels, characters, covers, and scripts with powerful AI tools for artists, writers, and storytellers."
+    lang="en"
+  />
+
+  {/* Japanese OG */}
+  <meta property="og:title" content="Mangafy.Ai – AI漫画作成ツール" lang="ja" />
+  <meta
+    property="og:description"
+    content="AIツールを使って漫画のキャラクター、パネル、カバー、スクリプトを作成できます。"
+    lang="ja"
+  />
+  <meta property="og:image" content="https://www.mangafyai.com/logo.png" />
+
+  {/* Twitter */}
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://www.mangafyai.com/" />
+
+  {/* English Twitter */}
+  <meta name="twitter:title" content="Mangafy.Ai – AI Manga Creation Tools" lang="en" />
+  <meta
+    name="twitter:description"
+    content="Create manga panels, characters, covers, and scripts with powerful AI tools for artists, writers, and storytellers."
+    lang="en"
+  />
+
+  {/* Japanese Twitter */}
+  <meta name="twitter:title" content="Mangafy.Ai – AI漫画作成ツール" lang="ja" />
+  <meta
+    name="twitter:description"
+    content="AIツールで漫画のキャラクター、パネル、カバー、スクリプトを作成できます。"
+    lang="ja"
+  />
+  <meta name="twitter:image" content="https://www.mangafyai.com/logo.png" />
 
       {/* Structured Data: Organization + Website */}
       <script
@@ -173,6 +204,9 @@ export default function CharactersPage() {
         }}
       />
     </Head>
+    <h1 lang="en">Character Creation</h1>
+<h1 lang="ja">キャラクター作成</h1>
+
       <h1>Character Creation</h1>
       <CharacterForm onSubmit={handleAddCharacter} />
       <CharacterList
