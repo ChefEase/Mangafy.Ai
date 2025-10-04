@@ -7,13 +7,7 @@ import { UserProvider } from "@/context/UserContext";
 import { Inter } from 'next/font/google';
 import { CreditProvider } from "@/context/CreditContext";
 import Head from 'next/head';
-import '../app/script-writing/styles/GenerationFeedback.css';
-import '../app/script-writing/styles/MangaPage.css';
-import '../app/script-writing/styles/ArtStyleDropDown.css';
-import '../app/script-writing/styles/global.css';
-import "quill/dist/quill.snow.css";
-import "../components/ScriptEditor/ScriptEditor.css";
-
+import { usePathname } from "next/navigation";
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -33,6 +27,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     }
   }, []);
 
+  const pathname = usePathname();
+
+  // Define the routes where you DON'T want the footer
+  const hideFooterRoutes = ["/script-writing"]; 
+
+  const shouldHideFooter = pathname ? hideFooterRoutes.includes(pathname) : false;
   return (
     
       <html className={inter.className} lang="en">
@@ -86,7 +86,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {children}
           </CreditProvider>
           </UserProvider>
-          <Footer />
+          {!shouldHideFooter && <Footer />} {/* ✅ Conditional render */}
         </body>
       </html>
   );

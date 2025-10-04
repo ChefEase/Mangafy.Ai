@@ -6,6 +6,9 @@ import { autoSave, loadSavedContent } from "../../utils/autoSave";
 import { validateScript } from "../../utils/scriptValidation";
 import ScriptEditorWrapper from "../ScriptEditorWrapper/ScriptEditorWrapper";
 import { aiService, ArtStyle } from "../../services/aiService";
+import '../../app/script-writing/styles/GenerationFeedback.css'
+import '../../app/script-writing/styles/MangaPage.css'
+import '../../app/script-writing/styles/ArtStyleDropDown.css'
 import styles from '../../app/script-writing/styles/AIImageGenerator.module.css';
 import LZString from 'lz-string'
 import { useUser } from "@/context/UserContext";
@@ -16,6 +19,8 @@ import  CharactersPage  from "../../app/characters/page";
 import "./chatbot.css";
 import ChatInterface from "../../components/chat/ChatInterface"
 import MobileNav from "../../components/ScriptEditor/MobileNav"
+import '../../app/script-writing/styles/global.css';
+import { Footer } from "../Footer/Footer";
 
 interface User {
   id: string;

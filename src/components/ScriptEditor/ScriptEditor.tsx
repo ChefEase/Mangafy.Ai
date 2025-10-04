@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
+import "quill/dist/quill.snow.css";
+import "./ScriptEditor.css";
 import mammoth from "mammoth";
 import { validateScript } from "../../utils/scriptValidation";
 import type * as QuillNamespace from "quill";
