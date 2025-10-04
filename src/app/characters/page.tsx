@@ -204,9 +204,6 @@ export default function CharactersPage() {
         }}
       />
     </Head>
-    <h1 lang="en">Character Creation</h1>
-<h1 lang="ja">キャラクター作成</h1>
-
       <h1>Character Creation</h1>
       <CharacterForm onSubmit={handleAddCharacter} />
       <CharacterList

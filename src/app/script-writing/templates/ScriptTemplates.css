@@ -26,7 +26,7 @@
     padding: 0 20px;
     max-width: 1200px;
     margin: 100px auto;
-    margin-left: -600px;
+    margin-left: -800px;
 }
 
 /* ===== Elevated Card Design ===== */
@@ -124,11 +124,12 @@
 }
 
 .templates-section h2 {
-    font-size: 3rem; /* Increase text size */
+    font-size: 2.4rem; /* Increase text size */
     font-weight: bold; /* Make text bold */
     font-family: 'Pacifico', cursive; /* Example of a clean handwriting font */
     text-align: center; /* Center the text */
-    margin-bottom: 20px; /* Add space below the header */
+    margin-top: -30px; /* Add space below the header */
+    margin-left: 600px;
 }
 
 @media (max-width: 950px) {

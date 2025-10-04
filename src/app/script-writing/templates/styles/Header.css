@@ -1,78 +1,105 @@
-/* Header Styles */
-.header {
-    background: #ffffff;
-    padding: 1rem 2rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
-    border-bottom: 1px solid #eee;
-    overflow: visible;
-  }
-  
-  .header h1 {
-    font-size: 1.8rem;
-    font-weight: 700;
-    margin: 0;
-    letter-spacing: -0.5px;
-    line-height: 1.2; /* ensures letters with tails fit properly */
-    background: linear-gradient(45deg, #ffa500, #ffb347); /* simple orange gradient */
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-shadow: 0 0 3px #ffa500, 0 0 5px #ffb347; /* subtle glow only */
-    transition: all 0.3s ease;
-    display: inline-block; /* prevents clipping from flex container */
-  }
-  
-  /* Optional: gentle hover glow */
-  .header h1:hover {
-    text-shadow: 0 0 4px #ffa500, 0 0 6px #ffb347;
-    transform: scale(1.02); /* very slight scale for effect */
-  }
-  
+/* ===== Robust header: fixed height, no wrap, stable spacing ===== */
+.custom-header {
+  background: #2d2d2d;
+  top: 0;
+  padding: 6px 20px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  color: #f0f0f0;
+  position: realaive;
+  height: 40px;  
+  width: 1380px;          /* fixed height to prevent expansion/shrinking */
+  box-sizing: border-box;
+  flex-wrap: nowrap;       /* prevent wrapping to second row */
+  gap: 12px;
+  z-index: 999;            /* keep header above page content */
+  transition: height 0.08s linear; /* minimal, non-jarring */
+  overflow: visible;       /* allow absolutely-positioned dropdown to show */
+}
 
-  .header nav {
-    display: flex;
-    gap: 2rem;
-    align-items: center;
-  }
-  
-  .header nav a {
-    color: #666;
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    position: relative;
-    padding: 0.5rem 0;
-  }
-  
-  .header nav a:hover {
-    color: #1a1a1a;
-  }
-  
-  .header nav a::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: #2b00ff;
-    transition: width 0.3s ease;
-  }
-  
-  .header nav a:hover::after {
-    width: 100%;
-  }
-  
+/* Insert a flexible spacer between left & right so layout never collapses */
+.custom-header::before {
+  content: "";
+  display: block;
+  flex: 1 1 auto;          /* this takes remaining horizontal space */
+  min-width: 8px;          /* avoid disappearing completely */
+  order: 1;                /* places it after the left element */
+}
+
+/* If your header children are only two elements (left & right),
+   ::before will sit between them and keep spacing stable. */
+
+/* ===== Left: logo area (caret + dropdown) ===== */
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  position: relative;      /* needed for absolute dropdown */
+  flex: 0 0 auto;          /* don't let logo shrink/grow unexpectedly */
+  order: 0;                /* ensure left position */
+  z-index: 50;
+  min-width: 140px;        /* keeps a stable left block when content changes */
+  transform: scale(0.7);
+}
+
+/* small defensive rule so H1 doesn't expand header (text-wrapping) */
+.logo-area h1 {
+  margin: 0;
+  white-space: nowrap;     /* prevents wrapping to multiple lines */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 320px;
+  color: #ffd900;
+}
+
+/* caret */
+.caret-icon {
+  font-size: 0.95rem;
+  display: inline-block;
+  user-select: none;
+  cursor: pointer;
+  transition: transform 0.18s ease;
+  color: #e0e0e0;
+}
+
+/* ===== Dropdown (absolute so it doesn't affect header size) ===== */
+.nav-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  background: #3a3a3a;
+  border-radius: 6px;
+  padding: 6px 0;
+  display: none;
+  flex-direction: column;
+  min-width: 180px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+  z-index: 9999;
+  pointer-events: auto;
+  transform-origin: top left;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  opacity: 0;
+  transform: translateY(-6px) scale(0.7);
+}
+.nav-dropdown.open { display: flex; opacity: 1; transform: translateY(0); }
+.nav-dropdown a { display: block; padding: 10px 16px; color:#e0e0e0; text-decoration:none; white-space:nowrap; }
+.nav-dropdown a:hover { background:#4a4a4a; }
+
+/* ===== Right: credits + profile ===== */
 .user-credit-container {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 10px;
+  flex: 0 0 auto;         /* keep right block stable */
+  order: 2;                /* ensure right position */
+  min-width: 140px;
+  z-index: 50;
+  white-space: nowrap;
 }
 
+/* tighten credit pill slightly */
 .credit-pill {
   background: linear-gradient(90deg, #FFFFFF 0%, #ffa500 100%);
   color: white;
@@ -81,59 +108,27 @@
   display: flex;
   align-items: center;
   font-weight: bold;
-  font-size: 20px;
+  font-size: 18px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transform: scale(0.7);
 }
+.credit-icon { width: 35px; height: 35px; margin-right: 8px; }
 
-.credit-icon {
-  width: 35px;
-  height: 35px;
-  margin-right: 8px;
+/* profile */
+.user-profile { display:flex; align-items:center; gap:8px; transform: scale(0.8); }
+.profile-avatar {
+  width: 34px; height: 34px; object-fit:cover; border-radius:9999px;
+  cursor:pointer; transition: transform .12s ease; transform: scale(1.1);
 }
+.profile-avatar:hover { transform: translateY(-1px) scale(0.7); }
 
-/* Media query for screens 768px and smaller */
+/* ===== Responsive adjustments ===== */
 @media (max-width: 950px) {
-  /* Header */
-  .header {
-    padding: 0.5rem 1rem;
-    flex-direction: row;         /* ✅ keep items in a row */
-    justify-content: space-between; /* ✅ space out logo & credits */
-    align-items: center;         /* ✅ vertically center them */
-    box-shadow: none;
-    border-bottom: none;
-  }
-
-  .header h1 {
-    font-size: 1.4rem;
-    letter-spacing: normal;
-    background: none;
-    -webkit-text-fill-color: #1a1a1a;
-  }
-
-  .header nav {
-    display: none; /* ✅ hide nav entirely on mobile */
-  }
-
-  /* User credit container */
-  .user-credit-container {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-left: auto; /* ✅ pushes it to the far right */
-  }
-
-  .credit-pill {
-    font-size: 16px;
-    padding: 2px 6px;
-  }
-
-  .credit-icon {
-    width: 25px;
-    height: 25px;
-    margin-right: 4px;
-  }
-
-  .desktop-nav {
-    display: none !important;
-  }
+  .custom-header { padding: 6px 12px; height: 48px; }
+  .logo-area { min-width: 120px; }
+  .user-credit-container { min-width: 100px; gap:6px; }
+  .credit-pill { font-size: 16px; padding: 2px 6px; }
+  .credit-icon { width: 25px; height:25px; margin-right:4px; }
+  .profile-avatar { width: 30px; height: 30px; }
+  .logo-area h1 { max-width: 200px; }
 }

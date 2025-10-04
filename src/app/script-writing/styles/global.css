@@ -2,54 +2,152 @@
 .script-writing-page {
     display: flex;
     height: calc(100vh - 60px); /* Adjust for header height */
+    margin-left: 35%;   /* leave space for left panel */
+    margin-right: 35%;
+    padding: 20px;
   }
   
   /* Characters Sidebar */
-  .characters-sidebar {
-    position: relative;
-    background: #f5f5f5;
-    border-right: 1px solid #ddd;
-    transition: width 0.3s ease;
-    overflow: hidden;
-  }
-  
-  .characters-sidebar.closed {
-    width: 0;
-  }
-  
-  .characters-sidebar.open {
-    width: 300px; /* Default width */
-  }
-  
-  .toggle-button {
-    position: absolute;
-    top: 50%;
-    right: -20px;
-    background: #ff9900;
-    color: rgb(0, 0, 0);
-    border: none;
-    padding: 0.5rem;
-    cursor: pointer;
-    transform: translateY(-50%);
-    z-index: 10;
-  }
-  
-  .resize-handle {
-    position: absolute;
-    top: 0;
+  .characters-sidebar-fixed {
+    position: absolute; /* or fixed */
+    top: 240px;
+    transform: scale(0.9); 
     right: 0;
-    width: 5px;
-    height: 100%;
-    background: #ddd;
-    cursor: ew-resize;
+    width: 33%;
+    height: 85vh;
+    background: #1e1e1e;
+    border-left: 2px solid #333;
+    padding: 16px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-shadow: -4px 0 12px rgba(0,0,0,0.4);
+    z-index: 200;
+    border-radius: 12px 0 0 12px;
+}
+/* Scale down contents inside sidebar */
+  .characters-sidebar-fixed * {
+    font-size: 0.5rem;        /* slightly smaller text */
   }
   
-  /* Script Editor */
-  .script-editor-container {
-    flex: 1;
-    padding: 1rem;
-    overflow-y: auto;
+  .characters-sidebar-fixed input,
+  .characters-sidebar-fixed select,
+  .characters-sidebar-fixed button,
+  .characters-sidebar-fixed textarea {
+    font-size: 0.9rem;
+    padding: 8px 10px;
   }
+  
+  /* stack sections vertically */
+  .characters-sidebar-fixed .search-bar,
+  .characters-sidebar-fixed .sort-controls,
+  .characters-sidebar-fixed .character-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 0.85rem;
+    padding: 6px 8px; /* smaller controls */
+  }
+  
+  /* ensure characters are vertical list */
+  .character-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  /* Scale down everything when inside the sidebar */
+.characters-sidebar-fixed .characters-page {
+  max-width: 100%;
+  margin: 0;
+  padding: 1rem;
+  background: transparent;   /* remove big white card background */
+  box-shadow: none;
+  border-radius: 0;
+}
+
+/* Header smaller */
+.characters-sidebar-fixed .characters-page h1 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+/* Form smaller + fit width */
+.characters-sidebar-fixed .character-form {
+  padding: 1rem;
+  margin: 1rem 0;
+  max-width: 100%;
+  background: #2a2a2a; /* blend with sidebar */
+  border-radius: 10px;
+}
+
+.characters-sidebar-fixed .character-form input,
+.characters-sidebar-fixed .character-form select,
+.characters-sidebar-fixed .character-form textarea {
+  max-width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+/* Search + filters stacked */
+.characters-sidebar-fixed .character-search {
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  padding: 0;
+  max-width: 100%;
+}
+
+.characters-sidebar-fixed .character-search input,
+.characters-sidebar-fixed .character-search select {
+  width: 100%;
+  font-size: 0.85rem;
+  padding: 0.5rem 0.75rem;
+}
+
+/* Force vertical list instead of grid */
+.characters-sidebar-fixed .character-list {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1rem;
+  padding: 0;
+  margin: 0;
+}
+
+/* Smaller character cards */
+.characters-sidebar-fixed .character-card {
+  border-radius: 10px;
+  margin: 0;
+  padding: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  background: #222;
+}
+
+.characters-sidebar-fixed .character-card h3 {
+  font-size: 1rem;
+  margin: 0.75rem;
+}
+
+/* Images smaller */
+.characters-sidebar-fixed .character-image {
+  height: 160px;
+  border-radius: 10px 10px 0 0;
+}
+
+/* Actions smaller */
+.characters-sidebar-fixed .actions {
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+}
+
+.characters-sidebar-fixed .actions button {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+}
 /* globals.css */
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;

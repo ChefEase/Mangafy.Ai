@@ -19,7 +19,7 @@ import  CharactersPage  from "../../app/characters/page";
 import "./chatbot.css";
 import ChatInterface from "../../components/chat/ChatInterface"
 import MobileNav from "../../components/ScriptEditor/MobileNav"
-
+import '../../app/script-writing/styles/global.css';
 
 interface User {
   id: string;
@@ -67,7 +67,7 @@ const PANEL_CONFIG: Record<PanelType, PanelConfig> = {
       panels.forEach((panel) => {
       if (typeof window === 'undefined') return;
       const margin = 140;
-      const border = 12;
+      const border = 2;
 
       ctx.fillStyle = 'white';
   ctx.fillRect(0, 0, A4_WIDTH, A4_HEIGHT);
@@ -108,7 +108,7 @@ panelCount: 2,
 layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
   if (typeof window === 'undefined') return;
   const MARGIN = 140;
-  const BORDER = 12;
+  const BORDER = 2;
   const panelWidth = (A4_WIDTH - MARGIN * 3) / 2;
   const maxHeight = A4_HEIGHT - MARGIN * 2;
 
@@ -153,7 +153,7 @@ panelCount: 2,
 layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
   if (typeof window === 'undefined') return;
   const MARGIN = 140;
-  const BORDER = 12;
+  const BORDER = 2;
   const PANEL_WIDTH = A4_WIDTH - MARGIN * 2;
   const PANEL_HEIGHT = (A4_HEIGHT - MARGIN * 3) / 2;
 
@@ -198,60 +198,80 @@ layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
 },
 
   'three-default': {
-    panelCount: 3,
-    layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
-      if (typeof window === 'undefined') return;
-      const margin = 140;
-      const border = 12;
-      const PANEL_WIDTH = 2200; // (2480 - 40*2)
-      const PANEL_HEIGHT = 1009; // (3508 - 40*4) / 3 → 3348/3=1116 → floor to 1112
+  panelCount: 3,
+  layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
+    if (typeof window === 'undefined') return;
 
-      ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, A4_WIDTH, A4_HEIGHT);
+    const margin = 140;
+    const border = 2;
+    const PANEL_WIDTH = A4_WIDTH - margin * 2; 
+    const availableHeight = A4_HEIGHT - margin * 2;
+    const PANEL_HEIGHT = availableHeight / 3 - margin / 3; // evenly spaced
 
-      panels.forEach((panel, index) => {
-        const y = margin + (PANEL_HEIGHT + margin) * index;
-        const img = panel.image;
-        if (!img) return;
+    // Clear and set background
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, A4_WIDTH, A4_HEIGHT);
+
+    panels.forEach((panel, index) => {
+      const img = panel.image;
+      if (!img) return;
+
+      // Position for this panel
+      const y = margin + (PANEL_HEIGHT + margin / 2) * index;
+      const x = margin;
+
+      // Calculate scaling
+      const scale = Math.min(
+        PANEL_WIDTH / panel.dimensions.width,
+        PANEL_HEIGHT / panel.dimensions.height
+      );
+      const scaledWidth = Math.round(panel.dimensions.width * scale);
+      const scaledHeight = Math.round(panel.dimensions.height * scale);
+
+      // Center image horizontally and vertically within its slot
+      const xOffset = Math.round(x + (PANEL_WIDTH - scaledWidth) / 2);
+      const yOffset = Math.round(y + (PANEL_HEIGHT - scaledHeight) / 2);
+
+      // 🟩 Draw border using strokeRect for consistent width
+      ctx.lineWidth = border;
+      ctx.strokeStyle = 'black';
+      ctx.strokeRect(
+        Math.round(xOffset - border / 2),
+        Math.round(yOffset - border / 2),
+        Math.round(scaledWidth + border),
+        Math.round(scaledHeight + border)
+      );
+
+      // 🖼️ Draw image
+      ctx.drawImage(img, xOffset, yOffset, scaledWidth, scaledHeight);
+
+      // 💬 Optional dialogue bubble
+      if (panel.dialogue) {
+        const bubbleX = xOffset + 50;
+        const bubbleY = yOffset + scaledHeight - 150;
 
         ctx.fillStyle = 'white';
-        ctx.fillRect(margin, y, PANEL_WIDTH, PANEL_HEIGHT);
-        
-        // Calculate scaling
-        const scale = Math.min(
-          PANEL_WIDTH / panel.dimensions.width,
-          PANEL_HEIGHT / panel.dimensions.height
-        );
-        const scaledWidth = panel.dimensions.width * scale;
-        const scaledHeight = panel.dimensions.height * scale;
-
-        const xOffset = margin + (PANEL_WIDTH - scaledWidth) / 2;
-        const yOffset = y + (PANEL_HEIGHT - scaledHeight) / 2;
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(bubbleX, bubbleY, 300, 80, 10);
+        ctx.fill();
+        ctx.stroke();
 
         ctx.fillStyle = 'black';
-        ctx.fillRect(
-          margin - border,
-          y - border,
-          PANEL_WIDTH + border * 2,
-          PANEL_HEIGHT + border * 2
-        );
-
-      ctx.drawImage(img, xOffset, yOffset, scaledWidth, scaledHeight);
-        // Border and image
-        if (panel.dialogue) {
-          const bubbleX = xOffset + 50;
-          const bubbleY = yOffset + scaledHeight - 150;
-          addDialogueBubble(ctx, panel.dialogue, bubbleX, bubbleY);
-        }
-      });
-    }
-  },
+        ctx.font = '24px sans-serif';
+        ctx.textAlign = 'left';
+        wrapText(ctx, panel.dialogue, bubbleX + 15, bubbleY + 30, 270, 28);
+      }
+    });
+  }
+},
   'three-vertical-horizontal': {
 panelCount: 3,
 layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
   if (typeof window === 'undefined') return;
   const margin = 140;
-  const border = 12;
+  const border = 2;
   const panelSpacing = 30;
 
   ctx.fillStyle = 'white';
@@ -288,27 +308,26 @@ layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
   // 🟥 Bottom horizontal panel
   panels.forEach((panel) => {
   const bottomPanel = panels[2];
-  const img = panel.image;
-  if (!img) return;
-  img.src = bottomPanel.url;
-
-  const BOTTOM_WIDTH = A4_WIDTH * 0.9;
-  const BOTTOM_HEIGHT = A4_HEIGHT * 0.5;
-
-  const scale = Math.min(
-    BOTTOM_WIDTH / img.width,
-    BOTTOM_HEIGHT / img.height
-  );
-
-  const scaledWidth = img.width * scale;
-  const scaledHeight = img.height * scale;
-
-  const x = margin + (BOTTOM_WIDTH - scaledWidth) / 2;
-  const y = margin + tallestTopPanelHeight + panelSpacing + border * 2; // ✅ True spacing based on top
-
-  ctx.fillStyle = 'black';
-  ctx.fillRect(x - border, y - border, scaledWidth + border * 2, scaledHeight + border * 2);
-  ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
+  if (bottomPanel?.image) {
+    const img = bottomPanel.image;
+    const BOTTOM_WIDTH = A4_WIDTH * 0.9;
+    const BOTTOM_HEIGHT = A4_HEIGHT * 0.5;
+  
+    const scale = Math.min(
+      BOTTOM_WIDTH / img.width,
+      BOTTOM_HEIGHT / img.height
+    );
+  
+    const scaledWidth = img.width * scale;
+    const scaledHeight = img.height * scale;
+  
+    const x = margin + (BOTTOM_WIDTH - scaledWidth) / 2;
+    const y = margin + tallestTopPanelHeight + panelSpacing + border * 2;
+  
+    ctx.fillStyle = 'black';
+    ctx.fillRect(x - border, y - border, scaledWidth + border * 2, scaledHeight + border * 2);
+    ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
+  }
 });
 }
 },
@@ -318,7 +337,7 @@ layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
     layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
       if (typeof window === 'undefined') return;
       const margin = 140;
-      const border = 12;
+      const border = 2;
       const panelSpacing = 40;
       const topHeight = (A4_HEIGHT - margin*2 - panelSpacing) * 0.6;
       const bottomHeight = (A4_HEIGHT - margin*2 - panelSpacing) * 0.4;
@@ -452,7 +471,7 @@ layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
     const [content, setContent] = useState<string>("");
     const [errors, setErrors] = useState<string[]>([]);
     const pathname = usePathname(); // Get the current route
-    const [isCharactersPageOpen, setIsCharactersPageOpen] = useState(false); // Toggle for characters panel
+
     // Change the characters state line to:
     const [characters, setCharacters] = useState<Character[]>([]);
     const [charactersPageWidth, setCharactersPageWidth] = useState(250); // Default width for characters panel
@@ -479,11 +498,26 @@ const [seedValue, setSeedValue] = useState<number | null>(null); // null == rand
 const [useCustomStyle, setUseCustomStyle] = useState(false);
 const [customStyleDescription, setCustomStyleDescription] = useState("");
 const customStyleRef = useRef<HTMLTextAreaElement | null>(null);
+const [showControls, setShowControls] = useState(false);
+const dropdownRef = useRef<HTMLDivElement>(null);
+const [navOpen, setNavOpen] = useState(false);
+const [activeTab, setActiveTab] = useState<'script' | 'advanced'>('script');
+const [panelPreviews, setPanelPreviews] = useState<(string | "generating")[]>([]);
+const [gallery, setGallery] = useState<string[]>([]);
 
 let touchTimer: NodeJS.Timeout | null = null;
 let isTouchDragging = false;
 let offsetX = 0;
 let offsetY = 0;
+
+const getCostForPanelType = (panelType: PanelType): number => {
+  switch(panelType) {
+    case 'one-portrait': return 12;
+    case 'two-vertical': 
+    case 'two-horizontal': return 22;
+    default: return 30; // All three-panel layouts
+  }
+};
 
 // Desktop mouse drag (unchanged)
 const startDrag = (e: React.MouseEvent) => {
@@ -647,7 +681,18 @@ if (typeof window !== 'undefined') {
       pages.push(canvas.toDataURL('image/png'));
       return pages;
     };
-}  
+} 
+
+useEffect(() => {
+  function handleClickOutside(e: MouseEvent) {
+    if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      setShowControls(false);
+    }
+  }
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => document.removeEventListener("mousedown", handleClickOutside);
+}, []);
+
     useEffect(() => {
       console.log("Building ScriptWritingClient"); // top of file
       console.log("Document is", typeof document); // should error if run on server
@@ -717,6 +762,80 @@ let initialContent = "";
       }
     }, [searchParams, router]);
     
+    // 1) helper to create a simple placeholder svg image as dataURL
+function createPlaceholderDataUrl(w: number, h: number, label = "") {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
+    <rect width="100%" height="100%" fill="#ffffff"/>
+    <rect x="8" y="8" width="${Math.max(1,w-16)}" height="${Math.max(1,h-16)}" fill="#f6f6f6" stroke="#000000" stroke-width="6" />
+    <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="${Math.min(48, Math.floor(w/10))}" fill="#777">${label}</text>
+  </svg>`;
+  return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+}
+
+// 2) draw A4 preview on visible canvasRef whenever layout/preview data changes
+useEffect(() => {
+  if (typeof window === "undefined") return;
+  const canvas = canvasRef.current;
+  if (!canvas) return;
+
+  // A4 internal pixel sizes you use for final export:
+  const A4_W = 2480;
+  const A4_H = 3508;
+
+  // Ensure canvas is at full internal resolution
+  canvas.width = A4_W;
+  canvas.height = A4_H;
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  // Build panels array for layout function. PANEL_CONFIG layout expects panel.image and .dimensions
+  const panelCountForType = PANEL_CONFIG[selectedPanelType].panelCount;
+  const panelsForLayout: PanelData[] = Array.from({ length: panelCountForType }).map((_, i) => {
+    const dims = getPanelDimensions(i);
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+
+    // if a panel preview URL exists and is not "generating", use it; otherwise use placeholder svg
+    const previewUrl = panelPreviews[i];
+    if (previewUrl && previewUrl !== "generating") {
+      img.src = previewUrl as string;
+    } else {
+      img.src = createPlaceholderDataUrl(dims.width, dims.height, previewUrl === "generating" ? "Generating..." : `Panel ${i+1}`);
+    }
+
+    return {
+      url: "", // not needed for preview drawing
+      dimensions: dims,
+      dialogue: "",
+      image: img
+    };
+  });
+
+  // wait for all placeholder/preview images to be loaded, then call layout
+  let isCancelled = false;
+  Promise.all(panelsForLayout.map(p => new Promise<void>((res) => {
+    if (p.image!.complete && p.image!.naturalWidth !== 0) return res();
+    p.image!.onload = () => res();
+    p.image!.onerror = () => res(); // continue even if an image fails
+  }))).then(() => {
+    if (isCancelled) return;
+
+    // Clear canvas and scale background if desired (keep your A4 "paper" look if styles applied elsewhere)
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, A4_W, A4_H);
+
+    // Use your existing panel layout function to draw the placeholder images/boxes
+    try {
+      PANEL_CONFIG[selectedPanelType].layout(panelsForLayout, ctx, A4_W, A4_H);
+    } catch (err) {
+      console.error("Error drawing preview layout:", err);
+    }
+  });
+
+  return () => { isCancelled = true; };
+}, [selectedPanelType, panelPreviews, generatedPanels, canvasRef]);
+
     const handleSave = () => {
       const validationErrors = validateScript(content);
       setErrors(validationErrors);
@@ -730,9 +849,6 @@ let initialContent = "";
       setContent(generatedScript); // Update the editor with the generated script
     };
   
-    const toggleCharactersPage = () => {
-      setIsCharactersPageOpen(!isCharactersPageOpen);
-    };
   
     const handleResizeCharactersPage = (newWidth: number) => {
       setCharactersPageWidth(newWidth);
@@ -794,9 +910,9 @@ function getOrUpdateSeed(currentScript: string): number {
   return seed;
 }
 
+  const cost = getCostForPanelType(selectedPanelType);
     const handleGenerateManga = async () => {
       if (typeof window === 'undefined') return;
-      const cost = getCostForPanelType(selectedPanelType);
       const config = PANEL_CONFIG[selectedPanelType];
       const MAX_PANELS = config.panelCount;
       setGenerationProgress({
@@ -864,15 +980,11 @@ function getOrUpdateSeed(currentScript: string): number {
 
         // Log processed panels to console
         console.log("Processed Panels with Descriptions:", processedPanels);
-    
+        setPanelPreviews(Array(panelCount).fill("generating"));
+
         // Generate images with proper dimensions
         const newPanels = [];
           for (let i = 0; i < processedPanels.length; i++) {
-            setGenerationProgress({
-              current: i + 1,
-              total: processedPanels.length,
-              status: `Generating image ${i + 1}/${processedPanels.length}`
-            });
             const dimensions = getPanelDimensions(i);
             const targetWidth = dimensions.width;
             const targetHeight = dimensions.height;
@@ -913,7 +1025,11 @@ function getOrUpdateSeed(currentScript: string): number {
             
             let blob = panelImage; // that's the smaller blob
             const upscaledBlob = await upscaleBlob(panelImage, targetWidth, targetHeight);
-
+            setPanelPreviews(prev => {
+              const updated = [...prev];
+              updated[i] = URL.createObjectURL(upscaledBlob);
+              return updated;
+            });
 
             newPanels.push({
               url: URL.createObjectURL(upscaledBlob),
@@ -955,6 +1071,7 @@ function getOrUpdateSeed(currentScript: string): number {
       } finally {
         setIsGenerating(false);
       }
+      setGallery(prev => [...prev, ...generatedPanels]);
     };
 
     async function upscaleBlob(blob: Blob, width: number, height: number): Promise<Blob> {
@@ -1256,16 +1373,6 @@ const StylePresetSelector = ({
   
 );
 
-// Add getCostForPanelType function
-const getCostForPanelType = (panelType: PanelType): number => {
-  switch(panelType) {
-    case 'one-portrait': return 12;
-    case 'two-vertical': 
-    case 'two-horizontal': return 22;
-    default: return 30; // All three-panel layouts
-  }
-};
-
 // Add CreditIcon component
 const CreditIcon = ({ cost }: { cost: number }) => (
   <div className={styles.creditBadge}>
@@ -1274,200 +1381,178 @@ const CreditIcon = ({ cost }: { cost: number }) => (
   </div>
 );
 
-    return (
-      <div className={styles.container}>
-        <Header />
-        <div className={styles.header}>
+return (
+  <>    
+    <Header />
+    <div className={styles.header}>
       <h2>Manga Creator Studio</h2>
-      <p className={styles.subtitle}>Transform your script into professional manga panels</p>
+      <p className={styles.subtitle}>
+        Transform your script into professional manga panels
+      </p>
     </div>
-        <div className="script-writing-page">
-          {/* Characters Page Sidebar */}
-          <div
-            className={`characters-sidebar ${isCharactersPageOpen ? "open" : "closed"}`}
-            style={{ width: isCharactersPageOpen ? charactersPageWidth : 0 }}
-          >
-            <CharactersPage />
-            <div
-              className="resize-handle"
-              onMouseDown={(e) => {
-                if (typeof window === "undefined") return;
-                e.preventDefault();
-                const startWidth = charactersPageWidth;
-                const startX = e.clientX;
-  
-                const handleMouseMove = (e: MouseEvent) => {
-                  const newWidth = startWidth + (e.clientX - startX);
-                  setCharactersPageWidth(Math.max(400, Math.min(800, newWidth))); // Limit width between 200px and 500px
-                };
-  
-                const handleMouseUp = () => {
-                  if (typeof window === "undefined") return;
-                  document.removeEventListener("mousemove", handleMouseMove);
-                  if (typeof window === "undefined") return;
-                  document.removeEventListener("mouseup", handleMouseUp);
-                };
-  
-                if (typeof window === "undefined") return;
-                document.addEventListener("mousemove", handleMouseMove);
-                if (typeof window === "undefined") return;
-                document.addEventListener("mouseup", handleMouseUp);
-              }}
-            />
-          </div>
 
-          <button className="toggle-button" onClick={toggleCharactersPage}>
-              {isCharactersPageOpen ? "◄" : "►"}
-            </button>
-  
-{/* Floating Chatbot Button */}
-{!isChatbotOpen && (
-  <div className="chatbot-toggle" onClick={() => setIsChatbotOpen(true)}>
-    <div className="chatbot-plus">+</div>
-    <span className="chatbot-label">Chatbot</span>
-  </div>
-)}
-
-{/* Chatbot Panel */}
-{/* Chatbot Panel */}
-{isChatbotOpen && (
-  <div
-    className="chatbot-panel"
-    ref={panelRef}
-    onMouseDown={(e) => startDrag(e)}
-    onTouchStart={(e) => handleTouchStart(e)}  // 👈 add this
-  onTouchEnd={(e) => handleTouchEnd(e)}      // 👈 add this
-  >
+    {/* Left sidebar with tabs */}
+    <div className="script-sidebar-fixed">
+    <div className={styles["tab-header"]}>
     <button
-      className="chatbot-close"
-      onClick={() => setIsChatbotOpen(false)}
-    >
-    </button>
-    <div className="chatbot-iframe">
-      <ChatInterface />
-    </div>
-
-    {/* Resize handle */}
-    <div className="resize-handle top-left"    onMouseDown={(e) => startResize(e, "tl")} />
-  <div className="resize-handle top-right"   onMouseDown={(e) => startResize(e, "tr")} />
-  <div className="resize-handle bottom-left" onMouseDown={(e) => startResize(e, "bl")} />
-  <div className="resize-handle bottom-right"onMouseDown={(e) => startResize(e, "br")} />
-</div>
-)}
-
-          {/* Script Editor */}
-          <div className="script-editor-container">
-            <h2>Script Box</h2>
-            {errors.length > 0 && (
-              <div className="error-message">
-                {errors.map((error, index) => (
-                  <p key={index}>{error}</p>
-                ))}
-              </div>
-            )}
-            <ScriptEditorWrapper
-              content={content}
-              onContentChange={setContent}
-              onSave={handleSave}
-              initialContent={undefined}
-            />
-    <div className={styles.controls}>
-      <StylePresetSelector
-        selectedPreset={selectedPreset}
-        onChange={setSelectedPreset}
-      />
-      <AnimeStyleSelector
-    selectedStyle={selectedStyle}
-    onChange={(style: ArtStyle) => setSelectedStyle(style)}
-    disabled={useCustomStyle}
-  />
-   <PanelTypeSelector 
-        selectedType={selectedPanelType}
-        onChange={(type) => {
-          setSelectedPanelType(type);
-          setPanelCount(PANEL_CONFIG[type].panelCount);
-        }}
-      />
-      
-      <ColorOptionSelector
-        selectedColor={selectedColor}
-        onChange={setSelectedColor}
-      />
-      <h2>Click on the preview page to see how it appears once downloaded</h2>
-      <button 
-        onClick={handleGenerateManga} 
-        disabled={isGenerating}
-        className={styles.generateButton}
-      >
-         <CreditIcon cost={getCostForPanelType(selectedPanelType)} />
-        {isGenerating ? "Generating..." : "Generate Manga Panels"}
-      </button>
+    className={activeTab === "script" ? styles.active : ""}
+    onClick={() => setActiveTab("script")}
+  >
+    Script Box
+  </button>
+  <button
+    className={activeTab === "advanced" ? styles.active : ""}
+    onClick={() => setActiveTab("advanced")}
+  >
+    Advanced Options
+  </button>
       </div>
 
-            
-            {generationProgress.status && (
-      <div className={styles.loading}>
-        <div className={styles.loadingDots}>
-          <div className={styles.dot}></div>
-          <div className={styles.dot}></div>
-          <div className={styles.dot}></div>
+      {activeTab === 'script' && (
+        <div className="script-editor-container">
+          {errors.length > 0 && (
+            <div className="error-message">
+              {errors.map((error, index) => (
+                <p key={index}>{error}</p>
+              ))}
+            </div>
+          )}
+          <ScriptEditorWrapper
+            content={content}
+            onContentChange={setContent}
+            onSave={handleSave}
+          />
         </div>
-        <p>{generationProgress.status}</p>
-        {generationProgress.current > 0 && (
-          <p>Progress: {generationProgress.current}/{generationProgress.total}</p>
-        )}
+      )}
+
+      {activeTab === 'advanced' && (
+        <div className={styles.controls}>
+          <StylePresetSelector 
+            selectedPreset={selectedPreset} 
+            onChange={setSelectedPreset} 
+          />
+          <AnimeStyleSelector 
+            selectedStyle={selectedStyle} 
+            onChange={setSelectedStyle} 
+            disabled={useCustomStyle} 
+          />
+          <PanelTypeSelector 
+            selectedType={selectedPanelType} 
+            onChange={(type) => { 
+              setSelectedPanelType(type); 
+              setPanelCount(PANEL_CONFIG[type].panelCount); 
+            }} 
+          />
+          <ColorOptionSelector 
+            selectedColor={selectedColor} 
+            onChange={setSelectedColor} 
+          />
+        </div>
+      )}
+    </div>
+    <div className={styles.generateWrapper}>
+  <button 
+    onClick={handleGenerateManga} 
+    className={styles.generateButton}
+    disabled={isGenerating}
+  >
+    <CreditIcon cost={cost} /> 🎨 Generate
+  </button>
+</div>
+    {/* Right sidebar */}
+    <div className="characters-sidebar-fixed">
+      <CharactersPage />
+    </div>
+
+    {/* Floating Chatbot Button */}
+    {!isChatbotOpen && (
+      <div className="chatbot-toggle" onClick={() => setIsChatbotOpen(true)}>
+        <div className="chatbot-plus">+</div>
+        <span className="chatbot-label">Chatbot</span>
       </div>
     )}
-  <div className={styles.panelGrid}>
-  {generatedPanels.map((pageData, pageIndex) => (
-      <div key={pageIndex} className="{styles.panel}">
-         <div 
-         className="preview-container"
-         onClick={() => setZoomedPage(pageData)}
-         >
-          <img
-            src={pageData}
-            alt={`Manga Page ${pageIndex + 1}`}
-            className="full-page-image"
-            onError={(e) => {
-              console.error('Failed to load panel image:', pageData);
-              e.currentTarget.style.display = 'none';
-            }}
-          />
-          </div>
-          <div className="page-number">Page {pageIndex + 1}</div>
-      </div>
-  ))}
-  </div>
-  <div className={styles.controls}>
-      <button 
-        onClick={downloadAllPages}
-        className={styles.generateButton}
-        disabled={generatedPanels.length === 0}
-      >
-        Download All Pages
-      </button>
-      </div>
-  <canvas 
-  ref={canvasRef}
-  id="preview-canvas" 
-  style={{ display: 'none' }} // Hide if not needed visually
-/>
 
-  {zoomedPage && (
-  <div className="zoom-modal" onClick={() => setZoomedPage(null)}>
-    <img
-      src={zoomedPage}
-      alt="Zoomed page"
-      className="zoomed-image"
-    />
-  </div>
-)}
-          </div>
+    {/* Chatbot Panel */}
+    {isChatbotOpen && (
+      <div
+        className="chatbot-panel"
+        ref={panelRef}
+        onMouseDown={(e) => startDrag(e)}
+        onTouchStart={(e) => handleTouchStart(e)}
+        onTouchEnd={(e) => handleTouchEnd(e)}
+      >
+        <button
+          className="chatbot-close"
+          onClick={() => setIsChatbotOpen(false)}
+        >
+        </button>
+        <div className="chatbot-iframe">
+          <ChatInterface />
         </div>
-        <MobileNav /> {/* Only visible on mobile */}
+
+        {/* Resize handles */}
+        <div className="resize-handle top-left" onMouseDown={(e) => startResize(e, "tl")} />
+        <div className="resize-handle top-right" onMouseDown={(e) => startResize(e, "tr")} />
+        <div className="resize-handle bottom-left" onMouseDown={(e) => startResize(e, "bl")} />
+        <div className="resize-handle bottom-right" onMouseDown={(e) => startResize(e, "br")} />
       </div>
-    );
+    )}
+
+    {/* Generated Panels */}
+   {/* === Visible A4 preview (always rendered) === */}
+<div className={styles.previewGrid} style={{ alignItems: 'flex-start' }}>
+  {/* Canvas wrapper; keep your own wrapper styles/classes if you have them */}
+  <div style={{
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",      // centers vertically
+    minHeight: "70vh",         // makes sure it centers in the visible area
+    padding: "24px 0",
+    gap: 0
+  }}>
+    <div style={{ width: 640, maxWidth: '95%',  justifyContent: "center",
+    alignItems: "center",   }}>
+      <canvas
+        ref={canvasRef}
+        aria-label="Manga page preview"
+        // inline CSS ensures canvas is visible for now — you can remove/replace with your own wrapper style
+        style={{
+          width: '100%',
+          height: 'auto',
+          display: 'block',
+          background: '#fff',
+        }}
+      />
+    </div>
+  </div>
+
+  {/* Keep your old panel placeholders (hidden visually) — this preserves any other logic that depends on this markup */}
+  <div style={{ display: 'none' }}>
+    {panelPreviews.map((preview, i) => (
+      <div key={i} className={styles.previewPanel}>
+        {preview === "generating" ? (
+          <div className={styles.loading}>Generating...</div>
+        ) : (
+          <img src={preview as string} alt={`Panel ${i + 1}`} />
+        )}
+      </div>
+    ))}
+  </div>
+</div>
+
+<div className={styles.gallery}>
+  {gallery.map((img, i) => (
+    <div key={i} className={styles.galleryItem} onClick={() => setZoomedPage(img)}>
+      <img src={img} alt={`Saved ${i+1}`} className={styles.galleryThumb}/>
+    </div>
+  ))}
+</div>
+
+    <MobileNav /> {/* Only visible on mobile */}
+  </>
+);
+
   }
   
   const seedCache: Record<string, number> = {};

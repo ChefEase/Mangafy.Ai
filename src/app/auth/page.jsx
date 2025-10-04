@@ -19,6 +19,7 @@ import Head from "next/head";
           lang="ja"
           content="Mangafy.Aiにログインまたはサインアップして、AIを使ってマンガのパネル、キャラクター、スクリプトを作成しましょう。"
         />
+        
 <meta name="robots" content="index, follow" />
 </Head>
 
