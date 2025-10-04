@@ -7,6 +7,13 @@ import { UserProvider } from "@/context/UserContext";
 import { Inter } from 'next/font/google';
 import { CreditProvider } from "@/context/CreditContext";
 import Head from 'next/head';
+import '../app/script-writing/styles/GenerationFeedback.css';
+import '../app/script-writing/styles/MangaPage.css';
+import '../app/script-writing/styles/ArtStyleDropDown.css';
+import '../app/script-writing/styles/global.css';
+import "quill/dist/quill.snow.css";
+import "../components/ScriptEditor/ScriptEditor.css";
+
 
 const inter = Inter({ subsets: ['latin'] });
 
