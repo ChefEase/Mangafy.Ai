@@ -155,9 +155,9 @@
 
 .controls {
   position: absolute;           
-  top: 470;
+  top: 470px;
   margin: 20px 0;                      /* vertical center */
-  left: -30;                       /* aligned to left */
+  left: -30px;                       /* aligned to left */
   transform: translateY(-50%) scale(0.9); /* center vertically and scale */
   display: flex;
   flex-direction: column;        /* stack items vertically */

@@ -1,8 +1,8 @@
 .script-editor {
-    position: relative;
+    position: absolute;
     margin: 20px 0;
-    left: -40;                       /* aligned to left */
-    top: 235;                       /* vertical center */
+    left: -40px;                       /* aligned to left */
+    top: 235px;                       /* vertical center */
     transform: translateY(-50%) scale(0.9);    /* center vertically */
     display: flex;
     flex-direction: column;
