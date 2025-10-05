@@ -237,6 +237,8 @@
     align-items: center;
     gap: 10px;
     box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+    position: absolute;
+    top: 800px;
   }
   
   .generateButton:hover {
@@ -328,8 +330,8 @@
   
   .previewGrid {
   display: grid;
-  top: -15;
-  left: 165;
+  top: -15px;
+  left: 165px;
   position: absolute;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   justify-content: center;

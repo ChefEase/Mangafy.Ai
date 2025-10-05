@@ -2,7 +2,7 @@
     position: absolute;
     margin: 20px 0;
     left: -40px;                       /* aligned to left */
-    top: 235px;                       /* vertical center */
+    top: 480px;                       /* vertical center */
     transform: translateY(-50%) scale(0.9);    /* center vertically */
     display: flex;
     flex-direction: column;
