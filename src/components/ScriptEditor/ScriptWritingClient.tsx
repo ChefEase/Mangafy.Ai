@@ -1542,13 +1542,34 @@ return (
   </div>
 </div>
 
-<div className={styles.gallery}>
-  {gallery.map((img, i) => (
-    <div key={i} className={styles.galleryItem} onClick={() => setZoomedPage(img)}>
-      <img src={img} alt={`Saved ${i+1}`} className={styles.galleryThumb}/>
-    </div>
-  ))}
+{/* wrapper that provides a containing block for absolute positioning */}
+<div style={{ position: 'relative' }}>
+  {/* Download button: absolute, can override position via inline style variables below */}
+  <button
+    className={styles.downloadButtonAbsolute}
+    onClick={downloadAllPages}
+    aria-label="Download all pages"
+    // You can tweak position here by changing the CSS variables:
+    // e.g. set top to '48px' or left to '50%' or left to '60%' etc.
+    style={{
+      ['--download-top' as any]: '528px',     // desktop top offset
+      ['--download-left' as any]: '50%',     // horizontal center
+      ['--download-translateX' as any]: '-50%' // default center transform
+    }}
+  >
+    Download All Pages
+  </button>
+
+  {/* Actual gallery */}
+  <div className={styles.gallery}>
+    {gallery.map((img, i) => (
+      <div key={i} className={styles.galleryItem} onClick={() => setZoomedPage(img)}>
+        <img src={img} alt={`Saved ${i+1}`} className={styles.galleryThumb}/>
+      </div>
+    ))}
+  </div>
 </div>
+
 
     <MobileNav /> {/* Only visible on mobile */}
   </>

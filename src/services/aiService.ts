@@ -1,5 +1,5 @@
 // Add at the top of aiService.ts
-import { HfInference, } from "@huggingface/inference";
+import { HfInference, InferenceClient } from "@huggingface/inference";
 import {enforceNoDialogueAndStyle, calculateBudget, countWordsAndCommas} from '@/utils/promptUtils'
 
 interface Panel {
@@ -120,7 +120,7 @@ export class AIService {
   private hf: HfInference;
   private readonly TEXT_MODEL = "black-forest-labs/FLUX.1-dev";
   private readonly TEXTER_MODEL = "mistralai/Mixtral-8x7B-Instruct-v0.1";
-  private readonly COMPRESS_MODEL = "mistralai/Mistral-Nemo-Instruct-2407";
+  private readonly COMPRESS_MODEL = "deepseek-ai/DeepSeek-V3.2-Exp";
   private readonly IMAGE_TO_TEXT_MODEL = "Salesforce/blip-image-captioning-base";
   private HF_TOKEN = process.env.NEXT_PUBLIC_HF_TOKEN!; // put your HF token in .env.local
 
@@ -217,6 +217,7 @@ export class AIService {
   // inside AIService class in aiService.ts - replace old compressPrompt with this
 async compressPrompt(prompt: string, options?: { maxWords?: number; maxCommas?: number }): Promise<string> {
   // base instruction (your existing rules)
+  const client = new InferenceClient(process.env.NEXT_PUBLIC_HF_TOKEN);
   let systemInstruction = `
     You are a prompt compression tool for AI image generation.
     Convert a natural-language scene description into a concise, comma-separated list of visual tags under 77 tokens.
@@ -239,24 +240,24 @@ async compressPrompt(prompt: string, options?: { maxWords?: number; maxCommas?: 
     systemInstruction += `\n\nStrict budget: compress the scene to at most ${w} words and at most ${c} commas. Do NOT include art style or final style tags in this compressed scene output.`;
   }
 
-  const result = await this.hf.chatCompletion({
+  const chatCompletion = await client.chatCompletion({
+    provider: "auto",
     model: this.COMPRESS_MODEL, // use your text/compression model
     messages: [
       { role: "system", content: systemInstruction },
       { role: "user", content: `Prompt:\n${prompt}` }
     ],
-    parameters: {
-      max_new_tokens: 80,
-      temperature: 0.6,
-      top_p: 0.9
-    }
+    max_tokens: 120,
+    temperature: 0.6,
+    top_p: 0.9,
   });
 
-  if (!result || !result.choices?.[0]?.message?.content) {
+  const output = chatCompletion?.choices?.[0]?.message?.content?.trim();
+  if (!output) {
     throw new Error("Prompt compression failed or response malformed");
   }
 
-  return result.choices[0].message.content.trim();
+  return output;
 }
 
     // ✅ FRONTEND — safe to call your own backend API

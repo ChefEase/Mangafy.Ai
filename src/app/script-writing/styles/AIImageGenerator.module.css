@@ -459,6 +459,32 @@
   font-size: 0.9rem;
 }
 
+.downloadButtonAbsolute {
+  position: absolute;
+  top: var(--download-top, 20px);       /* change via CSS variable or inline style */
+  left: var(--download-left, 50%);      /* default centered horizontally */
+  transform: translateX(var(--download-translateX, -50%)) translateY(var(--download-translateY, 0));
+  z-index: 600;
+  padding: 12px 22px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(90deg, #ffffff 0%, #ff8a00 100%); /* white -> orange */
+  box-shadow: 0 8px 20px rgba(0,0,0,0.24);
+  font-weight: 700;
+  color: #111; /* dark text on light→orange gradient */
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+/* subtle hover */
+.downloadButtonAbsolute:hover {
+  transform: translateX(var(--download-translateX, -50%)) translateY(var(--download-translateY, 0)) scale(1.03);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.32);
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 16px;
@@ -466,6 +492,15 @@
     border-radius: 8px;
   }
 
+  .downloadButtonAbsolute {
+    padding: 10px 16px;
+    font-size: 14px;
+    left: 50%;
+    top: var(--download-top-mobile, 12px);
+    transform: translateX(-50%);
+    width: calc(90% - 32px);
+  }
+  
   .header h2 {
     font-size: 1.4rem;
     margin-bottom: 4px;
