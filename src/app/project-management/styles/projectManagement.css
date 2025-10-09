@@ -415,7 +415,7 @@ background-color: rgba(244, 67, 54, 0.1);
 color: #f44336;
 }
 
-@media (max-width: 950px) {
+@media (max-width: 1024px) {
 
 .project-management-page {
   flex-direction: column;

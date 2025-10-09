@@ -71,7 +71,28 @@
   border-radius: 4px;
 }
 
-@media (max-width: 950px) {
+@media (max-width: 1024px) {
+  .script-editor {
+    position: absolute;
+    width: 85%; /* ✅ already relative — leave it */
+    height: auto;
+  
+    /* Convert 525px → relative to 844px height */
+    top: calc(525 / 844 * 100vh);
+  
+    /* Convert 30px → relative to 390px width */
+    left: calc(30 / 390 * 100vw);
+  
+    transform: none;
+    margin: 16px auto;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: none;
+    overflow-y: visible;
+    background: #fff;
+  }
+  
+
   .script-editor {
     max-width: 100%;   /* Full width on small screens */
     padding: 1rem;     /* Less padding */

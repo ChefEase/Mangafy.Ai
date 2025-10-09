@@ -73,7 +73,7 @@
   right: 0;
 }
 
-@media (max-width: 950px) {
+@media (max-width: 1024px) {
   .subscription-status {
     flex-direction: column; /* Already column, but just in case */
     padding: 1rem; /* Less padding on small screens */

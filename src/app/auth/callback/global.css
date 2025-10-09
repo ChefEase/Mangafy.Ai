@@ -7,7 +7,7 @@
     color: #666;
   }
 
-  @media (max-width: 950px) {
+  @media (max-width: 1024px) {
     .loading-screen {
       font-size: 1rem;      /* Smaller font on mobile */
       height: 80vh;         /* Shorter height if you want */

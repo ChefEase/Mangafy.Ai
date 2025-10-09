@@ -365,7 +365,7 @@
   border-radius: 12px;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 1024px) {
   .center-panel {
     min-width: 100%;   /* take full width */
     min-height: 250px; /* shrink height */

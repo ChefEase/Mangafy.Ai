@@ -44,7 +44,7 @@
     text-align: center;
   }
   
-  @media (min-width: 951px) {
+  @media (min-width: 1024px) {
     .mobile-nav {
       display: none !important;
     }

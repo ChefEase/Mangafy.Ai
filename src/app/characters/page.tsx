@@ -5,6 +5,7 @@ import CharacterForm from "@/components/Character/CharacterForm";
 import CharacterList from "@/components/Character/CharacterList";
 import "./CharactersPage.css";
 import Head from 'next/head';
+import MobileNav from "../../components/ScriptEditor/MobileNav"
 
 interface Character {
   id: string;
@@ -211,6 +212,9 @@ export default function CharactersPage() {
         onDelete={handleDeleteCharacter}
         onEdit={handleEditCharacter}
       />
+        <div>
+        <MobileNav /> {/* Only visible on mobile */}
+        </div>
     </div>
   );
 }

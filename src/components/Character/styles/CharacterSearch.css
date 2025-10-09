@@ -52,7 +52,7 @@
     opacity: 0.4;
 }
 
-@media (max-width: 950px) {
+@media (max-width: 1024px) {
     .character-search {
       flex-direction: column;
       gap: 0.5rem;

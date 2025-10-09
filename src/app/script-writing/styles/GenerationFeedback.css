@@ -32,7 +32,7 @@
     100% { transform: rotate(360deg); }
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 1024px) {
     .generation-status {
       bottom: 10px;      /* moves it up a bit */
       right: 10px;       /* moves it left a bit */

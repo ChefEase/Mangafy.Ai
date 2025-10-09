@@ -138,7 +138,7 @@ li::before {
   animation: fadeIn 0.4s ease-out;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 1024px) {
   /* Override root colors */
   :root {
     --primary-color: #333333;

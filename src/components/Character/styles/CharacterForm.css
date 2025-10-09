@@ -152,7 +152,7 @@ button[type="submit"]:hover {
   animation: formEntrance 0.4s ease-out;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 1024px) {
   .character-form {
     padding: 1.5rem;
     margin: 2rem 1rem;

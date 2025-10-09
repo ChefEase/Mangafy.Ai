@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import Head from 'next/head';      // Import Head here
+import MobileNav from "../../components/ScriptEditor/MobileNav"
 
 // Dynamically import to prevent SSR issues with CSS modules
 const ChatInterface = dynamic(() => import('@/components/chat/ChatInterface'), {
@@ -61,6 +62,9 @@ export default function ChatPage() {
     <div className="h-screen bg-gray-900">
       <ChatInterface />
     </div>
+    <div>
+        <MobileNav /> {/* Only visible on mobile */}
+        </div>
     </>
   );
 }

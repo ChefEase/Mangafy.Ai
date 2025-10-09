@@ -122,6 +122,10 @@
   
   /* 📱 Mobile */
   @media (max-width: 768px) {
+    .desktop-only {
+      display: none !important;
+    }
+    
     .chatbot-toggle {
         top: 113px;
         right: 18px;

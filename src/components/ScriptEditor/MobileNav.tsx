@@ -1,4 +1,4 @@
-import { Book, FileText, Lightbulb, Pencil } from "lucide-react";
+import { Book, FileText, UserCircle, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import "./MobileNav.css";
 
@@ -12,6 +12,16 @@ const MobileNav = () => {
       <Link href="/script-writing/templates">
         <div className="icon-circle"><FileText size={22} /></div>
         <span className="nav-label">Templates</span>
+      </Link>
+      
+      <Link href="/characters">
+        <div className="icon-circle"><UserCircle size={22} /></div>
+        <span className="nav-label">Characters</span>
+      </Link>
+
+      <Link href="/chat">
+        <div className="icon-circle"><MessageCircle size={22} /></div>
+        <span className="nav-label">Chatbot</span>
       </Link>
     </div>
   );

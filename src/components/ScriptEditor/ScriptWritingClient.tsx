@@ -837,6 +837,7 @@ useEffect(() => {
   return () => { isCancelled = true; };
 }, [selectedPanelType, panelPreviews, generatedPanels, canvasRef]);
 
+
     const handleSave = () => {
       const validationErrors = validateScript(content);
       setErrors(validationErrors);
@@ -1273,7 +1274,7 @@ onChange={(e) => setGuidanceScale(parseInt(e.target.value, 10))}
 
 <div className={styles.controlGroup}>
   <label>Seed: (Optional)</label>
-  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+  <div className={styles.controlGroupInner}>
     <input
       type="range"
       min={1}
@@ -1461,13 +1462,13 @@ return (
   </button>
 </div>
     {/* Right sidebar */}
-    <div className="characters-sidebar-fixed">
+    <div className="characters-sidebar-fixed desktop-only">
       <CharactersPage />
     </div>
 
     {/* Floating Chatbot Button */}
     {!isChatbotOpen && (
-      <div className="chatbot-toggle" onClick={() => setIsChatbotOpen(true)}>
+      <div className="chatbot-toggle desktop-only" onClick={() => setIsChatbotOpen(true)}>
         <div className="chatbot-plus">+</div>
         <span className="chatbot-label">Chatbot</span>
       </div>
@@ -1569,9 +1570,9 @@ return (
     ))}
   </div>
 </div>
-
-
-    <MobileNav /> {/* Only visible on mobile */}
+<div>
+        <MobileNav /> {/* Only visible on mobile */}
+        </div>
   </>
 );
 

@@ -14,7 +14,7 @@
     background-color: #1e40af; /* Tailwind blue-800 */
   }
   
-  @media (max-width: 600px) {
+  @media (max-width: 1024px) {
     .logout-button {
       background-color: #ef4444; /* Override with Tailwind red-500 */
       padding: 0.5rem 1rem;      /* Smaller padding */

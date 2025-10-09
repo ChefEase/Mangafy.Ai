@@ -485,172 +485,135 @@
   box-shadow: 0 12px 28px rgba(0,0,0,0.32);
 }
 
-@media (max-width: 768px) {
-  .container {
-    padding: 16px;
-    max-width: 100%;
-    border-radius: 8px;
+.controlGroupInner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap; /* single line by default */
+}
+
+/* ===== MOBILE & TABLET: Fullscreen Manga Page Scaling ===== */
+@media (max-width: 1024px) {
+
+  .controlGroupInner {
+    flex-wrap: wrap;               /* ✅ allow items to wrap */
   }
 
-  .downloadButtonAbsolute {
-    padding: 10px 16px;
-    font-size: 14px;
-    left: 50%;
-    top: var(--download-top-mobile, 12px);
-    transform: translateX(-50%);
-    width: calc(90% - 32px);
+  .controlGroupInner button {
+    flex-basis: 100%;              /* ✅ button goes to next line */
+    margin-top: 6px;               /* a little spacing */
+  }
+  /* Hide fixed sidebar for compact layout */
+  .script-sidebar-fixed {
+    display: none !important;
+  }
+
+  /* Center the manga page (previewGrid or panelGrid container) */
+  .controlGroupInner {
+    flex-wrap: wrap; /* ✅ allow items to wrap */
   }
   
-  .header h2 {
-    font-size: 1.4rem;
-    margin-bottom: 4px;
-  }
-
-  .subtitle {
-    font-size: 0.85rem;
-  }
-
-  .controls {
-    display: grid;
-    grid-template-columns: 1fr;  /* one column */
-    gap: 12px;
-    overflow: hidden;   /* prevent child overflow */
-  }
-
-  .controls button {
-    width: 100%;
-    max-width: 100%;     /* prevent overflow */
-    box-sizing: border-box; /* respect parent padding */
-    padding: 16px;
-    overflow-wrap: break-word; /* break long text if needed */
-  }
-
-  .controls input,
-  .controls select,
-  .controls button,
-  .controls textarea {
-    max-width: 100% !important;
-    width: 100% !important;
-    box-sizing: border-box;
-  }
-
-  .controls textarea {
-    background: #2d2d2d;
-    color: #ffffff;    /* force white text */
-    border: 1px solid #444;
-    border-radius: 6px;
-    padding: 10px;
-    resize: vertical;
+  .controlGroupInner button {
+    flex-basis: 100%;
+    margin-top: calc(6 / 844 * 100vh); /* scale the spacing */
   }
   
-  /* When disabled */
-  .controls textarea:disabled {
-    background: #1a1a1a; 
-    color: #888888;   /* lighter gray so text is still visible */
-    cursor: not-allowed;
-  }
-
-  .generateButton {
+  /* Preview and panel containers */
+  .previewGrid,
+  .panelGrid {
+    position: absolute;
+    top: calc(-150 / 844 * 100vh); /* converted from -150px */
+    left: 0;
+    width: 100vw;
+    height: 100vh;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     justify-content: center;
-    padding: 12px 16px;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Panels scale fluidly */
+  .panel {
+    width: 95vw;
+    height: auto;
+    max-height: 85vh;
+    aspect-ratio: 2 / 3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .panel img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  
+  /* Redundant but safe for scaling */
+  .previewGrid,
+  .panelGrid {
+    width: 100vw;
+    height: 100vh;
+  }
+  
+  /* Download button */
+  .downloadButtonAbsolute {
+    position: absolute;
+    top: calc(250 / 844 * 100vh); /* was 290px */
+    left: calc(110 / 390 * 100vw); /* was 110px */
+    transform: translateX(-50%) scale(0.9);
+    width: 50%;
+    max-width: calc(300 / 390 * 100vw);
+    padding: calc(12 / 390 * 100vw) calc(18 / 390 * 100vw);
     font-size: 1rem;
   }
   
-  .select {
-    padding: 10px 12px;
-    font-size: 0.9rem;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-
-  .panelGrid {
-    gap: 20px;
-    padding: 10px 0;
-  }
-
-  .panel {
-    aspect-ratio: auto;
-    width: 100%;
-    height: auto;
-  }
-
-  .panel img {
-    height: auto;
-  }
-
-  .panelNumber {
-    font-size: 0.75rem;
-    padding: 2px 8px;
-  }
-
-  .controlGroup label {
-    display: inline-flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 6px;
-    flex-wrap: nowrap;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color: #e0e0e0 !important; /* 👈 force visible text color */
-  }
+  /* Controls panel */
+  .controls {
+    position: absolute;
+    width: calc(325 / 390 * 100vw);
+    height: calc(800 / 844 * 100vh);
+    top: calc(525 / 844 * 100vh);
+    left: calc(35 / 390 * 100vw);
+    margin-top: calc(20 / 844 * 100vh);
+    padding: calc(16 / 390 * 100vw);
   
-  .controlGroup label::before {
-    content: "•";
-    display: inline-block;
-    margin-right: 4px;
-    color: #4a6cf7; /* force bullet color */
-  }
-  
-  .controlGroup label span {
-    display: inline-block;
-    white-space: nowrap;
-    color: inherit;   /* 👈 makes sure span takes the label's color */
-    z-index: 1;       /* 👈 ensure it's not layered behind pseudo */
-    position: relative; /* Safari fix */
-  }
-  
-  /* Flex containers with multiple inputs/buttons should wrap */
-  .controlGroup > div {
+    background: rgba(30, 30, 30, 0.85);
+    box-shadow: none;
+    transform: none;
+    border: none;
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    flex-direction: column;
+    gap: calc(14 / 390 * 100vw);
+  
+    overflow-y: auto;
+    overflow-x: hidden;
+  
+    scrollbar-width: thin;
+    scrollbar-color: #888 #1e1e1e;
   }
   
-  .controlGroup > div > * {
-    flex: 1 1 auto; /* Let children shrink/grow */
-    min-width: 0;   /* Prevent overflow */
+  /* Generate button */
+  .generateButton {
+    position: absolute;
+    top: calc(400 / 844 * 100vh);
+    left: calc(200 / 390 * 100vw);
+    transform: none;
+    margin-top: calc(12 / 844 * 100vh);
+    width: 50%;
+    transform: scale(0.8);
   }
-
-  .panel-type-note {
-    padding: 1rem;
-    font-size: 0.85rem;
+  
+  /* Tabs header */
+  .tab-header {
+    position: absolute;
+    margin: calc(12 / 844 * 100vh) auto;
+    justify-content: center;
+    transform: scale(0.9);
+    top: calc(475 / 844 * 100vh);
+    left: calc(60 / 390 * 100vw);
   }
-
-  .prompt-table th,
-  .prompt-table td {
-    padding: 0.4rem;
-  }
-
-  .creditBadge {
-    padding: 2px 6px;
-    font-size: 0.8rem;
-  }
-
-  .creditIcon {
-    width: 16px;
-    height: 16px;
-  }
-}
-
-@media (max-width: 480px) {
-  .controlGroup button {
-    width: 100% !important;
-    margin-top: 8px;
-  }
+  
 }
