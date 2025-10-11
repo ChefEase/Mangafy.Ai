@@ -371,7 +371,7 @@
 
 }
 
-@media (min-width: 1024px) and (min-height: 600px) {
+@media (max-width: 1024px) and (min-height: 600px) {
 
   /* --- SCRIPT TAB WRAPPER (optional, only applies when visible) --- */
   .script-tab-active .script-editor,
