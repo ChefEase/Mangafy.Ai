@@ -548,3 +548,36 @@
     font-size: 1.25rem;
     margin-bottom: 1.5rem;
   }
+
+  .recommendationSection {
+    text-align: center;
+    background-color: #ffffff;
+    padding: 3rem 1.5rem;
+    border-top: 1px solid #f97316;
+    border-bottom: 1px solid #333;
+  }
+  
+  .recommendationSection h2 {
+    font-size: 2rem;
+    color: #f97316;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+  
+  .recommendationText {
+    font-size: 1.125rem;
+    color: #000000;
+    line-height: 1.6;
+  }
+  
+  .docLink {
+    color: #f97316;
+    font-weight: 600;
+    text-decoration: underline;
+    transition: color 0.3s ease;
+  }
+  
+  .docLink:hover {
+    color: #ffae42;
+  }
+  

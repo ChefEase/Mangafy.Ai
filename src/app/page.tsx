@@ -323,6 +323,21 @@ export default function LandingPage() {
         </section>
       )}
       
+            {/* RECOMMENDATION FOR NEW USERS */}
+            <section className={styles.recommendationSection}>
+        <h2 className={styles.sectionTitle}>New to Mangafy.ai?</h2>
+        <p className={styles.recommendationText}>
+          For new users, we recommend you read our documentation pages on how to{" "}
+          <Link href="/documentation-project-management" className={styles.docLink}>
+            create projects
+          </Link>{" "}
+          and{" "}
+          <Link href="/documentation" className={styles.docLink}>
+            generate images
+          </Link>.
+        </p>
+      </section>
+
       {/* FAQ */}
       <section className={styles.faqSection}>
         <h2 className={styles.sectionTitleFaq}>FAQ</h2>

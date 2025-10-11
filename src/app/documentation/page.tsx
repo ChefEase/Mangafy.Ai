@@ -58,7 +58,9 @@ const DocumentationPage: React.FC = () => {
             <li><b>For three panels:</b> Continue the same pattern</li>
           </ul>
           <motion.div className="documentation-image-card" whileHover={{ scale: 1.03 }}>
-            <img src="/screenshots/storybox.png" alt="Story Text Box" />
+            <img src="/screenshots/storybox (1).png" alt="Story Text Box" />
+            <img src="/screenshots/storybox (2).png" alt="Story Text Box" />
+            <img src="/screenshots/storybox (3).png" alt="Story Text Box" />
           </motion.div>
         </section>
 
@@ -70,17 +72,21 @@ const DocumentationPage: React.FC = () => {
             Here, you’ll find:
           </p>
           <ul className="doc-list">
-            <li><b>Style Presets</b> – Choose from predefined looks (you’ll list your styles).</li>
-            <li><b>Art Style</b> – Pick your preferred drawing style (you’ll list these too).</li>
+            <li><b>Style Presets</b> – Choose from predefined looks (Cinematic, Photographic, Anime, Digital Art e.t.c).</li>
+            <li><b>Art Style</b> – Pick your preferred drawing style (Default Manga, One Piece, Jujutsu Kaisen, My Hero Academi e.t.c).</li>
             <li><b>Panel Layout</b> – Select your manga/comic panel layout.</li>
             <li><b>Color Options</b> – Choose between full color or black & white.</li>
-            <li><b>Mangafy Checkbox</b> – Adds traditional manga effects like inking, cross-hatching, shading, etc. (Not applicable for the default “Manga” option.)</li>
+            <li><b>Mangafy Checkbox</b> – Adds traditional manga effects like inking, cross-hatching, shading, etc. (Not applicable for the "Default Manga” option.)</li>
             <li><b>Custom Art Style</b> – Input your own prompt if you want a unique art style.</li>
-            <li><b>Guidance Scale</b> – (1–15) controls how closely the AI sticks to your prompt.</li>
-            <li><b>Seed & Randomizer</b> – Seeds keep results consistent; randomizing changes the look.</li>
+            <li><b>Guidance Scale</b> – (1–15) controls how closely the AI sticks to your prompt. The lower the guidance scale the more Ai sticks to your prompt. The less creative it is. The hugher the guidancescale number, the more Ai deviates from your prompt and the more createive is. Ideal or recommended guidance scale is 7</li>
+            <li><b>Seed & Randomizer</b> – Seeds keep results consistent; randomizing changes the look. We recommend you keep your seed consistent throughout generation</li>
           </ul>
           <motion.div className="documentation-image-card" whileHover={{ scale: 1.03 }}>
-            <img src="/screenshots/advanced-options.png" alt="Advanced Options Panel" />
+            <img src="/screenshots/advanced-options (1).png" alt="Advanced Options Panel" />
+            <img src="/screenshots/advanced-options (2).png" alt="Advanced Options Panel" />
+            <img src="/screenshots/advanced-options (3).png" alt="Advanced Options Panel" />
+            <img src="/screenshots/advanced-options (4).png" alt="Advanced Options Panel" />
+            <img src="/screenshots/advanced-options (5).png" alt="Advanced Options Panel" />
           </motion.div>
         </section>
 
@@ -93,14 +99,16 @@ const DocumentationPage: React.FC = () => {
           </p>
           <p>
             Use this format for accurate generation:  
-            <i>1girl, black hair, white skirt, blue eyes, smiling, school uniform</i>
+            <i>1girl, black hair, white skirt, blue eyes, smiling, school uniform. This is only an example.</i>
           </p>
           <p>
             You can search characters by <strong>name</strong>, <strong>role</strong>, or <strong>creation date</strong>, 
             and sort results ascending or descending.
           </p>
           <motion.div className="documentation-image-card" whileHover={{ scale: 1.03 }}>
-            <img src="/screenshots/character-management.png" alt="Character Management" />
+            <img src="/screenshots/character-management (1).png" alt="Character Management" />
+            <img src="/screenshots/character-management (2).png" alt="Character Management" />
+            <img src="/screenshots/character-management (3).png" alt="Character Management" />
           </motion.div>
         </section>
 
@@ -125,7 +133,10 @@ const DocumentationPage: React.FC = () => {
             You can also explore <strong>script templates</strong> and <strong>panel format ideas</strong> to help structure your manga.
           </p>
           <motion.div className="documentation-image-card" whileHover={{ scale: 1.03 }}>
-            <img src="/screenshots/chatbot.png" alt="Chatbot Screen" />
+            <img src="/screenshots/chatbot (1).png" alt="Chatbot Screen" />
+            <img src="/screenshots/chatbot (2).png" alt="Chatbot Screen" />
+            <img src="/screenshots/chatbot (3).png" alt="Chatbot Screen" />
+            <img src="/screenshots/chatbot (4).png" alt="Chatbot Screen" />
           </motion.div>
         </section>
 
@@ -151,6 +162,13 @@ const DocumentationPage: React.FC = () => {
           <motion.div className="documentation-image-card" whileHover={{ scale: 1.03 }}>
             <img src="/screenshots/subscription-placeholder (1).png" alt="Subscription Screen" />
           </motion.div>
+        </section>
+
+        <section className="documentation-section">
+          <h2>9. Text Box</h2>
+          <p>
+            To create/add text box we recommend you use other apps such as medibang paint or clip studio paint. To make edits to the genrated images we recommend you use other third party apps as we do not have editing features at the moment.
+          </p>
         </section>
       </main>
 
