@@ -1100,6 +1100,31 @@
       }
     }
 
+    @media (min-width: 912px) and (min-height: 1368px) {
+      /* --- Generate Button --- */
+      .generateButton {
+        position: relative !important;
+        top: -350px !important;
+        left: 200px !important;
+        transform: scale(1) !important;
+        margin: 24px auto !important;
+        width: 40% !important;
+        max-width: 420px !important;
+      }
+    
+      /* --- Download Button --- */
+      .downloadButtonAbsolute {
+        position: relative !important;
+        top: -1425px !important;
+        left: 80px !important;
+        bottom: auto !important;
+        transform: scale(0.8) !important;
+        margin: 20px auto !important;
+        width: 40% !important;
+        max-width: 420px !important;
+      }
+    }
+
     @media (min-width: 1024px) and (min-height: 600px) {
 
       /* --- Preview + Panel Grid --- */
@@ -1166,3 +1191,207 @@
       }
     }
     
+/* =========================================
+   MOBILE & TABLET — Fullscreen Manga Page Scaling
+   ========================================= */
+@media (max-width: 1024px) {
+
+  /* Panels and preview */
+  .previewGrid,
+  .panelGrid {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    padding: 0;
+    position: relative !important; /* keep existing offsets */
+  }
+
+  .panel {
+    width: 95%;
+    max-width: 100%;
+    height: auto;
+    max-height: 85vh;
+    aspect-ratio: 2 / 3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .panel img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* Controls panel */
+  .controls {
+    position: relative !important;
+    width: 90%;
+    max-width: 500px;
+    height: auto !important;
+    margin: 1rem auto;
+    padding: 1rem;
+    background: rgba(30, 30, 30, 0.85);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
+  }
+
+  .controlGroupInner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .controlGroupInner button {
+    flex: 1 1 100%;
+    margin-top: 0.5rem;
+  }
+
+  /* Buttons */
+  .generateButton,
+  .downloadButtonAbsolute {
+    width: 50%;
+    max-width: 300px;
+    margin: 1rem auto;
+    display: block;
+  }
+
+  /* Tabs header */
+  .tab-header {
+    margin: 1rem auto;
+    width: fit-content !important;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* Script editor */
+  .script-editor {
+    position: relative !important;
+    width: 90%;
+    max-width: 100%;
+    margin: 1rem auto;
+    padding: 1rem !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    overflow-y: visible;
+  }
+
+  .ql-editor {
+    min-height: 160px;
+    font-size: 14px;
+    padding: 1rem;
+  }
+
+  .ql-toolbar {
+    padding: 0.5rem !important;
+    border-radius: 6px 6px 0 0;
+  }
+
+  .ql-container {
+    border-radius: 0 0 6px 6px !important;
+  }
+
+  .ql-toolbar button {
+    border-radius: 4px !important;
+  }
+}
+
+/* =========================================
+   LARGE DEVICES (iPad and up)
+   ========================================= */
+@media (min-width: 768px) and (min-height: 1024px) {
+
+  .previewGrid,
+  .panelGrid {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    position: relative !important; /* keep offsets */
+  }
+
+  .controls {
+    position: relative !important;
+    width: 60%;
+    max-width: 600px;
+    height: auto !important;
+    margin: 2rem auto;
+    padding: 1.25rem;
+    background: rgba(30, 30, 30, 0.9);
+    border-radius: 12px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .panel {
+    max-width: 85%;
+    aspect-ratio: 2 / 3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .generateButton,
+  .downloadButtonAbsolute {
+    width: 40%;
+    max-width: 420px;
+    margin: 1rem auto;
+    display: block;
+  }
+
+  .tab-header {
+    margin: 1rem auto;
+    width: fit-content !important;
+    display: flex;
+    justify-content: center;
+  }
+
+  .script-editor {
+    position: relative !important;
+    width: 70%;
+    max-width: 720px;
+    margin: 1.5rem auto;
+    padding: 1.5rem !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    background: #fff !important;
+    overflow-y: visible;
+  }
+
+  .ql-editor {
+    min-height: 320px !important;
+    font-size: 15px;
+    padding: 1.25rem !important;
+  }
+
+  .ql-toolbar {
+    padding: 0.75rem !important;
+    border-radius: 8px 8px 0 0;
+  }
+
+  body.script-tab-active .controls,
+  body.script-tab-active .previewGrid,
+  body.script-tab-active .panelGrid,
+  body.script-tab-active .generateButton,
+  body.script-tab-active .downloadButtonAbsolute {
+    display: none !important;
+  }
+}
+
+/* =========================================
+   SAFETY / SMOOTH SCROLL
+   ========================================= */
+.controls, .script-editor {
+  -webkit-overflow-scrolling: touch;
+}
