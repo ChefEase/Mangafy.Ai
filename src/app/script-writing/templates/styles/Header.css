@@ -191,7 +191,7 @@
     flex: 0 0 auto;
     margin-left: auto;
     transform: none;              /* 🚫 remove scale that lowered it */
-    margin-top: -20px;
+    margin-top: -30px;
   }
 
   .credit-pill {

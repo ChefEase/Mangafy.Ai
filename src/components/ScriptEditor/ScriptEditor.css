@@ -120,3 +120,294 @@
     border-radius: 4px !important;
   }
 }
+/* =========================================
+   SMALL DEVICES (iPhone SE and smaller)
+   ≤ 375 px wide  AND  ≤ 667 px tall
+   ========================================= */
+   @media (max-width: 375px) and (max-height: 667px) {
+
+    .script-editor {
+      position: relative !important;  /* detach from absolute layout */
+      top: 350px;                      /* 🔧 manual vertical offset – adjust as needed */
+      left: 0 !important;
+      width: 90% !important;
+      margin: 40px auto 0 auto;       /* centers it nicely */
+      padding: 0.75rem !important;
+      border-radius: 8px !important;
+      box-shadow: none !important;
+    }
+  
+    .ql-toolbar {
+      padding: 0.4rem !important;
+      border-radius: 6px 6px 0 0;
+    }
+  
+    .ql-editor {
+      min-height: 160px !important;   /* reduce height for small screens */
+      font-size: 13px !important;
+      padding: 0.75rem !important;
+    }
+  }
+  
+  @media (max-width: 360px) and (max-height: 740px) {
+
+    .script-editor {
+      position: relative !important;  /* detach from absolute layout */
+      top: 350px;                      /* 🔧 manual vertical offset – adjust as needed */
+      left: 0 !important;
+      width: 90% !important;
+      margin: 40px auto 0 auto;       /* centers it nicely */
+      padding: 0.75rem !important;
+      border-radius: 8px !important;
+      box-shadow: none !important;
+    }
+  
+    .ql-toolbar {
+      padding: 0.4rem !important;
+      border-radius: 6px 6px 0 0;
+    }
+  
+    .ql-editor {
+      min-height: 160px !important;   /* reduce height for small screens */
+      font-size: 13px !important;
+      padding: 0.75rem !important;
+    }
+  }
+  
+  @media (max-width: 540px) and (max-height: 720px) {
+
+    .script-editor {
+      position: relative !important;  /* detach from absolute layout */
+      top: 450px;                      /* 🔧 manual vertical offset – adjust as needed */
+      left: 0 !important;
+      width: 90% !important;
+      margin: 40px auto 0 auto;       /* centers it nicely */
+      padding: 0.75rem !important;
+      border-radius: 8px !important;
+      box-shadow: none !important;
+    }
+  
+    .ql-toolbar {
+      padding: 0.4rem !important;
+      border-radius: 6px 6px 0 0;
+    }
+  
+    .ql-editor {
+      min-height: 160px !important;   /* reduce height for small screens */
+      font-size: 13px !important;
+      padding: 0.75rem !important;
+    }
+  }
+  
+  
+  /* =========================================
+     LARGE DEVICES (iPad Mini and larger)
+     ≥ 768 px wide  AND  ≥ 1024 px tall
+     ========================================= */
+  /* =========================================
+   iPad / Large Devices — Script Tab Layout
+   ========================================= */
+@media (min-width: 768px) and (min-height: 1024px) {
+
+  /* --- SCRIPT TAB WRAPPER (optional, only applies when visible) --- */
+  .script-tab-active .script-editor,
+  .script-editor {
+    position: absollute !important;
+    top: 930px;                        /* 🔧 was 700px — reduced to fit viewport better */
+    left: 375px;
+    transform: translateX(-50%) !important;
+    width: 70% !important;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 1.5rem !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    background: #fff !important;
+    z-index: 5;                        /* stay above preview layers */
+  }
+
+  /* --- Quill Editor --- */
+  .ql-editor {
+    min-height: 320px !important;
+    font-size: 15px !important;
+    padding: 1.25rem !important;
+  }
+
+  .ql-toolbar {
+    padding: 0.75rem !important;
+    border-radius: 8px 8px 0 0;
+  }
+
+  body.script-tab-active .controls,
+  body.script-tab-active .previewGrid,
+  body.script-tab-active .panelGrid,
+  body.script-tab-active .generateButton,
+  body.script-tab-active .downloadButtonAbsolute {
+    display: none !important;
+  }
+
+}
+
+@media (min-width: 820px) and (min-height: 1120px) {
+
+  /* --- SCRIPT TAB WRAPPER (optional, only applies when visible) --- */
+  .script-tab-active .script-editor,
+  .script-editor {
+    position: absollute !important;
+    top: 1230px;                        /* 🔧 was 700px — reduced to fit viewport better */
+    left: 400px;
+    transform: translateX(-50%) !important;
+    width: 70% !important;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 1.5rem !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    background: #fff !important;
+    z-index: 5;                        /* stay above preview layers */
+  }
+
+  /* --- Quill Editor --- */
+  .ql-editor {
+    min-height: 320px !important;
+    font-size: 15px !important;
+    padding: 1.25rem !important;
+  }
+
+  .ql-toolbar {
+    padding: 0.75rem !important;
+    border-radius: 8px 8px 0 0;
+  }
+
+  body.script-tab-active .controls,
+  body.script-tab-active .previewGrid,
+  body.script-tab-active .panelGrid,
+  body.script-tab-active .generateButton,
+  body.script-tab-active .downloadButtonAbsolute {
+    display: none !important;
+  }
+
+}
+
+@media (min-width: 1024px) and (min-height: 1366px) {
+
+  /* --- SCRIPT TAB WRAPPER (optional, only applies when visible) --- */
+  .script-tab-active .script-editor,
+  .script-editor {
+    position: absollute !important;
+    top: 1330px;                        /* 🔧 was 700px — reduced to fit viewport better */
+    left: 510px;
+    transform: translateX(-50%) !important;
+    width: 70% !important;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 1.5rem !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    background: #fff !important;
+    z-index: 5;                        /* stay above preview layers */
+  }
+
+  /* --- Quill Editor --- */
+  .ql-editor {
+    min-height: 320px !important;
+    font-size: 15px !important;
+    padding: 1.25rem !important;
+  }
+
+  .ql-toolbar {
+    padding: 0.75rem !important;
+    border-radius: 8px 8px 0 0;
+  }
+
+  body.script-tab-active .controls,
+  body.script-tab-active .previewGrid,
+  body.script-tab-active .panelGrid,
+  body.script-tab-active .generateButton,
+  body.script-tab-active .downloadButtonAbsolute {
+    display: none !important;
+  }
+
+}
+
+@media (min-width: 912px) and (min-height: 1368px) {
+
+  /* --- SCRIPT TAB WRAPPER (optional, only applies when visible) --- */
+  .script-tab-active .script-editor,
+  .script-editor {
+    position: absollute !important;
+    top: 1330px;                        /* 🔧 was 700px — reduced to fit viewport better */
+    left: 510px;
+    transform: translateX(-50%) !important;
+    width: 70% !important;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 1.5rem !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    background: #fff !important;
+    z-index: 5;                        /* stay above preview layers */
+  }
+
+  /* --- Quill Editor --- */
+  .ql-editor {
+    min-height: 320px !important;
+    font-size: 15px !important;
+    padding: 1.25rem !important;
+  }
+
+  .ql-toolbar {
+    padding: 0.75rem !important;
+    border-radius: 8px 8px 0 0;
+  }
+
+  body.script-tab-active .controls,
+  body.script-tab-active .previewGrid,
+  body.script-tab-active .panelGrid,
+  body.script-tab-active .generateButton,
+  body.script-tab-active .downloadButtonAbsolute {
+    display: none !important;
+  }
+
+}
+
+@media (min-width: 1024px) and (min-height: 600px) {
+
+  /* --- SCRIPT TAB WRAPPER (optional, only applies when visible) --- */
+  .script-tab-active .script-editor,
+  .script-editor {
+    position: absollute !important;
+    top: 1330px;                        /* 🔧 was 700px — reduced to fit viewport better */
+    left: 510px;
+    transform: translateX(-50%) !important;
+    width: 70% !important;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 1.5rem !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    background: #fff !important;
+    z-index: 5;                        /* stay above preview layers */
+  }
+
+  /* --- Quill Editor --- */
+  .ql-editor {
+    min-height: 320px !important;
+    font-size: 15px !important;
+    padding: 1.25rem !important;
+  }
+
+  .ql-toolbar {
+    padding: 0.75rem !important;
+    border-radius: 8px 8px 0 0;
+  }
+
+  body.script-tab-active .controls,
+  body.script-tab-active .previewGrid,
+  body.script-tab-active .panelGrid,
+  body.script-tab-active .generateButton,
+  body.script-tab-active .downloadButtonAbsolute {
+    display: none !important;
+  }
+
+}

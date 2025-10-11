@@ -70,6 +70,7 @@ body {
 }
 
 @media (max-width: 1024px) {
+  
   .header a {
     color: #ffffff;
     margin: 0 0.5rem;
