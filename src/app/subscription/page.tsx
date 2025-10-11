@@ -58,10 +58,9 @@ export default function SubscriptionPage() {
   const monthlyPlans = [
     {
       type: "Free",
-      price: "$0/month",
+      price: "$0",
       features: [
         "🎁 One-time 195 Free Credits",
-        "✍️ Generate 6–16 Pages",
         "📦 Access All Core Features",
         "🤖 Character & Story Generation"
       ],
@@ -71,11 +70,10 @@ export default function SubscriptionPage() {
     },
     {
       type: "Starter Creator",
-      price: "$9.99/month",
+      price: "$9.99",
       priceId: "price_1RnV3NCfqQf6EFEyrJGUcfkP",
       features: [
         "🔓 1,200 Credits",
-        "📘 Generate 40–60 Pages",
         "🧠 Character Consistency AI",
         "🎨 Cover Art & Story Generator",
         "🎁 Referral: Earn 125 Credits Each"
@@ -86,11 +84,10 @@ export default function SubscriptionPage() {
     },
     {
       type: "Ultimate Creator",
-      price: "$24.99/month",
+      price: "$24.99",
       priceId: "price_1RnV5nCfqQf6EFEyvx3H79KA",
       features: [
         "🚀 3,500 Credits",
-        "📚 Generate 100–150 Pages",
         "🔥 Early Access to New Features",
         "👥 Priority Support & Creator Chatbot",
         "🎁 Referral: Earn 125 Credits Each"
@@ -104,12 +101,10 @@ export default function SubscriptionPage() {
   const yearlyPlans = [
     {
       type: "Starter Creator (Yearly)",
-      price: "$95.99/year",
+      price: "$95.99",
       priceId:"price_1RnV9mCfqQf6EFEyBT96MPqv",
       features: [
         "💰 Save 20% (Normally $120)",
-        "🔓 1,200 Monthly Credits (14,400/yr)",
-        "📘 40–60 Pages Monthly",
         "🧠 Character Consistency AI",
         "🎨 Cover Art & Story Generator",
         "🎁 Referral: Earn 125 Credits Each"
@@ -123,9 +118,6 @@ export default function SubscriptionPage() {
       price: "$239.99/year",
       priceId: "price_1RnVCJCfqQf6EFEyvODEySQl",
       features: [
-        "💰 Save 20% (Normally $300)",
-        "🚀 3,500 Monthly Credits (42,000/yr)",
-        "📚 100–150 Pages Monthly",
         "🔥 Early Access to New Features",
         "👥 Priority Support & Creator Chatbot",
         "🎁 Referral: Earn 125 Credits Each"

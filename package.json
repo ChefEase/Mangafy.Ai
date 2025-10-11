@@ -34,6 +34,7 @@
     "firebase": "^11.3.1",
     "fontfaceobserver": "^2.3.0",
     "formidable": "^3.5.4",
+    "framer-motion": "^12.23.24",
     "js-cookie": "^3.0.5",
     "konva": "^9.3.20",
     "lucide-react": "^0.542.0",

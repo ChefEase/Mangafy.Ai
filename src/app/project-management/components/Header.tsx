@@ -49,6 +49,7 @@ export default function Header() {
 
       <nav className="nav">
         <Link href="/project-management">Projects Tab</Link>
+        <Link href="/documentation-project-management">Documentation</Link>
       </nav>
       
       <div className="user-credit-container">

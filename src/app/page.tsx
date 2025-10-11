@@ -65,39 +65,10 @@ description: 'Mangafy.ai uses your uploaded characters and their descriptions to
 media: '/samples/sample3.png',
   },
   {
-    title: 'AI Story-to-Manga Conversion',
-    description: `Turn your written stories into fully illustrated manga pages with a single click.
-  Our intelligent pipeline understands narrative structure, dialogue, and visual context allowing it to transform raw text into manga panels with dynamic compositions, expressive characters, and cinematic flow.
-  You can specify panel layout, camera angles, and style preferences to tailor the output to your vision. It's storytelling, visually automated.`,
-    media: '/features/feature2.mp4', // Replace with your actual video file path
-    isVideo: true
-  },
-  {
-    title: 'Custom Character Generation',
-    description:
-      'Create unique manga characters with AI tailored to your story’s style. Whether you need a stoic warrior, a whimsical sidekick, or a mysterious villain, Mangafy.ai allows you to generate characters based on detailed prompts, personality traits, and design preferences. Customize clothing, expressions, poses, and more, ensuring every character feels authentic and visually aligned with your manga universe.',
-    media: '/features/feature4.mp4',
-    isVideo: true
-  },
-  {
-    title: 'Image-to-Image Transformation',
-    description:
-      'Upload your own sketches or character art and watch them come to life as polished manga-style illustrations. Mangafy.ai enhances your visuals with AI while preserving core details like pose, expression, and costume perfect for refining concept art or adapting existing characters into manga format.',
-    media: '/features/feature5.mp4',
-    isVideo: true
-  },
-  {
     title: 'AI Story Panel Generator',
     description:
       'Effortlessly create manga-style stories with our AI-powered panel generator. Choose from a variety of story templates or generate original plots, then apply them directly to your script box. Each story is broken into dynamic panels ready for editing, making storytelling faster, more flexible, and visually captivating.',
     media: '/features/feature3.mp4',
-    isVideo: true
-  },
-  {
-    title: 'AI Cover Art Creator',
-    description:
-      'Design stunning manga-style cover pages using our AI-powered generator. Upload your own characters or use pre-saved ones to generate personalized covers with dynamic artwork. Once generated, customize your cover with editable text, fonts, colors, and visual effects — all in real-time. Perfect for creators who want total control over both the art and design.',
-    media: '/features/feature1.mp4',
     isVideo: true
   },
   
