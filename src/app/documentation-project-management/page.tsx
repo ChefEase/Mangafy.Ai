@@ -88,7 +88,20 @@ const DocumentationPage: React.FC = () => {
             payment to upgrade.
           </p>
           <motion.div className="documentation-image-card" whileHover={{ scale: 1.03 }}>
-            <img src="/screenshots/subscription-placeholder.png" alt="Subscription Screen" />
+            <img src="/screenshots/subscription-placeholder (1).png" alt="Subscription Screen" />
+            <img src="/screenshots/subscription-placeholder (2).png" alt="Subscription Screen" />
+            <img src="/screenshots/subscription-placeholder (3).png" alt="Subscription Screen" />
+          </motion.div>
+        </section>
+
+        <section className="documentation-section">
+          <h2>6. Start Creating</h2>
+          <p>
+            Click on your project card and click on edit chapters to edit a created chapter
+          </p>
+          <motion.div className="documentation-image-card" whileHover={{ scale: 1.03 }}>
+            <img src="/screenshots/chapter (1).png" alt="Subscription Screen" />
+            <img src="/screenshots/chapter (2).png" alt="Subscription Screen" />
           </motion.div>
         </section>
       </main>

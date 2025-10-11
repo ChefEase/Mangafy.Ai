@@ -68,7 +68,7 @@ const Header = () => {
         <div className={`nav-dropdown ${navOpen ? "open" : ""}`}>
           <Link href="/script-writing">Script Box</Link>
           <Link href="/script-writing/templates">Script Templates</Link>
-          <Link href="/">Documentation</Link>
+          <Link href="/documentation">Documentation</Link>
         </div>
       </div>
 
