@@ -1053,6 +1053,7 @@ function getOrUpdateSeed(currentScript: string): number {
             throw new Error("Page generation returned empty array");
         }
         setGeneratedPanels(pages);
+        setGallery(prev => [...prev, ...pages]); // ✅ use pages directly
         const deductionSuccess = await deductCredits(cost);
         if (!deductionSuccess) {
           alert("Something went wrong updating credits. Please refresh the page.");
@@ -1073,9 +1074,17 @@ function getOrUpdateSeed(currentScript: string): number {
       } finally {
         setIsGenerating(false);
       }
-      setGallery(prev => [...prev, ...generatedPanels]);
     };
 
+    useEffect(() => {
+      const savedGallery = localStorage.getItem("gallery");
+      if (savedGallery) setGallery(JSON.parse(savedGallery));
+    }, []);
+    
+    useEffect(() => {
+      localStorage.setItem("gallery", JSON.stringify(gallery));
+    }, [gallery]);
+    
     async function upscaleBlob(blob: Blob, width: number, height: number): Promise<Blob> {
       const imgBitmap = await createImageBitmap(blob);
     
