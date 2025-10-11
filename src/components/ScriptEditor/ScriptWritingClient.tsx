@@ -1053,7 +1053,34 @@ function getOrUpdateSeed(currentScript: string): number {
             throw new Error("Page generation returned empty array");
         }
         setGeneratedPanels(pages);
-        setGallery(prev => [...prev, ...pages]); // ✅ use pages directly
+        // Save pages into IndexedDB + save small thumbnail + metadata to localStorage
+try {
+  const newEntries: { id: string; thumb: string; createdAt: number }[] = [];
+  for (let i = 0; i < pages.length; i++) {
+    const pageDataUrl = pages[i]; // data:image/png;base64,...
+    const id = `page-${Date.now()}-${Math.floor(Math.random() * 1e6)}-${i}`; // unique id
+    const blob = dataURLToBlob(pageDataUrl);
+    // Save full blob to IndexedDB
+    await saveImageBlobToDB(id, blob);
+    // Create a small thumbnail for metadata/localStorage (safe to store)
+    const thumb = await createThumbnailFromDataUrl(pageDataUrl, 300);
+    newEntries.push({ id, thumb, createdAt: Date.now() });
+  }
+
+  // update UI gallery state immediately with metadata entries
+  setGallery(prev => [...prev, ...newEntries.map(e => JSON.stringify({ id: e.id, thumb: e.thumb }))]);
+
+  // persist metadata (thumbnails + ids) to localStorage (small)
+  try {
+    const existing = JSON.parse(localStorage.getItem('gallery_meta') || '[]');
+    localStorage.setItem('gallery_meta', JSON.stringify(existing.concat(newEntries.map(e => ({ id: e.id, thumb: e.thumb, createdAt: e.createdAt })) )));
+  } catch (err) {
+    console.warn("Failed to save gallery_meta (localStorage), skipping:", err);
+  }
+} catch (err) {
+  console.error("Failed to save generated pages to IndexedDB:", err);
+}
+
         const deductionSuccess = await deductCredits(cost);
         if (!deductionSuccess) {
           alert("Something went wrong updating credits. Please refresh the page.");
@@ -1077,14 +1104,101 @@ function getOrUpdateSeed(currentScript: string): number {
     };
 
     useEffect(() => {
-      const savedGallery = localStorage.getItem("gallery");
-      if (savedGallery) setGallery(JSON.parse(savedGallery));
+      try {
+        const meta = JSON.parse(localStorage.getItem('gallery_meta') || '[]');
+        if (Array.isArray(meta) && meta.length) {
+          // Convert to same format your gallery state expects (stringified)
+          setGallery(meta.map(e => JSON.stringify({ id: e.id, thumb: e.thumb, createdAt: e.createdAt })));
+        }
+      } catch (err) {
+        console.warn("Failed to load gallery_meta:", err);
+      }
     }, []);
     
+    const closeZoom = () => {
+      if (zoomedPage && zoomedPage.startsWith('blob:')) {
+        URL.revokeObjectURL(zoomedPage);
+      }
+      setZoomedPage(null);
+    };
+        
     useEffect(() => {
       localStorage.setItem("gallery", JSON.stringify(gallery));
     }, [gallery]);
     
+    // -------- IndexedDB helpers --------
+function openImageDB() {
+  return new Promise<IDBDatabase>((resolve, reject) => {
+    const req = indexedDB.open("mangaImagesDB", 1);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains("images")) {
+        db.createObjectStore("images", { keyPath: "id" });
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function saveImageBlobToDB(id: string, blob: Blob) {
+  const db = await openImageDB();
+  return new Promise<void>((resolve, reject) => {
+    const tx = db.transaction("images", "readwrite");
+    const store = tx.objectStore("images");
+    store.put({ id, blob });
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+async function getImageBlobFromDB(id: string): Promise<Blob | null> {
+  const db = await openImageDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction("images", "readonly");
+    const store = tx.objectStore("images");
+    const req = store.get(id);
+    req.onsuccess = () => {
+      if (!req.result) return resolve(null);
+      resolve(req.result.blob as Blob);
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// Convert dataURL to Blob
+function dataURLToBlob(dataURL: string): Blob {
+  const parts = dataURL.split(',');
+  const meta = parts[0];
+  const base64 = parts[1];
+  const mime = meta.match(/:(.*?);/)?.[1] || 'image/png';
+  const binary = atob(base64);
+  const len = binary.length;
+  const u8 = new Uint8Array(len);
+  for (let i = 0; i < len; i++) u8[i] = binary.charCodeAt(i);
+  return new Blob([u8], { type: mime });
+}
+
+// Make a small thumbnail (dataURL) from a full-size dataURL
+function createThumbnailFromDataUrl(dataUrl: string, maxWidth = 300): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, maxWidth / img.width);
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      const ctx = canvas.getContext('2d')!;
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      // Use jpeg with quality 0.7 to reduce size
+      const thumb = canvas.toDataURL('image/jpeg', 0.7);
+      resolve(thumb);
+    };
+    img.onerror = () => resolve(''); // fallback empty
+    img.src = dataUrl;
+  });
+}
+
     async function upscaleBlob(blob: Blob, width: number, height: number): Promise<Blob> {
       const imgBitmap = await createImageBitmap(blob);
     
@@ -1570,14 +1684,30 @@ return (
     Download All Pages
   </button>
 
-  {/* Actual gallery */}
-  <div className={styles.gallery}>
-    {gallery.map((img, i) => (
-      <div key={i} className={styles.galleryItem} onClick={() => setZoomedPage(img)}>
-        <img src={img} alt={`Saved ${i+1}`} className={styles.galleryThumb}/>
+  {/* gallery state now holds JSON-stringified entries or can be parsed before render */}
+<div className={styles.gallery}>
+  {gallery.map((entryStr, i) => {
+    const entry = typeof entryStr === 'string' ? JSON.parse(entryStr) : entryStr;
+    return (
+      <div key={entry.id} className={styles.galleryItem}>
+        {/* show thumbnail from metadata immediately */}
+        {entry.thumb ? (
+          <img src={entry.thumb} alt={`Saved ${i+1}`} className={styles.galleryThumb} />
+        ) : (
+          <div className={styles.galleryThumbPlaceholder}>No Thumb</div>
+        )}
+        <button onClick={async () => {
+          // when clicked, get full blob from IndexedDB, create object URL and show (zoom)
+          const blob = await getImageBlobFromDB(entry.id);
+          if (!blob) { alert("Failed to load full image."); return; }
+          const url = URL.createObjectURL(blob);
+          setZoomedPage(url);
+        }}>Open</button>
       </div>
-    ))}
-  </div>
+    );
+  })}
+</div>
+
 </div>
 <div>
         <MobileNav /> {/* Only visible on mobile */}
