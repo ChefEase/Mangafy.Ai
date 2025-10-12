@@ -76,6 +76,7 @@ const DocumentationPage: React.FC = () => {
             <li><b>Art Style</b> – Pick your preferred drawing style (Default Manga, One Piece, Jujutsu Kaisen, My Hero Academi e.t.c).</li>
             <li><b>Panel Layout</b> – Select your manga/comic panel layout.</li>
             <li><b>Color Options</b> – Choose between full color or black & white.</li>
+            <li><b>Lightning/Mood Preset</b> – Choose from predefined filters(Neon, Sunset, Cinematic e.t.c).</li>
             <li><b>Mangafy Checkbox</b> – Adds traditional manga effects like inking, cross-hatching, shading, etc. (Not applicable for the "Default Manga” option.)</li>
             <li><b>Custom Art Style</b> – Input your own prompt if you want a unique art style.</li>
             <li><b>Guidance Scale</b> – (1–15) controls how closely the AI sticks to your prompt. The lower the guidance scale the more Ai sticks to your prompt. The less creative it is. The hugher the guidancescale number, the more Ai deviates from your prompt and the more createive is. Ideal or recommended guidance scale is 7</li>

@@ -517,6 +517,8 @@ const [activeTab, setActiveTab] = useState<'script' | 'advanced'>('script');
 const [panelPreviews, setPanelPreviews] = useState<(string | "generating")[]>([]);
 const [gallery, setGallery] = useState<string[]>([]);
 const [selectedMood, setSelectedMood] = useState<MoodType>("none");
+const originalImageRef = useRef<HTMLImageElement | null>(null);
+
 
 let touchTimer: NodeJS.Timeout | null = null;
 let isTouchDragging = false;
@@ -691,6 +693,13 @@ if (typeof window !== 'undefined') {
         A4_HEIGHT
       );
     
+      // 🧩 Save a clean unfiltered copy for mood switching
+if (canvasRef.current) {
+  const img = new Image();
+  img.src = canvasRef.current.toDataURL("image/png");
+  originalImageRef.current = img;
+}
+
       pages.push(canvas.toDataURL('image/png'));
       return pages;
     };
@@ -787,27 +796,27 @@ function createPlaceholderDataUrl(w: number, h: number, label = "") {
 
 function applyMoodEffect(mood: MoodType) {
   const canvas = canvasRef.current;
-  if (!canvas) return;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
+  const ctx = canvas?.getContext("2d");
+  if (!canvas || !ctx) return;
 
-  // If no generated image, don’t apply
-  if (panelPreviews.every(p => p === "generating" || !p)) {
+  // If no generated image, stop
+  if (!originalImageRef.current) {
     alert("Please generate an image before applying a mood.");
     return;
   }
 
-  // Get current canvas image
-  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  const data = imageData.data;
+  // 🧼 Step 1: Reset to original clean image first
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.filter = "none";
+  ctx.drawImage(originalImageRef.current, 0, 0, canvas.width, canvas.height);
 
+  // 🧠 Step 2: If 'none', just leave it clean
+  if (mood === "none") return;
+
+  // 🪄 Step 3: Apply new mood filter
   switch (mood) {
     case "noir":
-      // Black & white high contrast
-      for (let i = 0; i < data.length; i += 4) {
-        const avg = (data[i] + data[i+1] + data[i+2]) / 3;
-        data[i] = data[i+1] = data[i+2] = avg < 128 ? avg * 0.8 : avg * 1.2;
-      }
+      ctx.filter = "grayscale(100%) contrast(1.3)";
       break;
     case "sunset":
       ctx.filter = "brightness(1.1) sepia(0.4) hue-rotate(-20deg)";
@@ -830,19 +839,15 @@ function applyMoodEffect(mood: MoodType) {
     case "cinematic":
       ctx.filter = "contrast(1.3) brightness(0.95) saturate(0.9)";
       break;
-    default:
-      ctx.filter = "none";
   }
 
-  // Redraw with applied filter
-  const img = new Image();
-  img.src = canvas.toDataURL();
-  img.onload = () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    ctx.filter = "none"; // reset for next draw
-  };
+  // 🔄 Step 4: Redraw clean image with new filter
+  ctx.drawImage(originalImageRef.current, 0, 0, canvas.width, canvas.height);
+
+  // Reset filter for next draw calls
+  ctx.filter = "none";
 }
+
 
 function handleMoodChange(mood: MoodType) {
   setSelectedMood(mood);
@@ -990,6 +995,7 @@ function getOrUpdateSeed(currentScript: string): number {
 
   const cost = getCostForPanelType(selectedPanelType);
     const handleGenerateManga = async () => {
+      originalImageRef.current = null;
       if (typeof window === 'undefined') return;
       const config = PANEL_CONFIG[selectedPanelType];
       const MAX_PANELS = config.panelCount;
