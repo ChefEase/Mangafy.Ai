@@ -83,6 +83,7 @@ const DocumentationPage: React.FC = () => {
             <li><b>Seed & Randomizer</b> – Seeds keep results consistent; randomizing changes the look. We recommend you keep your seed consistent throughout generation</li>
           </ul>
           <motion.div className="documentation-image-card" whileHover={{ scale: 1.03 }}>
+          <img src="/screenshots/advanced-options.png" alt="Advanced Options Panel" />
             <img src="/screenshots/advanced-options (1).png" alt="Advanced Options Panel" />
             <img src="/screenshots/advanced-options (2).png" alt="Advanced Options Panel" />
             <img src="/screenshots/advanced-options (3).png" alt="Advanced Options Panel" />
