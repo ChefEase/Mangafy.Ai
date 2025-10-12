@@ -692,13 +692,22 @@ if (typeof window !== 'undefined') {
         A4_WIDTH,
         A4_HEIGHT
       );
-    
-      // 🧩 Save a clean unfiltered copy for mood switching
-if (canvasRef.current) {
-  const img = new Image();
-  img.src = canvasRef.current.toDataURL("image/png");
-  originalImageRef.current = img;
-}
+
+      try {
+        const cleanDataUrl = canvas.toDataURL("image/png");
+        const savedImg = new Image();
+        savedImg.crossOrigin = "anonymous";
+        savedImg.src = cleanDataUrl;
+        // Wait for the image to be decoded so applyMoodEffect can use it synchronously later
+        await new Promise<void>((resolve) => {
+          if (savedImg.complete) return resolve();
+          savedImg.onload = () => resolve();
+          savedImg.onerror = () => resolve(); // still resolve on error to avoid blocking
+        });
+        originalImageRef.current = savedImg;
+      } catch (err) {
+        console.warn("Failed to save clean canvas image for mood switching:", err);
+      }
 
       pages.push(canvas.toDataURL('image/png'));
       return pages;
@@ -805,49 +814,58 @@ function applyMoodEffect(mood: MoodType) {
     return;
   }
 
-  // 🧼 Step 1: Reset to original clean image first
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.filter = "none";
-  ctx.drawImage(originalImageRef.current, 0, 0, canvas.width, canvas.height);
+  const doDraw = () => {
+    // Clear the canvas fully
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // 🧠 Step 2: If 'none', just leave it clean
-  if (mood === "none") return;
+    // Prepare filter string
+    let filter = "none";
+    switch (mood) {
+      case "noir":
+        filter = "grayscale(100%) contrast(1.3)";
+        break;
+      case "sunset":
+        filter = "brightness(1.08) sepia(0.35) hue-rotate(-15deg)";
+        break;
+      case "dramatic":
+        filter = "contrast(1.4) brightness(0.92)";
+        break;
+      case "cool":
+        filter = "contrast(1.05) hue-rotate(200deg) saturate(1.05)";
+        break;
+      case "warm":
+        filter = "brightness(1.04) sepia(0.28) saturate(1.08)";
+        break;
+      case "vintage":
+        filter = "sepia(0.55) contrast(1.05) saturate(0.9)";
+        break;
+      case "neon":
+        filter = "saturate(1.9) brightness(1.08)";
+        break;
+      case "cinematic":
+        filter = "contrast(1.25) brightness(0.96) saturate(0.95)";
+        break;
+      case "none":
+      default:
+        filter = "none";
+    }
 
-  // 🪄 Step 3: Apply new mood filter
-  switch (mood) {
-    case "noir":
-      ctx.filter = "grayscale(100%) contrast(1.3)";
-      break;
-    case "sunset":
-      ctx.filter = "brightness(1.1) sepia(0.4) hue-rotate(-20deg)";
-      break;
-    case "dramatic":
-      ctx.filter = "contrast(1.4) brightness(0.9)";
-      break;
-    case "cool":
-      ctx.filter = "contrast(1.1) hue-rotate(180deg) saturate(1.2)";
-      break;
-    case "warm":
-      ctx.filter = "brightness(1.05) sepia(0.3) saturate(1.1)";
-      break;
-    case "vintage":
-      ctx.filter = "sepia(0.6) contrast(1.1)";
-      break;
-    case "neon":
-      ctx.filter = "saturate(2.0) brightness(1.2)";
-      break;
-    case "cinematic":
-      ctx.filter = "contrast(1.3) brightness(0.95) saturate(0.9)";
-      break;
+    // Draw with the desired filter once (don't draw twice)
+    ctx.filter = filter;
+    ctx.drawImage(originalImageRef.current as HTMLImageElement, 0, 0, canvas.width, canvas.height);
+
+    // Reset filter for any future operations
+    ctx.filter = "none";
+  };
+
+  // If the image is still decoding, wait for its load event
+  if (!originalImageRef.current.complete) {
+    originalImageRef.current.onload = () => doDraw();
+    originalImageRef.current.onerror = () => doDraw();
+  } else {
+    doDraw();
   }
-
-  // 🔄 Step 4: Redraw clean image with new filter
-  ctx.drawImage(originalImageRef.current, 0, 0, canvas.width, canvas.height);
-
-  // Reset filter for next draw calls
-  ctx.filter = "none";
 }
-
 
 function handleMoodChange(mood: MoodType) {
   setSelectedMood(mood);
@@ -913,6 +931,20 @@ useEffect(() => {
     } catch (err) {
       console.error("Error drawing preview layout:", err);
     }
+
+    // Save a preview clean image for mood switching (preview-level)
+try {
+  if (canvasRef.current) {
+    const previewDataUrl = canvasRef.current.toDataURL("image/png");
+    const previewImg = new Image();
+    previewImg.crossOrigin = "anonymous";
+    previewImg.src = previewDataUrl;
+    previewImg.onload = () => { originalImageRef.current = previewImg; };
+    previewImg.onerror = () => { /* ignore */ };
+  }
+} catch (e) {
+  console.warn("Couldn't save preview for mood switching:", e);
+}
   });
 
   return () => { isCancelled = true; };
@@ -1351,31 +1383,121 @@ function createThumbnailFromDataUrl(dataUrl: string, maxWidth = 300): Promise<st
       status: ''
     });
   
-    const downloadAllPages = () => {
+    const downloadAllPages = async () => {
       if (typeof document === "undefined") return;
     
-      generatedPanels.forEach((pageData, index) => {
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
     
-        if (isIOS) {
-          // Open image in new tab, user can long-press to save
-          const newWindow = window.open();
-          if (newWindow) {
-            newWindow.document.write(`<img src="${pageData}" style="max-width:100%"/>`);
+      // Helper: apply mood to an image src (dataURL) and return new dataURL
+      const bakeMoodToDataUrl = (src: string, mood: MoodType): Promise<string> => {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.crossOrigin = "anonymous";
+          img.onload = () => {
+            const tmp = document.createElement("canvas");
+            tmp.width = img.width;
+            tmp.height = img.height;
+            const tctx = tmp.getContext("2d")!;
+            // pick same filter strings as applyMoodEffect
+            let filter = "none";
+            switch (mood) {
+              case "noir":
+                filter = "grayscale(100%) contrast(1.3)"; break;
+              case "sunset":
+                filter = "brightness(1.08) sepia(0.35) hue-rotate(-15deg)"; break;
+              case "dramatic":
+                filter = "contrast(1.4) brightness(0.92)"; break;
+              case "cool":
+                filter = "contrast(1.05) hue-rotate(200deg) saturate(1.05)"; break;
+              case "warm":
+                filter = "brightness(1.04) sepia(0.28) saturate(1.08)"; break;
+              case "vintage":
+                filter = "sepia(0.55) contrast(1.05) saturate(0.9)"; break;
+              case "neon":
+                filter = "saturate(1.9) brightness(1.08)"; break;
+              case "cinematic":
+                filter = "contrast(1.25) brightness(0.96) saturate(0.95)"; break;
+              case "none":
+              default:
+                filter = "none";
+            }
+            tctx.filter = filter;
+            tctx.drawImage(img, 0, 0, tmp.width, tmp.height);
+            tctx.filter = "none";
+            resolve(tmp.toDataURL("image/png"));
+          };
+          img.onerror = () => {
+            // fallback to src if load fails
+            resolve(src);
+          };
+          img.src = src;
+        });
+      };
+    
+      // If no pages generated, try to download visible canvas as a single page (with mood)
+      if (!generatedPanels || generatedPanels.length === 0) {
+        if (canvasRef.current) {
+          const dataUrl = canvasRef.current.toDataURL("image/png");
+          if (isIOS) {
+            const newWindow = window.open();
+            if (newWindow) newWindow.document.write(`<img src="${dataUrl}" style="max-width:100%"/>`);
+          } else {
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = `manga_page_with_mood.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
           }
         } else {
+          alert("No pages available to download.");
+        }
+        return;
+      }
+    
+      // If no mood selected, preserve existing behaviour (download stored generatedPages)
+      if (selectedMood === "none") {
+        generatedPanels.forEach((pageData, index) => {
+          if (isIOS) {
+            const newWindow = window.open();
+            if (newWindow) {
+              newWindow.document.write(`<img src="${pageData}" style="max-width:100%"/>`);
+            }
+          } else {
+            const link = document.createElement('a');
+            link.href = pageData;
+            link.download = `manga_page_${index + 1}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }
+    
+          if (index === 0) {
+            sessionStorage.setItem('templateImage', LZString.compressToUTF16(pageData));
+          }
+        });
+        return;
+      }
+    
+      // Mood selected -> bake mood into each generated page and download
+      for (let i = 0; i < generatedPanels.length; i++) {
+        const src = generatedPanels[i];
+        const bakedDataUrl = await bakeMoodToDataUrl(src, selectedMood);
+        if (isIOS) {
+          const newWindow = window.open();
+          if (newWindow) newWindow.document.write(`<img src="${bakedDataUrl}" style="max-width:100%"/>`);
+        } else {
           const link = document.createElement('a');
-          link.href = pageData;
-          link.download = `manga_page_${index + 1}.png`;
+          link.href = bakedDataUrl;
+          link.download = `manga_page_${i + 1}_mood.png`;
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
         }
-    
-        if (index === 0) {
-          sessionStorage.setItem('templateImage', LZString.compressToUTF16(pageData));
+        if (i === 0) {
+          sessionStorage.setItem('templateImage', LZString.compressToUTF16(bakedDataUrl));
         }
-      });
+      }
     };
     
     function randomVarLengthSeed(): number {

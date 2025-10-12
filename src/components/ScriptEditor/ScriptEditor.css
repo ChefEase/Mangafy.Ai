@@ -17,6 +17,7 @@
     overflow-y: auto;               /* enable vertical scroll if content overflows */
     overflow-x: hidden;             /* prevent horizontal scroll */
     box-sizing: border-box;         /* include padding in height/width */
+    z-index: 10000;
 }
 
 

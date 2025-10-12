@@ -171,6 +171,7 @@
   box-sizing: border-box;        /* include padding in width/height */
   overflow-y: auto;              /* enable vertical scrolling if content overflows */
   overflow-x: hidden;            /* prevent horizontal scroll */
+  z-index: 10000;
 }
 
   .controlGroup {
