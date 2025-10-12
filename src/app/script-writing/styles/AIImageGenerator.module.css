@@ -539,6 +539,30 @@
   flex-wrap: nowrap; /* single line by default */
 }
 
+.zoomOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999999; /* above everything */
+  cursor: zoom-out;
+}
+
+.zoomedImage {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 10px;
+  box-shadow: 0 0 25px rgba(0,0,0,0.6);
+  animation: zoomIn 0.3s ease;
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
 /* ===== MOBILE & TABLET: Fullscreen Manga Page Scaling ===== */
 @media (max-width: 1024px) {
 
@@ -608,7 +632,7 @@
   /* Download button */ 
   .downloadButtonAbsolute { 
     position: absolute; 
-    top: calc(-1485 / 844 * 100vh); /* was 290px */ 
+    top: calc(-1510 / 844 * 100vh); /* was 290px */ 
     left: calc(110 / 390 * 100vw); /* was 110px */ 
     transform: translateX(-50%) scale(0.9); 
     width: 50%; 
@@ -954,7 +978,7 @@
     /* --- Download Button --- */
     .downloadButtonAbsolute {
       position: absolute;
-      top: calc(240 / 844 * 100vh); /* was 290px */
+      top: calc(-1525 / 844 * 100vh); /* was 290px */
       left: calc(110 / 390 * 100vw); /* was 110px */
       transform: translateX(-50%) scale(0.9);
       width: 50%;

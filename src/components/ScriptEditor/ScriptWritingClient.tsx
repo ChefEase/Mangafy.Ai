@@ -1708,6 +1708,15 @@ return (
   })}
 </div>
 
+{zoomedPage && (
+  <div className={styles.zoomOverlay} onClick={() => {
+    URL.revokeObjectURL(zoomedPage);
+    setZoomedPage(null);
+  }}>
+    <img src={zoomedPage} alt="Zoomed" className={styles.zoomedImage}/>
+  </div>
+)}
+
 </div>
 <div>
         <MobileNav /> {/* Only visible on mobile */}
