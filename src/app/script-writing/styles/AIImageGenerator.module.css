@@ -573,8 +573,8 @@
   /* Preview and panel containers */
   .previewGrid,
   .panelGrid {
-    position: absolute;
-    top: calc(-150 / 844 * 100vh); /* converted from -150px */
+    position: relative;
+    top: calc(-1220 / 844 * 100vh); /* converted from -150px */
     left: 0;
     width: 100vw;
     height: 100vh;
@@ -610,24 +610,24 @@
     height: 100vh;
   }
   
-  /* Download button */
-  .downloadButtonAbsolute {
-    position: absolute;
-    top: calc(290 / 844 * 100vh); /* was 290px */
-    left: calc(110 / 390 * 100vw); /* was 110px */
-    transform: translateX(-50%) scale(0.9);
-    width: 50%;
-    max-width: calc(300 / 390 * 100vw);
-    padding: calc(12 / 390 * 100vw) calc(18 / 390 * 100vw);
-    font-size: 1rem;
+  /* Download button */ 
+  .downloadButtonAbsolute { 
+    position: absolute; 
+    top: calc(-1485 / 844 * 100vh); /* was 290px */ 
+    left: calc(110 / 390 * 100vw); /* was 110px */ 
+    transform: translateX(-50%) scale(0.9); 
+    width: 50%; 
+    max-width: calc(300 / 390 * 100vw); 
+    padding: calc(12 / 390 * 100vw) calc(18 / 390 * 100vw); 
+    font-size: 1rem; 
   }
-  
+
   /* Controls panel */
   .controls {
-    position: absolute;
+    position: relative;
     width: calc(325 / 390 * 100vw);
     height: calc(800 / 844 * 100vh);
-    top: calc(525 / 844 * 100vh);
+    top: calc(450 / 844 * 100vh);
     left: calc(35 / 390 * 100vw);
     margin-top: calc(20 / 844 * 100vh);
     padding: calc(16 / 390 * 100vw);
@@ -649,8 +649,8 @@
   
   /* Generate button */
   .generateButton {
-    position: absolute;
-    top: calc(400 / 844 * 100vh);
+    position: relative;
+    top: calc(-580 / 844 * 100vh);
     left: calc(200 / 390 * 100vw);
     transform: none;
     margin-top: calc(12 / 844 * 100vh);
@@ -660,12 +660,12 @@
   
   /* Tabs header */
   .tab-header {
-    position: absolute;
+    position: relative;
     margin: calc(12 / 844 * 100vh) auto;
     justify-content: center;
     transform: scale(0.9);
-    top: calc(475 / 844 * 100vh);
-    left: calc(60 / 390 * 100vw);
+    top: calc(400 / 844 * 100vh);
+    left: calc(0 / 390 * 100vw);
   }  
 }
 
@@ -1156,6 +1156,69 @@
       /* --- Generate Button --- */
       .generateButton {
         position: relative !important;
+        top: -850px !important;
+        left: 200px !important;
+        transform: scale(1) !important;
+        margin: 24px auto !important;
+        width: 40% !important;
+        max-width: 420px !important;
+      }
+    
+      /* --- Download Button --- */
+      .downloadButtonAbsolute {
+        position: relative !important;
+        top: -2325px !important;
+        left: 80px !important;
+        bottom: auto !important;
+        transform: scale(0.8) !important;
+        margin: 20px auto !important;
+        width: 40% !important;
+        max-width: 420px !important;
+      }
+    }
+
+    @media (width: 1024px) and (height: 1366px) {
+      /* --- Generate Button --- */
+      .previewGrid,
+      .panelGrid {
+        position: relative !important;
+        top: -1240px;                 /* 🔧 manual downward offset */
+        margin: 40px auto 0 auto;  /* center and push down a bit */
+        width: 100%;
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+    
+      /* --- Controls --- */
+      .controls {
+        position: relative !important;
+        top: 900px;
+        left: 0px;                 /* 🔧 manual downward offset for breathing space */
+        margin: 40px auto 0 auto;
+        width: 60% !important;     /* narrower on tablets */
+        max-width: 600px;
+        transform: none !important;
+        height: auto !important;
+        overflow-y: visible !important;
+        background: rgba(30, 30, 30, 0.9);
+        border-radius: 12px;
+        padding: 1.25rem;
+      }
+    
+      /* --- Tab Header --- */
+      .tab-header {
+        position: absolute !important;
+        top: 800px !important;
+        left: auto !important;
+        transform: scale(1.05) !important;
+        margin: 20px auto !important;
+        width: fit-content !important;
+      }
+      .generateButton {
+        position: relative !important;
         top: -350px !important;
         left: 200px !important;
         transform: scale(1) !important;
@@ -1167,7 +1230,7 @@
       /* --- Download Button --- */
       .downloadButtonAbsolute {
         position: relative !important;
-        top: -1425px !important;
+        top: -1435px !important;
         left: 80px !important;
         bottom: auto !important;
         transform: scale(0.8) !important;

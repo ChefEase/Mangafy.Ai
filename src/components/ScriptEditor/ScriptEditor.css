@@ -73,12 +73,12 @@
 
 @media (max-width: 1024px) {
   .script-editor {
-    position: absolute;
+    position: realtive;
     width: 85%; /* ✅ already relative — leave it */
     height: auto;
   
     /* Convert 525px → relative to 844px height */
-    top: calc(525 / 844 * 100vh);
+    top: calc(625 / 844 * 100vh);
   
     /* Convert 30px → relative to 390px width */
     left: calc(30 / 390 * 100vw);
@@ -212,7 +212,7 @@
   /* --- SCRIPT TAB WRAPPER (optional, only applies when visible) --- */
   .script-tab-active .script-editor,
   .script-editor {
-    position: absollute !important;
+    position: absolute !important;
     top: 930px;                        /* 🔧 was 700px — reduced to fit viewport better */
     left: 375px;
     transform: translateX(-50%) !important;
@@ -248,12 +248,53 @@
 
 }
 
-@media (width: 820px) and (height: 1120px) {
+@media (width: 820px) and (height: 1180px) {
 
   /* --- SCRIPT TAB WRAPPER (optional, only applies when visible) --- */
   .script-tab-active .script-editor,
   .script-editor {
-    position: absollute !important;
+    position: absolute !important;
+    top: 1230px;                        /* 🔧 was 700px — reduced to fit viewport better */
+    left: 400px;
+    transform: translateX(-50%) !important;
+    width: 70% !important;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 1.5rem !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    background: #fff !important;
+    z-index: 5;                        /* stay above preview layers */
+  }
+
+  /* --- Quill Editor --- */
+  .ql-editor {
+    min-height: 320px !important;
+    font-size: 15px !important;
+    padding: 1.25rem !important;
+  }
+
+  .ql-toolbar {
+    padding: 0.75rem !important;
+    border-radius: 8px 8px 0 0;
+  }
+
+  body.script-tab-active .controls,
+  body.script-tab-active .previewGrid,
+  body.script-tab-active .panelGrid,
+  body.script-tab-active .generateButton,
+  body.script-tab-active .downloadButtonAbsolute {
+    display: none !important;
+  }
+
+}
+
+@media (width: 853px) and (height: 1280px) {
+
+  /* --- SCRIPT TAB WRAPPER (optional, only applies when visible) --- */
+  .script-tab-active .script-editor,
+  .script-editor {
+    position: absolute !important;
     top: 1230px;                        /* 🔧 was 700px — reduced to fit viewport better */
     left: 400px;
     transform: translateX(-50%) !important;
@@ -294,8 +335,8 @@
   /* --- SCRIPT TAB WRAPPER (optional, only applies when visible) --- */
   .script-tab-active .script-editor,
   .script-editor {
-    position: absollute !important;
-    top: 1330px;                        /* 🔧 was 700px — reduced to fit viewport better */
+    position: absolute !important;
+    top: 1230px;                        /* 🔧 was 700px — reduced to fit viewport better */
     left: 510px;
     transform: translateX(-50%) !important;
     width: 70% !important;
