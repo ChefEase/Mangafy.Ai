@@ -53,6 +53,17 @@ interface User {
   | 'three-vertical-horizontal' 
   | 'three-horizontal-vertical';
 
+  type MoodType =
+  | "none"
+  | "noir"
+  | "sunset"
+  | "dramatic"
+  | "cool"
+  | "warm"
+  | "vintage"
+  | "neon"
+  | "cinematic";
+
   interface PanelConfig {
     panelCount: number;
     layout: (panels: PanelData[], ctx: CanvasRenderingContext2D, A4_WIDTH: number, A4_HEIGHT: number) => void;
@@ -505,6 +516,7 @@ const [navOpen, setNavOpen] = useState(false);
 const [activeTab, setActiveTab] = useState<'script' | 'advanced'>('script');
 const [panelPreviews, setPanelPreviews] = useState<(string | "generating")[]>([]);
 const [gallery, setGallery] = useState<string[]>([]);
+const [selectedMood, setSelectedMood] = useState<MoodType>("none");
 
 let touchTimer: NodeJS.Timeout | null = null;
 let isTouchDragging = false;
@@ -771,6 +783,70 @@ function createPlaceholderDataUrl(w: number, h: number, label = "") {
     <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="${Math.min(48, Math.floor(w/10))}" fill="#777">${label}</text>
   </svg>`;
   return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+}
+
+function applyMoodEffect(mood: MoodType) {
+  const canvas = canvasRef.current;
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  // If no generated image, don’t apply
+  if (panelPreviews.every(p => p === "generating" || !p)) {
+    alert("Please generate an image before applying a mood.");
+    return;
+  }
+
+  // Get current canvas image
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+
+  switch (mood) {
+    case "noir":
+      // Black & white high contrast
+      for (let i = 0; i < data.length; i += 4) {
+        const avg = (data[i] + data[i+1] + data[i+2]) / 3;
+        data[i] = data[i+1] = data[i+2] = avg < 128 ? avg * 0.8 : avg * 1.2;
+      }
+      break;
+    case "sunset":
+      ctx.filter = "brightness(1.1) sepia(0.4) hue-rotate(-20deg)";
+      break;
+    case "dramatic":
+      ctx.filter = "contrast(1.4) brightness(0.9)";
+      break;
+    case "cool":
+      ctx.filter = "contrast(1.1) hue-rotate(180deg) saturate(1.2)";
+      break;
+    case "warm":
+      ctx.filter = "brightness(1.05) sepia(0.3) saturate(1.1)";
+      break;
+    case "vintage":
+      ctx.filter = "sepia(0.6) contrast(1.1)";
+      break;
+    case "neon":
+      ctx.filter = "saturate(2.0) brightness(1.2)";
+      break;
+    case "cinematic":
+      ctx.filter = "contrast(1.3) brightness(0.95) saturate(0.9)";
+      break;
+    default:
+      ctx.filter = "none";
+  }
+
+  // Redraw with applied filter
+  const img = new Image();
+  img.src = canvas.toDataURL();
+  img.onload = () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    ctx.filter = "none"; // reset for next draw
+  };
+}
+
+function handleMoodChange(mood: MoodType) {
+  setSelectedMood(mood);
+  applyMoodEffect(mood);
 }
 
 // 2) draw A4 preview on visible canvasRef whenever layout/preview data changes
@@ -1334,6 +1410,25 @@ function createThumbnailFromDataUrl(dataUrl: string, maxWidth = 300): Promise<st
           <option value="colored"  disabled={isMangafy}  >Full Color</option>
         </select>
       </div>
+
+      <div className={styles.controlGroup}>
+  <label>Mood / Lighting Preset:</label>
+  <select
+    value={selectedMood}
+    onChange={(e) => handleMoodChange(e.target.value as MoodType)}
+    className={styles.select}
+  >
+    <option value="none">None</option>
+    <option value="noir">Noir</option>
+    <option value="sunset">Sunset</option>
+    <option value="dramatic">Dramatic Shadows</option>
+    <option value="cool">Cool Blue</option>
+    <option value="warm">Warm Glow</option>
+    <option value="vintage">Vintage</option>
+    <option value="neon">Neon Lights</option>
+    <option value="cinematic">Cinematic</option>
+  </select>
+</div>
 
       <div className={styles.controlGroup}>
   <label>
