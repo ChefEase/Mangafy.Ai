@@ -513,17 +513,30 @@ finalStylePromptTag = finalStylePromptTag ? finalStylePromptTag.trim() : "";
 // include character descriptions (if you pass them in payload.characters) so compressor can't drop them
 let charactersText = "";
 if (Array.isArray(payload.characters) && payload.characters.length > 0) {
-  charactersText = payload.characters
-    .map((c: any) => {
-      let desc = typeof c === 'string' ? c : (c.description ?? "");
-      // Ensure gender prefix
-      if (!/^(1boy|1girl|2boys|2girls):/i.test(desc)) {
-        const gender = c.gender ?? "1girl"; // fallback if not provided
-        desc = `${gender}: ${desc}`;
-      }
-      return `(${desc})`;
-    })
-    .join(", ");
+  if (payload.characters.length === 1) {
+    // Single character: no parentheses needed
+    const c = payload.characters[0];
+    let desc = typeof c === 'string' ? c : (c.description ?? "");
+    if (!/^(1boy|1girl|2boys|2girls):/i.test(desc)) {
+      const gender = c.gender ?? "1girl";
+      desc = `${gender}: ${desc}`;
+    }
+    charactersText = desc;
+  } else {
+    // Multiple characters: wrap each in parentheses with correct gender prefix
+    charactersText = payload.characters
+      .map((c: any) => {
+        let desc = typeof c === 'string' ? c : (c.description ?? "");
+        if (!/^(1boy|1girl|2boys|2girls):/i.test(desc)) {
+          const gender = c.gender ?? "1girl";
+          desc = `${gender}: ${desc}`;
+        }
+        return `(${desc})`;
+      })
+      .join(", ");
+    // Prepend character count tag at start
+    charactersText = "2 characters, " + charactersText;
+  }
 }
 
 
