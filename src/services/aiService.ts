@@ -559,14 +559,8 @@ const finalPromptRaw = assembledParts.join(", "); // no empty segments
 
 // Final cleanup & enforce ordering: ensure art style at start and final style tags at end
 const finalPrompt = enforceNoDialogueAndStyle(finalPromptRaw, artStyleTag, finalStylePromptTag);
-// 🧹 Clean up any accidental double commas and spaces
-const cleanedFinalPrompt = finalPrompt
-  .replace(/,\s*,+/g, ', ')   // collapse consecutive commas
-  .replace(/\s{2,}/g, ' ')    // collapse extra spaces
-  .replace(/(^,|,$)/g, '')    // remove leading/trailing commas
-  .trim();
 
-    let shortenedPrompt = cleanedFinalPrompt.trim();
+    let shortenedPrompt = finalPrompt.trim();
 
     // -------------------- Mangafy: second-pass compression (replace existing block) --------------------
 if (payload.isMangafy) {
