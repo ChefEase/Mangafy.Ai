@@ -1255,7 +1255,7 @@ try {
     
       setSnapshotName("");
       setShowNamePrompt(false);
-      alert("✅ Snapshot saved! You can view it in /snapshot");
+      alert("✅ Snapshot saved! You can view it in the snapshot page in the header dropdownmenu");
     };
     
     useEffect(() => {
@@ -1280,6 +1280,30 @@ try {
     useEffect(() => {
       localStorage.setItem("gallery", JSON.stringify(gallery));
     }, [gallery]);
+    
+    useEffect(() => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("restore") === "true") {
+        const revertData = localStorage.getItem("revertSnapshot");
+        if (revertData) {
+          const snap = JSON.parse(revertData);
+    
+          setContent(snap.prompt || "");
+          setSelectedPreset(snap.stylePreset);
+          setSelectedStyle(snap.artStyle);
+          setSelectedPanelType(snap.panelLayout);
+          setSelectedColor(snap.colorOption);
+          setSelectedMood(snap.moodPreset);
+          setIsMangafy(snap.mangafyChecked);
+          setUseCustomStyle(snap.customArtStyle || "");
+          setCustomStyleDescription(snap.customArtStyle || "");
+          setGuidanceScale(snap.guidanceScale);
+          setSeedValue(snap.seed);
+    
+          console.log("✅ Restored snapshot:", snap);
+        }
+      }
+    }, []);
     
     // -------- IndexedDB helpers --------
 function openImageDB() {

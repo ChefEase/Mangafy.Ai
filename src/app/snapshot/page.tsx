@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import './snapshot.css';
+import "./snapshot.css";
 
 interface Snapshot {
   id: string;
@@ -24,36 +24,55 @@ const SnapshotPage: React.FC = () => {
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
   const router = useRouter();
 
+  // Load saved snapshots
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem("snapshots") || "[]");
     setSnapshots(saved);
   }, []);
 
-  // 🟠 Add this function:
+  // Save snapshots back to storage whenever updated
+  const saveToStorage = (newSnaps: Snapshot[]) => {
+    setSnapshots(newSnaps);
+    localStorage.setItem("snapshots", JSON.stringify(newSnaps));
+  };
+
+  // 🟠 Revert and tweak function
   const handleRevert = (snap: Snapshot) => {
-    // Save data temporarily so ScriptWritingClient can pick it up
+    // Save snapshot data to localStorage so ScriptWritingClient can restore it
     localStorage.setItem("revertSnapshot", JSON.stringify(snap));
 
-    // Redirect back to your main writing page
-    router.push("/"); // or wherever your main generator page lives
+    // Redirect to your main editor page
+    router.push("/script-writing?restore=true"); // add flag so main page knows to restore
+  };
+
+  // 🗑️ Delete snapshot
+  const handleDelete = (id: string) => {
+    const confirmDelete = window.confirm("Delete this snapshot?");
+    if (!confirmDelete) return;
+
+    const updated = snapshots.filter((snap) => snap.id !== id);
+    saveToStorage(updated);
   };
 
   return (
     <div className="snapshotPage">
       <h1 className="snapshotTitle">My Snapshots</h1>
 
-      {snapshots.length === 0 &&  <div className="emptySnapshotState">
-    <img
-      src="/screenshots/snapshot.png" // 👈 place your custom illustration here (you can use any file)
-      alt="No snapshots"
-      className="emptyImage"
-    />
-    <p>No snapshots</p>
-  </div>}
+      {snapshots.length === 0 && (
+        <div className="emptySnapshotState">
+          <img
+            src="/screenshots/snapshot.png"
+            alt="No snapshots"
+            className="emptyImage"
+          />
+          <p>No snapshots</p>
+        </div>
+      )}
 
       {snapshots.map((snap) => (
         <div className="snapshotCard" key={snap.id}>
           <img src={snap.image} alt={snap.name} className="snapshotPreview" />
+
           <div className="snapshotInfo">
             <h3>{snap.name}</h3>
             <ul>
@@ -68,7 +87,15 @@ const SnapshotPage: React.FC = () => {
               <li><strong>Guidance Scale:</strong> {snap.guidanceScale}</li>
               <li><strong>Seed:</strong> {snap.seed}</li>
             </ul>
-            <button onClick={() => handleRevert(snap)}>Revert & Tweak</button>
+
+            <div className="snapshotActions">
+              <button className="revertBtn" onClick={() => handleRevert(snap)}>
+                Revert & Tweak
+              </button>
+              <button className="deleteBtn" onClick={() => handleDelete(snap.id)}>
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       ))}

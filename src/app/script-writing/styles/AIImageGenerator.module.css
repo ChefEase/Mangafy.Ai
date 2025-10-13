@@ -617,16 +617,20 @@
   color: white;
   font-size: 1.1rem;
   margin-bottom: 12px;
+  position: relative;
+  right: -100px;
 }
 
 .snapshotModal input {
   padding: 10px;
   font-size: 1rem;
-  width: 80%;
+  width: 20%;
   border: 1px solid #444;
   border-radius: 8px;
   margin-bottom: 10px;
   outline: none;
+  right: -100px;
+  position: relative;
 }
 
 .snapshotModal input:focus {
@@ -652,6 +656,8 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  position: relative; 
+  right : -100px;
 }
 
 .snapshotModal button:hover {
