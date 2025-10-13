@@ -21,6 +21,7 @@ import ChatInterface from "../../components/chat/ChatInterface"
 import MobileNav from "../../components/ScriptEditor/MobileNav"
 import '../../app/script-writing/styles/global.css';
 import { v4 as uuidv4 } from "uuid";
+import { saveSnapshotToDB } from '../../utils/db';
 
 interface User {
   id: string;
@@ -1229,14 +1230,14 @@ try {
       }
     };
 
-    const saveSnapshot = () => {
+    const saveSnapshot = async () => {
       if (!canvasRef.current || !snapshotName.trim()) return;
     
       const newSnapshot = {
         id: uuidv4(),
         name: snapshotName,
         image: canvasRef.current.toDataURL("image/png"),
-        prompt: content, // your story text
+        prompt: content,
         stylePreset: selectedPreset,
         artStyle: selectedStyle,
         panelLayout: selectedPanelType,
@@ -1247,17 +1248,17 @@ try {
         guidanceScale,
         seed: seedValue
       };
-      
     
-      const existing = JSON.parse(localStorage.getItem("snapshots") || "[]");
-      existing.push(newSnapshot);
-      localStorage.setItem("snapshots", JSON.stringify(existing));
-    
-      setSnapshotName("");
-      setShowNamePrompt(false);
-      alert("✅ Snapshot saved! You can view it in the snapshot page in the header dropdownmenu");
+      try {
+        await saveSnapshotToDB(newSnapshot);
+        setSnapshotName("");
+        setShowNamePrompt(false);
+        alert("✅ Snapshot saved! You can view it in the snapshot page in the header dropdown menu");
+      } catch (error) {
+        console.error("Failed to save snapshot:", error);
+        alert("❌ Failed to save snapshot.");
+      }
     };
-    
     useEffect(() => {
       try {
         const meta = JSON.parse(localStorage.getItem('gallery_meta') || '[]');

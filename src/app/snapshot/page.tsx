@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import "./snapshot.css";
+import { getSnapshotsFromDB, deleteSnapshotFromDB } from "../../utils/db";
 
 interface Snapshot {
   id: string;
@@ -24,34 +25,28 @@ const SnapshotPage: React.FC = () => {
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
   const router = useRouter();
 
-  // Load saved snapshots
+  // Load saved snapshots from IndexedDB
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem("snapshots") || "[]");
-    setSnapshots(saved);
+    const fetchSnapshots = async () => {
+      const saved = await getSnapshotsFromDB();
+      setSnapshots(saved);
+    };
+    fetchSnapshots();
   }, []);
-
-  // Save snapshots back to storage whenever updated
-  const saveToStorage = (newSnaps: Snapshot[]) => {
-    setSnapshots(newSnaps);
-    localStorage.setItem("snapshots", JSON.stringify(newSnaps));
-  };
 
   // 🟠 Revert and tweak function
   const handleRevert = (snap: Snapshot) => {
-    // Save snapshot data to localStorage so ScriptWritingClient can restore it
     localStorage.setItem("revertSnapshot", JSON.stringify(snap));
-
-    // Redirect to your main editor page
-    router.push("/script-writing?restore=true"); // add flag so main page knows to restore
+    router.push("/script-writing?restore=true"); // flag to restore
   };
 
   // 🗑️ Delete snapshot
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     const confirmDelete = window.confirm("Delete this snapshot?");
     if (!confirmDelete) return;
 
-    const updated = snapshots.filter((snap) => snap.id !== id);
-    saveToStorage(updated);
+    await deleteSnapshotFromDB(id);
+    setSnapshots((prev) => prev.filter((snap) => snap.id !== id));
   };
 
   return (
