@@ -40,23 +40,15 @@ export function enforceNoDialogueAndStyle(
   // Normalize whitespace & commas
   cleaned = cleaned.replace(/\s+/g, " ").trim();
 
-  // --- Fix duplicate character tags ---
-  const hasBoy = /\b1boy\b/i.test(cleaned);
-  const hasGirl = /\b1girl\b/i.test(cleaned);
+  // === Step A: extract and temporarily replace parenthetical blocks ===
+  const parenBlocks: string[] = [];
+  cleaned = cleaned.replace(/\([^)]*\)/g, (m) => {
+    parenBlocks.push(m); // store including parentheses
+    return `__PAREN_${parenBlocks.length - 1}__`;
+  });
 
-  if (hasBoy && hasGirl) {
-    // Remove any occurrences so we can reinject in canonical order
-    cleaned = cleaned.replace(/\b1boy\b\s*,?/gi, "").replace(/\b1girl\b\s*,?/gi, "").trim();
-    cleaned = `1boy, 1girl, ${cleaned}`;
-  } else if (/(\b1boy\b.*\b1boy\b)/i.test(cleaned)) {
-    cleaned = cleaned.replace(/\b1boy\b\s*,?/gi, "").trim();
-    cleaned = `2boys, ${cleaned}`;
-  } else if (/(\b1girl\b.*\b1girl\b)/i.test(cleaned)) {
-    cleaned = cleaned.replace(/\b1girl\b\s*,?/gi, "").trim();
-    cleaned = `2girls, ${cleaned}`;
-  }
-
-  // Remove any occurrences of the artStyleMustStart and finalStyleTags inside the middle
+  // === Step B: operate on the outside text only ===
+  // Remove occurrences of artStyleMustStart and finalStyleTags outside parentheses
   if (artStyleMustStart) {
     const escStart = artStyleMustStart.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
     const regexStart = new RegExp(`,?\\s*${escStart}`, "gi");
@@ -68,10 +60,28 @@ export function enforceNoDialogueAndStyle(
     cleaned = cleaned.replace(regexEnd, "").trim();
   }
 
-  // Remove repeated commas, leading/trailing commas and whitespace
+  // Fix duplicate character tags outside parentheses only
+  const hasBoyOutside = /\b1boy\b/i.test(cleaned);
+  const hasGirlOutside = /\b1girl\b/i.test(cleaned);
+
+  if (hasBoyOutside && hasGirlOutside) {
+    cleaned = cleaned.replace(/\b1boy\b\s*,?/gi, "").replace(/\b1girl\b\s*,?/gi, "").trim();
+    cleaned = `1boy, 1girl, ${cleaned}`.trim();
+  } else if (/(\b1boy\b.*\b1boy\b)/i.test(cleaned)) {
+    cleaned = cleaned.replace(/\b1boy\b\s*,?/gi, "").trim();
+    cleaned = `2boys, ${cleaned}`;
+  } else if (/(\b1girl\b.*\b1girl\b)/i.test(cleaned)) {
+    cleaned = cleaned.replace(/\b1girl\b\s*,?/gi, "").trim();
+    cleaned = `2girls, ${cleaned}`;
+  }
+
+  // Remove repeated commas, leading/trailing commas and whitespace (outside parens)
   cleaned = cleaned.replace(/\s*,\s*/g, ", ").replace(/(^,|,$)/g, "").trim();
 
-  // --- Re-assemble: artStyleMustStart first, then cleaned middle, then finalStyleTags last ---
+  // === Step C: restore parentheses blocks back in place ===
+  cleaned = cleaned.replace(/__PAREN_(\d+)__/g, (_, idx) => parenBlocks[Number(idx)] || "");
+
+  // === Step D: Re-assemble: artStyle first, then cleaned middle, then final style tags last ===
   const parts: string[] = [];
   if (artStyleMustStart && artStyleMustStart.trim()) {
     parts.push(artStyleMustStart.trim());
@@ -83,7 +93,6 @@ export function enforceNoDialogueAndStyle(
     parts.push(finalStyleTags.trim());
   }
 
-  // join and ensure single commas between parts
   const result = parts.join(", ").replace(/\s*,\s*/g, ", ").trim();
   return result;
 }

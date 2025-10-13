@@ -511,43 +511,45 @@ finalStylePromptTag = finalStylePromptTag ? finalStylePromptTag.trim() : "";
 
 // --- prepare the scene that we WILL compress ---
 // include character descriptions (if you pass them in payload.characters) so compressor can't drop them
+// Build charactersText deterministically
 let charactersText = "";
 if (Array.isArray(payload.characters) && payload.characters.length > 0) {
   if (payload.characters.length === 1) {
-    // Single character: no parentheses needed
     const c = payload.characters[0];
     let desc = typeof c === 'string' ? c : (c.description ?? "");
+    // Normalize: ensure no surrounding parentheses
+    desc = desc.replace(/^\(|\)$/g, "").trim();
     if (!/^(1boy|1girl|2boys|2girls):/i.test(desc)) {
-      const gender = c.gender ?? "1girl";
+      const gender = (c.gender || "1girl").toString().toLowerCase();
       desc = `${gender}: ${desc}`;
     }
-    charactersText = desc;
+    charactersText = desc; // single character -> no outer parentheses
   } else {
-    // Multiple characters: wrap each in parentheses with correct gender prefix
-    charactersText = payload.characters
-      .map((c: any) => {
-        let desc = typeof c === 'string' ? c : (c.description ?? "");
-        if (!/^(1boy|1girl|2boys|2girls):/i.test(desc)) {
-          const gender = c.gender ?? "1girl";
-          desc = `${gender}: ${desc}`;
-        }
-        return `(${desc})`;
-      })
-      .join(", ");
-    // Prepend character count tag at start
-    charactersText = "2 characters, " + charactersText;
+    const pieces = payload.characters.map((c: any) => {
+      let desc = typeof c === 'string' ? c : (c.description ?? "");
+      desc = desc.replace(/^\(|\)$/g, "").trim(); // strip accidental parentheses
+      if (!/^(1boy|1girl|2boys|2girls):/i.test(desc)) {
+        const gender = (c.gender || "1girl").toString().toLowerCase();
+        desc = `${gender}: ${desc}`;
+      }
+      return `(${desc})`;
+    });
+    // Use explicit count label for clarity and consistency
+    const countLabel = `${payload.characters.length} characters`;
+    charactersText = `${countLabel}, ${pieces.join(", ")}`;
   }
 }
 
-
 // sanitizedScene already deduped by sanitizeScenePrompt earlier
-const sceneToCompress = [charactersText, cleanedScene].filter(Boolean).join(", ").trim();
+// compress only the scene description (not the character paragraphs)
+const sceneToCompress = cleanedScene || "";
 
 // compute budgets from art+final style text
 const { wordBudget, commaBudget } = calculateBudget(`${artStyleTag}${finalStylePromptTag ? ", " + finalStylePromptTag : ""}`);
 
 // Now compress ONLY the scene (sceneToCompress) with budgets so characters are preserved
-const compressedScene = await this.compressPrompt(sceneToCompress, { maxWords: wordBudget, maxCommas: commaBudget });
+const compressedScene = await this.compressPrompt(cleanedScene, { maxWords: wordBudget, maxCommas: commaBudget });
+
 
 const assembledParts = [artStyleTag, charactersText, compressedScene, finalStylePromptTag]
   .filter(Boolean)
