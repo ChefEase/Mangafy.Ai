@@ -1293,6 +1293,7 @@ try {
             setSelectedPreset(snap.stylePreset);
             setSelectedStyle(snap.artStyle);
             setSelectedPanelType(snap.panelLayout);
+            setPanelCount(PANEL_CONFIG[snap.panelLayout as PanelType]?.panelCount || 3);
             setSelectedColor(snap.colorOption);
             setSelectedMood(snap.moodPreset);
             setIsMangafy(snap.mangafyChecked);
@@ -1301,6 +1302,7 @@ try {
             setGuidanceScale(snap.guidanceScale);
             setSeedValue(snap.seed);
             console.log("✅ Restored snapshot:", snap);
+            await db.delete('snapshots', 'revertSnapshot'); // 🧹 Clean temp snapshot
           }
         }
       };
@@ -2027,11 +2029,26 @@ return (
 </div>
 
 {zoomedPage && (
-  <div className={styles.zoomOverlay} onClick={() => {
-    URL.revokeObjectURL(zoomedPage);
-    setZoomedPage(null);
-  }}>
-    <img src={zoomedPage} alt="Zoomed" className={styles.zoomedImage}/>
+  <div className="zoomOverlay">
+    <div className="zoomContainer">
+      <img src={zoomedPage} alt="Zoomed Manga Page" className="zoomedImage" />
+      {/* ✅ Add delete button below-left of the zoomed image */}
+      <div className="zoomActions">
+        <button
+          className="deleteZoomBtn"
+          onClick={() => {
+            const confirmDelete = window.confirm("Delete this page?");
+            if (!confirmDelete) return;
+            // Remove from gallery & IndexedDB
+            setGallery(prev => prev.filter(g => !g.includes(zoomedPage)));
+            closeZoom();
+          }}
+        >
+          🗑️ Delete
+        </button>
+        <button className="closeZoomBtn" onClick={closeZoom}>Close</button>
+      </div>
+    </div>
   </div>
 )}
 </div>
