@@ -513,12 +513,19 @@ finalStylePromptTag = finalStylePromptTag ? finalStylePromptTag.trim() : "";
 // include character descriptions (if you pass them in payload.characters) so compressor can't drop them
 let charactersText = "";
 if (Array.isArray(payload.characters) && payload.characters.length > 0) {
-  // assume each character has a `description` string (adjust field name if different)
   charactersText = payload.characters
-    .map((c: any) => (typeof c === 'string' ? c : (c.description ?? "")))
-    .filter(Boolean)
+    .map((c: any) => {
+      let desc = typeof c === 'string' ? c : (c.description ?? "");
+      // Ensure gender prefix
+      if (!/^(1boy|1girl|2boys|2girls):/i.test(desc)) {
+        const gender = c.gender ?? "1girl"; // fallback if not provided
+        desc = `${gender}: ${desc}`;
+      }
+      return `(${desc})`;
+    })
     .join(", ");
 }
+
 
 // sanitizedScene already deduped by sanitizeScenePrompt earlier
 const sceneToCompress = [charactersText, cleanedScene].filter(Boolean).join(", ").trim();
@@ -529,12 +536,14 @@ const { wordBudget, commaBudget } = calculateBudget(`${artStyleTag}${finalStyleP
 // Now compress ONLY the scene (sceneToCompress) with budgets so characters are preserved
 const compressedScene = await this.compressPrompt(sceneToCompress, { maxWords: wordBudget, maxCommas: commaBudget });
 
-let assembled = `${artStyleTag}`;
-if (compressedScene && compressedScene.trim()) assembled += `, ${compressedScene.trim()}`;
-if (finalStylePromptTag) assembled += `, ${finalStylePromptTag.trim()}`;
+const assembledParts = [artStyleTag, charactersText, compressedScene, finalStylePromptTag]
+  .filter(Boolean)
+  .map(p => p.trim());
+const finalPromptRaw = assembledParts.join(", "); // no empty segments
+
 
 // Final cleanup & enforce ordering: ensure art style at start and final style tags at end
-const finalPrompt = enforceNoDialogueAndStyle(assembled, artStyleTag, finalStylePromptTag);
+const finalPrompt = enforceNoDialogueAndStyle(finalPromptRaw, artStyleTag, finalStylePromptTag);
 
     let shortenedPrompt = finalPrompt.trim();
 
