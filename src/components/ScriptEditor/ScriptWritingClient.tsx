@@ -2029,13 +2029,13 @@ return (
 </div>
 
 {zoomedPage && (
-  <div className="zoomOverlay">
-    <div className="zoomContainer">
-      <img src={zoomedPage} alt="Zoomed Manga Page" className="zoomedImage" />
+  <div className={styles.zoomOverlay}>
+    <div className={styles.zoomContainer}>
+      <img src={zoomedPage} alt="Zoomed Manga Page" className={styles.zoomedImage} />
       {/* ✅ Add delete button below-left of the zoomed image */}
-      <div className="zoomActions">
+      <div className={styles.zoomActions}>
         <button
-          className="deleteZoomBtn"
+          className={styles.deleteZoomBtn}
           onClick={() => {
             const confirmDelete = window.confirm("Delete this page?");
             if (!confirmDelete) return;
