@@ -2046,7 +2046,7 @@ return (
         >
           🗑️ Delete
         </button>
-        <button className="closeZoomBtn" onClick={closeZoom}>Close</button>
+        <button className={styles.closeZoomBtn} onClick={closeZoom}>Close</button>
       </div>
     </div>
   </div>
