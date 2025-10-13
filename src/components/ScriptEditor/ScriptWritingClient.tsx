@@ -20,7 +20,7 @@ import "./chatbot.css";
 import ChatInterface from "../../components/chat/ChatInterface"
 import MobileNav from "../../components/ScriptEditor/MobileNav"
 import '../../app/script-writing/styles/global.css';
-import { Footer } from "../Footer/Footer";
+import { v4 as uuidv4 } from "uuid";
 
 interface User {
   id: string;
@@ -518,12 +518,24 @@ const [panelPreviews, setPanelPreviews] = useState<(string | "generating")[]>([]
 const [gallery, setGallery] = useState<string[]>([]);
 const [selectedMood, setSelectedMood] = useState<MoodType>("none");
 const originalImageRef = useRef<HTMLImageElement | null>(null);
-
+const [snapshotName, setSnapshotName] = useState("");
+const [showNamePrompt, setShowNamePrompt] = useState(false);
+const [showConfirm, setShowConfirm] = useState(false);
 
 let touchTimer: NodeJS.Timeout | null = null;
 let isTouchDragging = false;
 let offsetX = 0;
 let offsetY = 0;
+
+const handleSnapshotClick = () => {
+  setShowConfirm(true);
+};
+
+// 🟠 Confirm saving snapshot
+const confirmSnapshot = () => {
+  setShowConfirm(false);
+  setShowNamePrompt(true);
+};
 
 const getCostForPanelType = (panelType: PanelType): number => {
   switch(panelType) {
@@ -1217,6 +1229,35 @@ try {
       }
     };
 
+    const saveSnapshot = () => {
+      if (!canvasRef.current || !snapshotName.trim()) return;
+    
+      const newSnapshot = {
+        id: uuidv4(),
+        name: snapshotName,
+        image: canvasRef.current.toDataURL("image/png"),
+        prompt: content, // your story text
+        stylePreset: selectedPreset,
+        artStyle: selectedStyle,
+        panelLayout: selectedPanelType,
+        colorOption: selectedColor,
+        moodPreset: selectedMood,
+        mangafyChecked: isMangafy,
+        customArtStyle: useCustomStyle ? customStyleDescription : null,
+        guidanceScale,
+        seed: seedValue
+      };
+      
+    
+      const existing = JSON.parse(localStorage.getItem("snapshots") || "[]");
+      existing.push(newSnapshot);
+      localStorage.setItem("snapshots", JSON.stringify(existing));
+    
+      setSnapshotName("");
+      setShowNamePrompt(false);
+      alert("✅ Snapshot saved! You can view it in /snapshot");
+    };
+    
     useEffect(() => {
       try {
         const meta = JSON.parse(localStorage.getItem('gallery_meta') || '[]');
@@ -1889,6 +1930,32 @@ return (
   </div>
 </div>
 
+<button className={styles.snapshotButton} onClick={handleSnapshotClick}>
+  📸
+</button>
+{showConfirm && (
+  <div className={styles.snapshotModal}>
+    <p>Save generated image as a snapshot?</p>
+    <div className="modalActions">
+      <button onClick={confirmSnapshot}>Yes</button>
+      <button onClick={() => setShowConfirm(false)}>No</button>
+    </div>
+  </div>
+)}
+
+{showNamePrompt && (
+  <div className={styles.snapshotModal}>
+    <p>Enter a name for your snapshot:</p>
+    <input
+      type="text"
+      value={snapshotName}
+      onChange={(e) => setSnapshotName(e.target.value)}
+      placeholder="e.g. Battle Scene v1"
+    />
+    <button onClick={saveSnapshot}>Save</button>
+  </div>
+)}
+
 {/* wrapper that provides a containing block for absolute positioning */}
 <div style={{ position: 'relative' }}>
   {/* Download button: absolute, can override position via inline style variables below */}
@@ -1939,7 +2006,6 @@ return (
     <img src={zoomedPage} alt="Zoomed" className={styles.zoomedImage}/>
   </div>
 )}
-
 </div>
 <div>
         <MobileNav /> {/* Only visible on mobile */}
