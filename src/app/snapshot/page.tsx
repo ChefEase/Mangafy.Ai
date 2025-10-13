@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import "./snapshot.css";
-import { getSnapshotsFromDB, deleteSnapshotFromDB } from "../../utils/db";
+import { getSnapshotsFromDB, deleteSnapshotFromDB, saveSnapshotToDB } from "../../utils/db";
 
 interface Snapshot {
   id: string;
@@ -35,9 +35,9 @@ const SnapshotPage: React.FC = () => {
   }, []);
 
   // 🟠 Revert and tweak function
-  const handleRevert = (snap: Snapshot) => {
-    localStorage.setItem("revertSnapshot", JSON.stringify(snap));
-    router.push("/script-writing?restore=true"); // flag to restore
+  const handleRevert = async (snap: Snapshot) => {
+    await saveSnapshotToDB({ ...snap, id: "revertSnapshot" });
+    router.push("/script-writing?restore=true");
   };
 
   // 🗑️ Delete snapshot
