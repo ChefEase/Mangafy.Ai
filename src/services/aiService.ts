@@ -222,20 +222,32 @@ async compressPrompt(prompt: string, options?: { maxWords?: number; maxCommas?: 
 You are a prompt compression tool for AI image generation.
 Convert a natural-language scene description into a concise, comma-separated list of visual tags under 77 tokens.
 
-Requirements:
-1. Only include the character(s) explicitly mentioned in the input. If only 1boy is mentioned, do not add any 1girl or others. If only 1girl is mentioned, do not add 1boy.
-2. For one character mentioned only, YOU MUST START with "1boy" or "1girl", followed by that character's distinctive traits (hairstyle, eye color, clothing), their action, and camera angle. Do not merge traits or imply extra people.
-3. For two or more characters, YOU MUST START with the combined gender+count tags (e.g., "1boy, 1girl", "2girls", "2boys", "3characters"), then describe each character in parentheses. Each character's description must include their distinctive traits (hair, eyes, outfit, accessories, etc.), separated clearly by commas, e.g.:
-   (1girl: long blonde hair, blue eyes, red dress), (1boy: black hair, white shirt, jeans)
-4. After describing all characters, include shared actions, poses, or interactions (e.g., walking together, facing each other, holding hands).
-5. Then include environment/setting tags (street, park background, night city, indoor room, lighting style, art style, etc.).
-6. REMOVE all dialogue or quoted speech completely. Do not output any spoken text, quotes, or implied conversation.
-7. Eliminate duplicate descriptors; each visual concept should appear only once.
-8. Output only comma-separated tags — no explanations, no sentences, no extra text.
-9. DO NOT include names of characters, only their descriptions.
-10. Example formats:
-   - Single character: 1girl, blonde hair, ponytail, blue eyes, red dress, smiling, outdoor background, masterpiece, best quality
-   - Two characters: 1girl, 1boy, (1girl: light brown hair, ponytail, brown eyes, white shirt, jeans), (1boy: messy black hair, cape, ninja outfit), walking together, park background, trees, anime art style, masterpiece, best quality
+Formatting and Structure Rules:
+1. Always output **pure comma-separated tags**, no full sentences, no explanations, no line breaks.
+2. If one character is described:
+   - Start with "1girl" or "1boy".
+   - Then list their distinct traits (hair color, hairstyle, eyes, clothing, accessories, pose, or expression).
+   - Then include shared environment, background, lighting, and art style tags.
+   Example: 1girl, light brown hair, ponytail, brown eyes, white shirt, blue jeans, standing, park background, masterpiece, best quality, anime art style
+
+3. If two or more characters are described:
+   - Start with "2 characters" or the correct gender-count tags (e.g., "1girl, 1boy", "2girls", "2boys").
+   - After that, describe each character inside parentheses in this exact format:
+     (1girl: traits...), (1boy: traits...)
+   - Each character description must start with their gender tag followed by a colon, then their traits separated by commas.
+   - Do **not** add extra commas before or after parentheses.
+   - Do **not** start a parenthesis with a colon, e.g., "(: ..." is invalid.
+   - Example of correct multi-character output:
+     2 characters, (1girl: light brown hair, ponytail, brown eyes, white shirt, blue jeans), (1boy: messy black hair, glasses, cape, batman outfit, black shinobi costume, red rope), walking together, park background, trees, hatching, masterpiece, best quality, jujutsu kaisen art style
+
+4. Keep output order consistent:
+   [character count and gender], [each character in parentheses], [shared actions/interactions], [background/environment/lighting], [quality and art style]
+
+5. Remove any dialogue, quotes, or spoken text.
+6. Remove duplicates; only include each visual descriptor once.
+7. Never output empty commas or double commas (", ,").
+8. Do not include character names or proper nouns.
+9. Keep everything under 77 tokens total.
 `;
 
   // Append explicit budget instruction if provided

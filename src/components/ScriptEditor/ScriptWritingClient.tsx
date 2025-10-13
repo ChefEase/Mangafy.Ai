@@ -21,7 +21,7 @@ import ChatInterface from "../../components/chat/ChatInterface"
 import MobileNav from "../../components/ScriptEditor/MobileNav"
 import '../../app/script-writing/styles/global.css';
 import { v4 as uuidv4 } from "uuid";
-import { saveSnapshotToDB } from '../../utils/db';
+import { saveSnapshotToDB, initDB } from '../../utils/db';
 
 interface User {
   id: string;
@@ -1283,28 +1283,31 @@ try {
     }, [gallery]);
     
     useEffect(() => {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get("restore") === "true") {
-        const revertData = localStorage.getItem("revertSnapshot");
-        if (revertData) {
-          const snap = JSON.parse(revertData);
-    
-          setContent(snap.prompt || "");
-          setSelectedPreset(snap.stylePreset);
-          setSelectedStyle(snap.artStyle);
-          setSelectedPanelType(snap.panelLayout);
-          setSelectedColor(snap.colorOption);
-          setSelectedMood(snap.moodPreset);
-          setIsMangafy(snap.mangafyChecked);
-          setUseCustomStyle(snap.customArtStyle || "");
-          setCustomStyleDescription(snap.customArtStyle || "");
-          setGuidanceScale(snap.guidanceScale);
-          setSeedValue(snap.seed);
-    
-          console.log("✅ Restored snapshot:", snap);
+      const restoreSnapshot = async () => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("restore") === "true") {
+          const db = await initDB();
+          const snap = await db.get('snapshots', 'revertSnapshot');
+          if (snap) {
+            setContent(snap.prompt || "");
+            setSelectedPreset(snap.stylePreset);
+            setSelectedStyle(snap.artStyle);
+            setSelectedPanelType(snap.panelLayout);
+            setSelectedColor(snap.colorOption);
+            setSelectedMood(snap.moodPreset);
+            setIsMangafy(snap.mangafyChecked);
+            setUseCustomStyle(snap.customArtStyle || "");
+            setCustomStyleDescription(snap.customArtStyle || "");
+            setGuidanceScale(snap.guidanceScale);
+            setSeedValue(snap.seed);
+            console.log("✅ Restored snapshot:", snap);
+          }
         }
-      }
+      };
+    
+      restoreSnapshot();
     }, []);
+    
     
     // -------- IndexedDB helpers --------
 function openImageDB() {
