@@ -215,40 +215,36 @@ export class AIService {
   }  
 
   // inside AIService class in aiService.ts - replace old compressPrompt with this
-async compressPrompt(prompt: string, options?: { maxWords?: number; maxCommas?: number }): Promise<string> {
-  // base instruction (your existing rules)
+// replace existing compressPrompt with this
+async compressPrompt(
+  prompt: string,
+  options?: { maxWords?: number; maxCommas?: number; allowParentheses?: boolean }
+): Promise<string> {
   const client = new InferenceClient(process.env.NEXT_PUBLIC_HF_TOKEN);
+
+  // Base instruction — note we **conditionally** allow parentheses
   let systemInstruction = `
 You are a prompt compression tool for AI image generation.
 Convert a natural-language scene description into a concise, comma-separated list of visual tags under 77 tokens.
-
-Formatting and Structure Rules:
-1. Always output **pure comma-separated tags**, no full sentences, no explanations, no line breaks.
-2. If one character is described:
-   - Start with "1girl" or "1boy".
-   - Then list their distinct traits (hair color, hairstyle, eyes, clothing, accessories, pose, or expression).
-   - Then include shared environment, background, lighting, and art style tags.
-   Example: 1girl, light brown hair, ponytail, brown eyes, white shirt, blue jeans, standing, park background, masterpiece, best quality, anime art style
-
-3. If two or more characters are described:
-   - Start with "2 characters" or the correct gender-count tags (e.g., "1girl, 1boy", "2girls", "2boys").
-   - After that, describe each character inside parentheses in this exact format:
-     (1girl: traits...), (1boy: traits...)
-   - Each character description must start with their gender tag followed by a colon, then their traits separated by commas.
-   - Do **not** add extra commas before or after parentheses.
-   - Do **not** start a parenthesis with a colon, e.g., "(: ..." is invalid.
-   - Example of correct multi-character output:
-     2 characters, (1girl: light brown hair, ponytail, brown eyes, white shirt, blue jeans), (1boy: messy black hair, glasses, cape, batman outfit, black shinobi costume, red rope), walking together, park background, trees, hatching, masterpiece, best quality, jujutsu kaisen art style
-
-4. Keep output order consistent:
-   [character count and gender], [each character in parentheses], [shared actions/interactions], [background/environment/lighting], [quality and art style]
-
-5. Remove any dialogue, quotes, or spoken text.
-6. Remove duplicates; only include each visual descriptor once.
-7. Never output empty commas or double commas (", ,").
-8. Do not include character names or proper nouns.
-9. Keep everything under 77 tokens total.
+Output only the compressed scene, no explanations.
 `;
+
+  // If caller allows parentheses (for multi-character scenes), relax rule
+  if (options?.allowParentheses) {
+    systemInstruction += `
+IMPORTANT: For multi-character scenes the output MAY include parenthetical character blocks in this exact format:
+(1girl: traits...), (1boy: traits...), etc.
+Keep parentheses, colons and inner commas ONLY for character descriptions. Otherwise produce comma-separated tags.
+Do NOT output full sentences or explanatory text.
+`;
+  } else {
+    systemInstruction += `
+Formatting and Structure Rules:
+1. Output pure comma-separated tags, no full sentences, no explanations, no line breaks.
+2. Start with character count or character tag (1girl, 1boy) if present, and then tags.
+3. Remove dialogue and quoted text, dedupe descriptors, keep under token budget.
+`;
+  }
 
   // Append explicit budget instruction if provided
   if (options?.maxWords !== undefined || options?.maxCommas !== undefined) {
@@ -259,13 +255,13 @@ Formatting and Structure Rules:
 
   const chatCompletion = await client.chatCompletion({
     provider: "auto",
-    model: this.COMPRESS_MODEL, // use your text/compression model
+    model: this.COMPRESS_MODEL,
     messages: [
       { role: "system", content: systemInstruction },
       { role: "user", content: `Prompt:\n${prompt}` }
     ],
     max_tokens: 120,
-    temperature: 0.6,
+    temperature: 0.35,
     top_p: 0.9,
   });
 
@@ -514,6 +510,29 @@ finalStylePromptTag = finalStylePromptTag ? finalStylePromptTag.trim() : "";
 // Build charactersText deterministically
 const { wordBudget, commaBudget } = calculateBudget(`${artStyleTag}${finalStylePromptTag ? ", " + finalStylePromptTag : ""}`);
 
+// Heuristic: if no characters were supplied but scene reads like "Name and Name are ...", create them.
+// Put this BEFORE the existing block that builds charactersText.
+if ((!Array.isArray((payload as any).characters) || (payload as any).characters.length === 0) && cleanedScene) {
+  // match "Name and Name" (capitalized single-word names)
+  const twoNamesMatch = cleanedScene.match(/\b([A-Z][a-z]+)\s+(?:and|&)\s+([A-Z][a-z]+)\b/);
+  if (twoNamesMatch) {
+    // set payload.characters so the later block uses it
+    (payload as any).characters = [
+      { gender: "1girl", description: twoNamesMatch[1] },
+      { gender: "1boy",  description: twoNamesMatch[2] }
+    ];
+  } else {
+    // try "Name, Name and Name" (pick first two names)
+    const nameList = cleanedScene.match(/\b([A-Z][a-z]+)\b/g);
+    if (nameList && nameList.length >= 2) {
+      (payload as any).characters = [
+        { gender: "1girl", description: nameList[0] },
+        { gender: "1boy",  description: nameList[1] }
+      ];
+    }
+  }
+}
+
 // --- Build character data ---
 let charactersText = "";
 if (Array.isArray(payload.characters) && payload.characters.length > 0) {
@@ -558,17 +577,34 @@ Scene: ${cleanedScene}
 // --- compress ---
 const compressedScene = await this.compressPrompt(compressionInput, {
   maxWords: wordBudget,
-  maxCommas: commaBudget
+  maxCommas: commaBudget,
+  allowParentheses: Array.isArray(payload.characters) && payload.characters.length > 1
 });
+
+let finalCompressed = compressedScene || "";
+console.log("compressionInput:", compressionInput);
+console.log("compressedScene (raw):", compressedScene);
+console.log("finalCompressed (after fallback):", finalCompressed);
+
+// If we expected multiple characters but compressor didn't return any parenthetical blocks,
+// construct them deterministically from payload.characters.
+if (Array.isArray(payload.characters) && payload.characters.length > 1 && !/\([^)]+:\s*[^)]+\)/.test(finalCompressed)) {
+  const charParts = payload.characters.map((c: any) => {
+    // Use provided description if present, otherwise leave short placeholder like "unspecified appearance"
+    const desc = (typeof c === "string" ? c : (c.description || "")).trim() || "unspecified appearance";
+    const genderTag = (c.gender || "1girl").toString().toLowerCase();
+    return `(${genderTag}: ${desc})`;
+  });
+  // Prepend explicit count label and the constructed character blocks, then append original compressed scene.
+  finalCompressed = `${payload.characters.length} characters, ${charParts.join(", ")}` + (finalCompressed ? `, ${finalCompressed}` : "");
+}
 
 // --- assemble prompt correctly ---
 let assembledParts: string[];
 if (Array.isArray(payload.characters) && payload.characters.length > 1) {
-  // multi-character: compressor already handled characters
-  assembledParts = [artStyleTag, compressedScene, finalStylePromptTag];
+  assembledParts = [artStyleTag, finalCompressed, finalStylePromptTag];
 } else {
-  // single-character: compressor handled only the scene
-  assembledParts = [artStyleTag, charactersText, compressedScene, finalStylePromptTag];
+  assembledParts = [artStyleTag, charactersText, finalCompressed, finalStylePromptTag];
 }
 
 const finalPromptRaw = assembledParts.filter(Boolean).map(s => s.trim()).join(", ");
