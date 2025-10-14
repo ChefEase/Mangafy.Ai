@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation"; // App Router versions
+import { useRouter, useSearchParams } from "next/navigation";
+import '../success/successClient.css';
 
 export default function SuccessClient() {
   const router = useRouter();
@@ -12,7 +13,6 @@ export default function SuccessClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  // Fetch session details
   useEffect(() => {
     async function fetchSessionDetails() {
       if (!sessionId) return;
@@ -37,7 +37,7 @@ export default function SuccessClient() {
     fetchSessionDetails();
   }, [sessionId]);
 
-  // Redirect after 15 seconds
+  // Redirect after 5 seconds
   useEffect(() => {
     if (!loading) {
       const timer = setTimeout(() => {
@@ -48,26 +48,49 @@ export default function SuccessClient() {
     }
   }, [loading, router]);
 
-  // UI
-  if (loading)
-    return <p className="text-center p-6">Verifying your purchase...</p>;
-
-  if (error)
+  // === Loading State ===
+  if (loading) {
     return (
-      <p className="text-center text-red-500 p-6">
-        Something went wrong. Please contact support.
-      </p>
+      <div className="verification-container">
+        <div className="spinner"></div>
+        <p className="verifying-text">Verifying your purchase...</p>
+      </div>
     );
+  }
 
+  // === Error State ===
+  if (error) {
+    return (
+      <div className="verification-container">
+        <p className="error-text">
+          ❌ Something went wrong. Please contact support.
+        </p>
+      </div>
+    );
+  }
+
+  // === Success State ===
   return (
-    <div className="success-page text-center p-6">
-      <h1 className="text-3xl font-bold mb-2">🎉 Payment Successful!</h1>
-      <p className="text-lg mb-4">
-        Thank you for your purchase. You've received{" "}
-        <span className="font-semibold">{credits}</span> new credits.
+    <div className="verification-container">
+      <div className="success-check">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={3}
+          stroke="white"
+          className="checkmark"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+      <h1 className="success-title">🎉 Payment Successful!</h1>
+      <p className="success-text">
+        Thank you for your purchase. You’ve received{" "}
+        <span className="font-semibold text-green-600">{credits}</span> new credits.
       </p>
-      <p className="text-sm text-gray-600">
-        If credits haven't updated yet, they will appear shortly.
+      <p className="subtext">
+        If credits haven’t updated yet, they will appear shortly.
       </p>
     </div>
   );

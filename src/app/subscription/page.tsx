@@ -115,7 +115,7 @@ export default function SubscriptionPage() {
     },
     {
       type: "Ultimate Creator (Yearly)",
-      price: "$239.99/year",
+      price: "$239.99",
       priceId: "price_1RnVCJCfqQf6EFEyvODEySQl",
       features: [
         "🔥 Early Access to New Features",
