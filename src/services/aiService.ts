@@ -556,7 +556,7 @@ if (Array.isArray(payload.characters) && payload.characters.length > 1) {
     const d = (typeof c === "string" ? c : c.description || "").trim();
     return `(${g}: ${d})`;
   });
-  compressionInput = `${payload.characters.length} characters, ${charParts.join(", ")}, ${cleanedScene}`;
+  compressionInput = `${payload.characters.length} characters described below:\n${charParts.join("\n")}\nScene: ${cleanedScene}`;
 }
 
 const compressedScene = await this.compressPrompt(compressionInput, {
@@ -565,10 +565,18 @@ const compressedScene = await this.compressPrompt(compressionInput, {
 });
 
 
-const assembledParts = [artStyleTag, charactersText, compressedScene, finalStylePromptTag]
-  .filter(Boolean)
-  .map(p => p.trim());
-const finalPromptRaw = assembledParts.join(", "); // no empty segments
+// 🧠 Choose what to use based on how many characters exist
+let assembledParts: string[];
+
+if (Array.isArray(payload.characters) && payload.characters.length > 1) {
+  // Multiple characters: the compressor already includes them in parentheses — don't add charactersText again
+  assembledParts = [artStyleTag, compressedScene, finalStylePromptTag];
+} else {
+  // Single character: add them explicitly (compressor doesn’t build parentheses here)
+  assembledParts = [artStyleTag, charactersText, compressedScene, finalStylePromptTag];
+}
+
+const finalPromptRaw = assembledParts.filter(Boolean).map(p => p.trim()).join(", ");
 
 
 // Final cleanup & enforce ordering: ensure art style at start and final style tags at end
