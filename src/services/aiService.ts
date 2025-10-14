@@ -458,16 +458,16 @@ async generatePanel(payload: {
     // Prompt generation logic preserved
     const rawScene = payload.scene;
 const sanitizedScene = sanitizeScenePrompt(rawScene);
+const cleanedScene = sanitizedScene.replace(/\(Camera:.*?\)/gi, '').trim();
 
-    const cleanedScene = sanitizedScene.replace(/\(Camera:.*?\)/gi, '').trim();
-    const negativePrompt = `${styleConfig.negative_prompt}, ${colorConfig.negative_prompt}`;
-    const styleSelector = GRADIO_TO_REPLICATE_STYLE[payload.gradioStyle] ?? "Anime";
-    const artStyleTag = styleConfig.prompt.trim(); // this must come FIRST
-    const stylePromptTag = payload.customStyle 
-    ? payload.customStyle.trim() 
-    : (this.ART_STYLES[payload.style]?.prompt ?? "").trim();
+// --- base setup ---
+const negativePrompt = `${styleConfig.negative_prompt}, ${colorConfig.negative_prompt}`;
+const styleSelector = GRADIO_TO_REPLICATE_STYLE[payload.gradioStyle] ?? "Anime";
+const artStyleTag = styleConfig.prompt.trim();
+let finalStylePromptTag = payload.customStyle
+  ? payload.customStyle.trim()
+  : (this.ART_STYLES[payload.style]?.prompt ?? "").trim();
   
-    let finalStylePromptTag = stylePromptTag;
 // ✅ If Mangafy + one-piece style → append extra description
 if (payload.isMangafy && payload.style === "one-piece") {
   finalStylePromptTag +=
@@ -512,78 +512,68 @@ finalStylePromptTag = finalStylePromptTag ? finalStylePromptTag.trim() : "";
 // --- prepare the scene that we WILL compress ---
 // include character descriptions (if you pass them in payload.characters) so compressor can't drop them
 // Build charactersText deterministically
+const { wordBudget, commaBudget } = calculateBudget(`${artStyleTag}${finalStylePromptTag ? ", " + finalStylePromptTag : ""}`);
+
+// --- Build character data ---
 let charactersText = "";
 if (Array.isArray(payload.characters) && payload.characters.length > 0) {
   if (payload.characters.length === 1) {
     const c = payload.characters[0];
-    let desc = typeof c === 'string' ? c : (c.description ?? "");
-    // Normalize: ensure no surrounding parentheses
-    desc = desc.replace(/^\(|\)$/g, "").trim();
-    if (!/^(1boy|1girl|2boys|2girls):/i.test(desc)) {
-      const gender = (c.gender || "1girl").toString().toLowerCase();
-      desc = `${gender}: ${desc}`;
-    }
-    charactersText = desc; // single character -> no outer parentheses
+    const gender = (c.gender || "1girl").toLowerCase();
+    const desc = (typeof c === "string" ? c : c.description || "").trim();
+    charactersText = `${gender}: ${desc}`;
   } else {
-    const pieces = payload.characters.map((c: any) => {
-      let desc = typeof c === 'string' ? c : (c.description ?? "");
-      desc = desc.replace(/^\(|\)$/g, "").trim(); // strip accidental parentheses
-      if (!/^(1boy|1girl|2boys|2girls):/i.test(desc)) {
-        const gender = (c.gender || "1girl").toString().toLowerCase();
-        desc = `${gender}: ${desc}`;
-      }
-      return `(${desc})`;
-    });
-    // Use explicit count label for clarity and consistency
     const countLabel = `${payload.characters.length} characters`;
-    charactersText = `${countLabel}, ${pieces.join(", ")}`;
+    const parts = payload.characters.map((c: any) => {
+      const g = (c.gender || "1girl").toLowerCase();
+      const d = (typeof c === "string" ? c : c.description || "").trim();
+      return `(${g}: ${d})`;
+    });
+    charactersText = `${countLabel}, ${parts.join(", ")}`;
   }
 }
 
-// sanitizedScene already deduped by sanitizeScenePrompt earlier
-// compress only the scene description (not the character paragraphs)
-const sceneToCompress = cleanedScene || "";
-
-// compute budgets from art+final style text
-const { wordBudget, commaBudget } = calculateBudget(`${artStyleTag}${finalStylePromptTag ? ", " + finalStylePromptTag : ""}`);
-
+// --- prepare compressor input ---
+// For multiple characters, feed compressor *explicitly* the full formatted character block.
+// We will NOT pass "comma separated tags" instruction — instead we allow parentheses.
 let compressionInput = cleanedScene;
-
-// include structured character info in compressor input so it learns parenthetical grouping
 if (Array.isArray(payload.characters) && payload.characters.length > 1) {
-  const charParts = payload.characters.map((c: any) => {
-    const g = (c.gender || "1girl").toLowerCase();
-    const d = (typeof c === "string" ? c : c.description || "").trim();
-    return `(${g}: ${d})`;
-  });
-  compressionInput = `${payload.characters.length} characters described below:\n${charParts.join("\n")}\nScene: ${cleanedScene}`;
+  compressionInput = `
+There are ${payload.characters.length} characters in the scene.
+Describe each one using parentheses in this exact format:
+(1girl: traits...), (1boy: traits...)
+After describing them, describe their shared action and environment.
+
+Characters:
+${payload.characters.map((c: any) => {
+  const g = (c.gender || "1girl").toLowerCase();
+  const d = (typeof c === "string" ? c : c.description || "").trim();
+  return `- ${g}: ${d}`;
+}).join("\n")}
+
+Scene: ${cleanedScene}
+`;
 }
 
+// --- compress ---
 const compressedScene = await this.compressPrompt(compressionInput, {
   maxWords: wordBudget,
   maxCommas: commaBudget
 });
 
-
-// 🧠 Choose what to use based on how many characters exist
+// --- assemble prompt correctly ---
 let assembledParts: string[];
-
 if (Array.isArray(payload.characters) && payload.characters.length > 1) {
-  // Multiple characters: the compressor already includes them in parentheses — don't add charactersText again
+  // multi-character: compressor already handled characters
   assembledParts = [artStyleTag, compressedScene, finalStylePromptTag];
 } else {
-  // Single character: add them explicitly (compressor doesn’t build parentheses here)
+  // single-character: compressor handled only the scene
   assembledParts = [artStyleTag, charactersText, compressedScene, finalStylePromptTag];
 }
 
-const finalPromptRaw = assembledParts.filter(Boolean).map(p => p.trim()).join(", ");
-
-
-// Final cleanup & enforce ordering: ensure art style at start and final style tags at end
+const finalPromptRaw = assembledParts.filter(Boolean).map(s => s.trim()).join(", ");
 const finalPrompt = enforceNoDialogueAndStyle(finalPromptRaw, artStyleTag, finalStylePromptTag);
-
-    let shortenedPrompt = finalPrompt.trim();
-
+let shortenedPrompt = finalPrompt.trim();
     // -------------------- Mangafy: second-pass compression (replace existing block) --------------------
 if (payload.isMangafy) {
   // Count current words/commas
@@ -607,8 +597,10 @@ if (payload.isMangafy) {
 
     // If middle is empty (unexpected), fallback to the earlier compressedScene
     if (!middle) {
-      middle = compressedScene || cleanedScene || sceneToCompress || "";
+      // fallback to whichever scene text exists
+      middle = compressedScene || cleanedScene || payload.scene || "";
     }
+    
 
     // compute budgets so final overall words/comma <= 50/20
     const styleCounts = countWordsAndCommas(`${artStyleTag}${finalStylePromptTag ? ", " + finalStylePromptTag : ""}`);
