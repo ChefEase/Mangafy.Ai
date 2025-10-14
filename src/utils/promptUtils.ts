@@ -80,7 +80,11 @@ export function enforceNoDialogueAndStyle(
 
   // === Step C: restore parentheses blocks back in place ===
   cleaned = cleaned.replace(/__PAREN_(\d+)__/g, (_, idx) => parenBlocks[Number(idx)] || "");
-
+  if (/^\d+\s*characters/i.test(cleaned) && !/\(1boy:|\(1girl:/i.test(cleaned)) {
+    // ensure the multi-character parentheses survived; if not, wrap heuristically
+    cleaned = cleaned.replace(/(1boy|1girl|2boys|2girls)/gi, "($1:");
+    cleaned = cleaned.replace(/, (\(1boy:|\(1girl:)/gi, ", $1");
+  }
   // === Step D: Re-assemble: artStyle first, then cleaned middle, then final style tags last ===
   const parts: string[] = [];
   if (artStyleMustStart && artStyleMustStart.trim()) {

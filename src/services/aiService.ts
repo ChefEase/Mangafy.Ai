@@ -547,8 +547,22 @@ const sceneToCompress = cleanedScene || "";
 // compute budgets from art+final style text
 const { wordBudget, commaBudget } = calculateBudget(`${artStyleTag}${finalStylePromptTag ? ", " + finalStylePromptTag : ""}`);
 
-// Now compress ONLY the scene (sceneToCompress) with budgets so characters are preserved
-const compressedScene = await this.compressPrompt(cleanedScene, { maxWords: wordBudget, maxCommas: commaBudget });
+let compressionInput = cleanedScene;
+
+// include structured character info in compressor input so it learns parenthetical grouping
+if (Array.isArray(payload.characters) && payload.characters.length > 1) {
+  const charParts = payload.characters.map((c: any) => {
+    const g = (c.gender || "1girl").toLowerCase();
+    const d = (typeof c === "string" ? c : c.description || "").trim();
+    return `(${g}: ${d})`;
+  });
+  compressionInput = `${payload.characters.length} characters, ${charParts.join(", ")}, ${cleanedScene}`;
+}
+
+const compressedScene = await this.compressPrompt(compressionInput, {
+  maxWords: wordBudget,
+  maxCommas: commaBudget
+});
 
 
 const assembledParts = [artStyleTag, charactersText, compressedScene, finalStylePromptTag]
