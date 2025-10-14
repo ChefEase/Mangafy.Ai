@@ -877,6 +877,99 @@
     top: -18px;
     left: 6px;
   }
+
+  .snapshotButton {
+    position: absolute;
+    top: 200px;
+    left: 310px;
+    width: 56px;
+    height: 56px;
+    font-size: 1.4rem;
+    border-radius: 50%;
+    box-shadow: 0 6px 18px rgba(255, 204, 51, 0.45);
+    z-index: 2000; /* keep above other UI */
+    bottom: env(safe-area-inset-bottom, 16px); /* safe area for iPhone notch */
+    right: env(safe-area-inset-right, 16px);
+    transform: none; /* avoid hover-scale surprises on mobile */
+  }
+
+  .snapshotButton:hover {
+    transform: none;
+    box-shadow: 0 8px 20px rgba(255, 220, 80, 0.65);
+  }
+
+  /* Modal overlay - full-screen center */
+  .snapshotModal {
+    align-items: center; /* stack modal closer to bottom on phones */
+    padding: 16px;
+  }
+
+  /* Modal inner container (target existing selector .snapshotModal > div) */
+  .snapshotModal > div {
+    width: 100%;
+    max-width: 480px;
+    background: rgba(10, 10, 10, 0.9);
+    border-radius: 12px;
+    padding: 18px;
+    box-sizing: border-box;
+    margin: 0 auto;
+    transform: translateY(0);
+  }
+
+  /* Readability / spacing */
+  .snapshotModal p {
+    color: #fff;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    position: static;
+    right: auto;
+  }
+
+  /* Make inputs easy to tap */
+  .snapshotModal input {
+    width: 100%;        /* full width on mobile */
+    max-width: 100%;
+    padding: 12px 10px;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #555;
+    margin-bottom: 12px;
+    position: static;
+    right: auto;
+  }
+
+  .snapshotModal input:focus {
+    outline: none;
+    border-color: #ffcc33;
+    box-shadow: 0 0 8px rgba(255, 220, 80, 0.6);
+  }
+
+  /* Buttons stack vertically and expand to full width */
+  .snapshotModal .modalActions {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .snapshotModal button {
+    width: 100%;
+    padding: 12px;
+    margin: 0;
+    position: static;
+    right: auto;
+    border-radius: 10px;
+    font-size: 1rem;
+  }
+
+  .snapshotModal button:hover {
+    transform: none;
+  }
+
+  /* Slightly reduce heavy shadows for phones */
+  .snapshotModal button {
+    box-shadow: none;
+  }
+
 }
 
 /* =========================================
@@ -1031,6 +1124,44 @@
     }
   }
   
+  @media (width: 412px) and (height: 914px) {
+
+    .snapshotButton {
+      position: absolute;
+      top: 200px;
+      left: 330px;
+      width: 56px;
+      height: 56px;
+      font-size: 1.4rem;
+      border-radius: 50%;
+      box-shadow: 0 6px 18px rgba(255, 204, 51, 0.45);
+      z-index: 2000; /* keep above other UI */
+      bottom: env(safe-area-inset-bottom, 16px); /* safe area for iPhone notch */
+      right: env(safe-area-inset-right, 16px);
+      transform: none; /* avoid hover-scale surprises on mobile */
+    }
+  
+  }
+
+  @media (width: 430px) and (height: 932px) {
+
+    .snapshotButton {
+      position: absolute;
+      top: 200px;
+      left: 350px;
+      width: 56px;
+      height: 56px;
+      font-size: 1.4rem;
+      border-radius: 50%;
+      box-shadow: 0 6px 18px rgba(255, 204, 51, 0.45);
+      z-index: 2000; /* keep above other UI */
+      bottom: env(safe-area-inset-bottom, 16px); /* safe area for iPhone notch */
+      right: env(safe-area-inset-right, 16px);
+      transform: none; /* avoid hover-scale surprises on mobile */
+    }
+  
+  }
+
   @media (width: 540px) and (height: 720px) {
 
     /* --- Panels and Preview Section --- */
@@ -1120,10 +1251,40 @@
       max-width: 340px !important;
       margin-top: 32px;
     }
+
+    .snapshotButton {
+      position: absolute;
+      top: 200px;
+      left: 40px;
+      width: 56px;
+      height: 56px;
+      font-size: 1.4rem;
+      border-radius: 50%;
+      box-shadow: 0 6px 18px rgba(255, 204, 51, 0.45);
+      z-index: 2000; /* keep above other UI */
+      bottom: env(safe-area-inset-bottom, 16px); /* safe area for iPhone notch */
+      right: env(safe-area-inset-right, 16px);
+      transform: none; /* avoid hover-scale surprises on mobile */
+    }
   }
   
   @media (width: 344px) and (height: 882px) {  
     /* --- Download Button --- */
+    .snapshotButton {
+      position: absolute;
+      top: 200px;
+      left: 20px;
+      width: 56px;
+      height: 56px;
+      font-size: 1.4rem;
+      border-radius: 50%;
+      box-shadow: 0 6px 18px rgba(255, 204, 51, 0.45);
+      z-index: 2000; /* keep above other UI */
+      bottom: env(safe-area-inset-bottom, 16px); /* safe area for iPhone notch */
+      right: env(safe-area-inset-right, 16px);
+      transform: none; /* avoid hover-scale surprises on mobile */
+    }
+
     .downloadButtonAbsolute {
       position: absolute;
       top: calc(-1525 / 844 * 100vh); /* was 290px */
@@ -1205,6 +1366,22 @@
         width: 40% !important;
         max-width: 420px !important;
       }
+
+      .snapshotButton {
+        position: absolute;
+        top: 200px;
+        left: 350px;
+        width: 56px;
+        height: 56px;
+        font-size: 1.4rem;
+        border-radius: 50%;
+        box-shadow: 0 6px 18px rgba(255, 204, 51, 0.45);
+        z-index: 2000; /* keep above other UI */
+        bottom: env(safe-area-inset-bottom, 16px); /* safe area for iPhone notch */
+        right: env(safe-area-inset-right, 16px);
+        transform: none; /* avoid hover-scale surprises on mobile */
+      }
+    
     }
       
     @media (width: 820px) and (height: 1180px) {
@@ -1311,6 +1488,21 @@
         margin: 20px auto !important;
         width: 40% !important;
         max-width: 420px !important;
+      }
+
+      .snapshotButton {
+        position: absolute;
+        top: 200px;
+        left: 380px;
+        width: 56px;
+        height: 56px;
+        font-size: 1.4rem;
+        border-radius: 50%;
+        box-shadow: 0 6px 18px rgba(255, 204, 51, 0.45);
+        z-index: 2000; /* keep above other UI */
+        bottom: env(safe-area-inset-bottom, 16px); /* safe area for iPhone notch */
+        right: env(safe-area-inset-right, 16px);
+        transform: none; /* avoid hover-scale surprises on mobile */
       }
     }
 
@@ -1487,6 +1679,21 @@
         width: 40% !important;
         max-width: 420px !important;
       }
+
+      .snapshotButton {
+        position: absolute;
+        top: 200px;
+        left: 375px;
+        width: 56px;
+        height: 56px;
+        font-size: 1.4rem;
+        border-radius: 50%;
+        box-shadow: 0 6px 18px rgba(255, 204, 51, 0.45);
+        z-index: 2000; /* keep above other UI */
+        bottom: env(safe-area-inset-bottom, 16px); /* safe area for iPhone notch */
+        right: env(safe-area-inset-right, 16px);
+        transform: none; /* avoid hover-scale surprises on mobile */
+      }
     }
 
     @media (width: 912px) and (height: 1368px) {
@@ -1504,13 +1711,41 @@
       /* --- Download Button --- */
       .downloadButtonAbsolute {
         position: relative !important;
-        top: -2325px !important;
+        top: -1930px !important;
         left: 80px !important;
         bottom: auto !important;
         transform: scale(0.8) !important;
         margin: 20px auto !important;
         width: 40% !important;
         max-width: 420px !important;
+      }
+
+      .previewGrid,
+      .panelGrid {
+        position: relative !important;
+        top: -1740px;                 /* 🔧 manual downward offset */
+        margin: 40px auto 0 auto;  /* center and push down a bit */
+        width: 100%;
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+    
+      .snapshotButton {
+        position: absolute;
+        top: 200px;
+        left: 110px;
+        width: 56px;
+        height: 56px;
+        font-size: 1.4rem;
+        border-radius: 50%;
+        box-shadow: 0 6px 18px rgba(255, 204, 51, 0.45);
+        z-index: 2000; /* keep above other UI */
+        bottom: env(safe-area-inset-bottom, 16px); /* safe area for iPhone notch */
+        right: env(safe-area-inset-right, 16px);
+        transform: none; /* avoid hover-scale surprises on mobile */
       }
     }
 
@@ -1617,6 +1852,21 @@
         margin: 20px auto !important;
         width: 40% !important;
         max-width: 420px !important;
+      }
+
+      .snapshotButton {
+        position: absolute;
+        top: 200px;
+        left: 480px;
+        width: 56px;
+        height: 56px;
+        font-size: 1.4rem;
+        border-radius: 50%;
+        box-shadow: 0 6px 18px rgba(255, 204, 51, 0.45);
+        z-index: 2000; /* keep above other UI */
+        bottom: env(safe-area-inset-bottom, 16px); /* safe area for iPhone notch */
+        right: env(safe-area-inset-right, 16px);
+        transform: none; /* avoid hover-scale surprises on mobile */
       }
     }
 
@@ -1727,6 +1977,22 @@
         top: -18px;
         left: 6px;
       }
+
+      .snapshotButton {
+        position: absolute;
+        top: 200px;
+        left: 250px;
+        width: 56px;
+        height: 56px;
+        font-size: 1.4rem;
+        border-radius: 50%;
+        box-shadow: 0 6px 18px rgba(255, 204, 51, 0.45);
+        z-index: 2000; /* keep above other UI */
+        bottom: env(safe-area-inset-bottom, 16px); /* safe area for iPhone notch */
+        right: env(safe-area-inset-right, 16px);
+        transform: none; /* avoid hover-scale surprises on mobile */
+      }
+    
     }
     
     
