@@ -137,7 +137,7 @@ export class AIService {
   // Art style configurations without model references
   private readonly ART_STYLES = {
     default: {
-      prompt: "black and white manga, screentone shading, hand-drawn ink lines",
+      prompt: "hand-drawn ink lines",
       negative_prompt: "color, 3D, CGI, photorealistic, painterly, soft gradients, western comic style, deformed hands, deformed body parts, nsfw, lowres, (bad), text, error, fewer, extra, missing, worst quality, jpeg artifacts, low quality, watermark, unfinished, displeasing, oldest, early, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract]"
     },
   
@@ -585,6 +585,17 @@ let finalCompressed = compressedScene || "";
 console.log("compressionInput:", compressionInput);
 console.log("compressedScene (raw):", compressedScene);
 console.log("finalCompressed (after fallback):", finalCompressed);
+
+// --- ensure explicit count label for multi-character scenes ---
+// If we have multiple characters, always prepend "N characters" if it's not already present.
+// This covers the case where the compressor returned parenthetical blocks but omitted the count label.
+if (Array.isArray(payload.characters) && payload.characters.length > 1) {
+  if (!/^\s*\d+\s*characters\b/i.test(finalCompressed)) {
+    // Avoid adding a trailing comma duplication when finalCompressed is empty
+    finalCompressed = `${payload.characters.length} characters` + (finalCompressed ? `, ${finalCompressed}` : "");
+    finalCompressed = finalCompressed.trim();
+  }
+}
 
 // If we expected multiple characters but compressor didn't return any parenthetical blocks,
 // construct them deterministically from payload.characters.

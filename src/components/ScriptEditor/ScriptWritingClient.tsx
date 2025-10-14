@@ -522,6 +522,9 @@ const originalImageRef = useRef<HTMLImageElement | null>(null);
 const [snapshotName, setSnapshotName] = useState("");
 const [showNamePrompt, setShowNamePrompt] = useState(false);
 const [showConfirm, setShowConfirm] = useState(false);
+// near your other useState declarations
+const [zoomedId, setZoomedId] = useState<string | null>(null);
+
 
 let touchTimer: NodeJS.Timeout | null = null;
 let isTouchDragging = false;
@@ -805,6 +808,17 @@ let initialContent = "";
         router.replace("/script-writing");
       }
     }, [searchParams, router]);
+    
+    async function deleteImageBlobFromDB(id: string) {
+      const db = await openImageDB();
+      return new Promise<void>((resolve, reject) => {
+        const tx = db.transaction("images", "readwrite");
+        const store = tx.objectStore("images");
+        const req = store.delete(id);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
     
     // 1) helper to create a simple placeholder svg image as dataURL
 function createPlaceholderDataUrl(w: number, h: number, label = "") {
@@ -2017,12 +2031,13 @@ return (
           <div className={styles.galleryThumbPlaceholder}>No Thumb</div>
         )}
         <button onClick={async () => {
-          // when clicked, get full blob from IndexedDB, create object URL and show (zoom)
-          const blob = await getImageBlobFromDB(entry.id);
-          if (!blob) { alert("Failed to load full image."); return; }
-          const url = URL.createObjectURL(blob);
-          setZoomedPage(url);
-        }}>Open</button>
+  const blob = await getImageBlobFromDB(entry.id);
+  if (!blob) { alert("Failed to load full image."); return; }
+  const url = URL.createObjectURL(blob);
+  setZoomedPage(url);
+  setZoomedId(entry.id);   // << store the id so delete can find it
+}}>Open</button>
+
       </div>
     );
   })}
@@ -2034,18 +2049,54 @@ return (
       <img src={zoomedPage} alt="Zoomed Manga Page" className={styles.zoomedImage} />
       {/* ✅ Add delete button below-left of the zoomed image */}
       <div className={styles.zoomActions}>
-        <button
-          className={styles.deleteZoomBtn}
-          onClick={() => {
-            const confirmDelete = window.confirm("Delete this page?");
-            if (!confirmDelete) return;
-            // Remove from gallery & IndexedDB
-            setGallery(prev => prev.filter(g => !g.includes(zoomedPage)));
-            closeZoom();
-          }}
-        >
-          🗑️ Delete
-        </button>
+      <button
+  className={styles.deleteZoomBtn}
+  onClick={async () => {
+    const confirmDelete = window.confirm("Delete this page?");
+    if (!confirmDelete) return;
+    if (!zoomedId) {
+      // defensive: no id available, try best-effort removal by thumbnail match
+      console.warn("No zoomedId available; deletion aborted.");
+      closeZoom();
+      return;
+    }
+
+    try {
+      // 1) remove blob from IndexedDB
+      await deleteImageBlobFromDB(zoomedId);
+
+      // 2) remove from UI gallery state (gallery stores JSON-stringified metadata)
+      setGallery(prev => prev.filter(itemStr => {
+        try {
+          const item = typeof itemStr === 'string' ? JSON.parse(itemStr) : itemStr;
+          return item.id !== zoomedId;
+        } catch (e) {
+          return true; // keep malformed entries
+        }
+      }));
+
+      // 3) remove from localStorage 'gallery_meta' as well
+      try {
+        const meta = JSON.parse(localStorage.getItem('gallery_meta') || '[]');
+        const filtered = (Array.isArray(meta) ? meta : []).filter((m: any) => m.id !== zoomedId);
+        localStorage.setItem('gallery_meta', JSON.stringify(filtered));
+      } catch (err) {
+        console.warn("Failed to update gallery_meta in localStorage:", err);
+      }
+
+      // 4) revoke url and close zoom
+      if (zoomedPage && zoomedPage.startsWith('blob:')) URL.revokeObjectURL(zoomedPage);
+      setZoomedPage(null);
+      setZoomedId(null);
+    } catch (err) {
+      console.error("Failed to delete image:", err);
+      alert("Failed to delete image. Check console for details.");
+    }
+  }}
+>
+  🗑️ Delete
+</button>
+
         <button className={styles.closeZoomBtn} onClick={closeZoom}>Close</button>
       </div>
     </div>
