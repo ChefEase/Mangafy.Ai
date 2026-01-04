@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { aiService, ArtStyle } from '../../services/aiService';
-import {getOrUpdateSeed} from '../../components/ScriptEditor/ScriptWritingClient'; // ✅ fixed import
+import { getOrUpdateSeed } from "@/utils/seeds";
 
 type GradioStyle = "(None)" | "Cinematic" | "Photographic" | "Anime" | "Manga" | "Digital Art" | "Pixel art" | "Fantasy art" | "Neonpunk" | "3D Model";
 type ColorOption = "colored" | "black_white";

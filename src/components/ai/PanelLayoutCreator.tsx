@@ -1,7 +1,8 @@
 'use client';
 import React, { useState } from 'react';
 import { aiService } from '@/services/aiService';
-import {getOrUpdateSeed} from '../../components/ScriptEditor/ScriptWritingClient'; // ✅ fixed import
+import { getOrUpdateSeed } from "@/utils/seeds";
+
 interface Character {
   id: string;
   name: string;

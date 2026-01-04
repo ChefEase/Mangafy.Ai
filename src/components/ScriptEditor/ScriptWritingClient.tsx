@@ -21,6 +21,7 @@ import MobileNav from "../../components/ScriptEditor/MobileNav"
 import '../../app/script-writing/styles/global.css';
 import { v4 as uuidv4 } from "uuid";
 import { saveSnapshotToDB, initDB } from '../../utils/db';
+import { getOrUpdateSeed } from "../../utils/seeds";
 
   interface PanelData {
     url: string;
@@ -1107,30 +1108,6 @@ try {
   
 function floorToMultipleOf8(n: number): number {
   return Math.floor(n / 8) * 8;
-}
-
-function getOrUpdateSeed(currentScript: string): number {
-  const storedScript = localStorage.getItem("lastScript");
-  const storedSeed = localStorage.getItem("lastSeed");
-
-  let seed: number;
-
-  if (storedScript && storedScript === currentScript && storedSeed) {
-    // Same script → regenerate with a NEW seed
-    seed = Math.floor(Math.random() * 10_000_000);
-    localStorage.setItem("lastSeed", seed.toString());
-  } else {
-    // New script → reuse existing seed if available, else make one
-    if (storedSeed) {
-      seed = parseInt(storedSeed, 10);
-    } else {
-      seed = Math.floor(Math.random() * 10_000_000);
-      localStorage.setItem("lastSeed", seed.toString());
-    }
-    localStorage.setItem("lastScript", currentScript);
-  }
-
-  return seed;
 }
 
   const cost = getCostForPanelType(selectedPanelType);
