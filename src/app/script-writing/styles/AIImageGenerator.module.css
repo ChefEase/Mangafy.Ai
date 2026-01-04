@@ -2023,14 +2023,5 @@
   position: relative; /* already relative, keep it */
 }
 
-/* Mode switch should stay on top and never be covered */
-.tab-header {
-  position: sticky;
-  top: 530px;
-  z-index: 1000;
-  margin-top: 12px;
-}
-
-/* The content below tabs must be in normal document flow */
 
     
