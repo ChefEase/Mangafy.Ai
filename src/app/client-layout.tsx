@@ -17,7 +17,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     }
   }, []);
 
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
   const hideFooterRoutes = ["/script-writing"];
   const shouldHideFooter = hideFooterRoutes.includes(pathname);
 
