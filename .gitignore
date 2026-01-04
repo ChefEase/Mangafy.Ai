@@ -2,3 +2,6 @@ node_modules/
 .next/
 my-desktop-app/
 my-mobile-app/
+# build artifacts
+/dist/
+/public/features/
