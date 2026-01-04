@@ -315,7 +315,7 @@ export default function LandingPage() {
               with our desktop app.
             </p>
             <div className={styles.downloadButtons}>
-              <a href="/downloads/Mangafy.Ai Setup 1.0.0.exe" className={styles.downloadButtonWindows}>
+              <a href="/dist/Mangafy.Ai Setup 0.1.0.exe" className={styles.downloadButtonWindows}>
                 <img src="/icons/windows3.svg" alt="Windows" /> Download for Windows
               </a>
             </div>

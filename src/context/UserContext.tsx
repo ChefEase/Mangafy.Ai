@@ -1,5 +1,5 @@
 // context/UserContext.jsx
-"use client"
+"use client";
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import  supabase  from '@/utils/supabaseClient';
 
@@ -52,9 +52,19 @@ export function UserProvider({ children }: UserProviderProps) {
 }
 
 export function useUser() {
-  const context = useContext(UserContext);
-  if (!context) {
-    throw new Error("useUser must be used within a UserProvider");
+  // Avoid useContext() errors during SSR or missing providers
+  try {
+    const context = useContext(UserContext);
+    if (!context) {
+      if (typeof window === "undefined") {
+        // Return harmless fallback during SSR
+        return { user: null, setUser: () => {} };
+      }
+      throw new Error("useUser must be used within a UserProvider");
+    }
+    return context;
+  } catch {
+    // Fallback if React context internals aren't available (rare)
+    return { user: null, setUser: () => {} };
   }
-  return context;
 }

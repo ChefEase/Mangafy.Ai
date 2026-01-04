@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import supabase from "@/utils/supabaseClient";
-import "./callback/global.css";
+import "./callback/callback.css";
 import { useUser } from "@/context/UserContext";
 
 export default function AuthCallback() {

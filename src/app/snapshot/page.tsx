@@ -46,7 +46,8 @@ const SnapshotPage: React.FC = () => {
     if (!confirmDelete) return;
 
     await deleteSnapshotFromDB(id);
-    setSnapshots((prev) => prev.filter((snap) => snap.id !== id));
+    console.log("snapshots before filter:", snapshots);
+    setSnapshots((prev) => (prev || []).filter((snap) => snap.id !== id));
   };
 
   return (

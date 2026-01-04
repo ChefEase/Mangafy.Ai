@@ -32,7 +32,8 @@ export default function CharacterList({
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   // Filter and sort characters
-  const filteredCharacters = characters
+  console.log("characters before filter:", characters);
+  const filteredCharacters = (characters ?? [])
     .filter((character) => {
       const matchesSearch = character.name
         ? character.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -51,8 +52,7 @@ export default function CharacterList({
           ? a.name.localeCompare(b.name)
           : b.name.localeCompare(a.name);
       }
-    })
-
+    });
   return (
     <div className="character-list-container">
       {/* Search and Filtering Component */}

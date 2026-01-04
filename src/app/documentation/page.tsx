@@ -107,6 +107,45 @@ const DocumentationPage: React.FC = () => {
             You can search characters by <strong>name</strong>, <strong>role</strong>, or <strong>creation date</strong>, 
             and sort results ascending or descending.
           </p>
+          <p>
+          <span className="highlight">Note: </span> </p> 
+          
+          <p> Character Description (Who they are)
+Use this for permanent traits only:
+Hair (style, color),
+Eyes,
+Face features,
+Body type,
+Age / vibe,
+Scars, tattoos, glasses, etc.
+🚫 Do NOT include clothing here unless it never changes.
+Script / Story Box (What happens per panel)
+</p>
+<p>
+Use this for anything that can change panel to panel:
+Clothing,
+Accessories,
+Actions,
+Emotions,
+Environment,
+Who enters or leaves the scene
+✅ This is where outfits belong if they change.
+</p>
+<p> <span className="highlight">Example: </span></p>
+
+<p>Character Description
+Riku is a teenage boy with messy black hair, blue eyes, and a tired expression.
+Script
+In the first panel, Riku is crying at home. He is wearing a white t-shirt and blue sweatpants.
+In the second panel, his sister Hina enters the room.
+</p>
+<p> <span className="highlight">Example (when clothing is constant): </span></p>
+<p>Character Description
+Riku wears a black school uniform at all times.
+Script
+In the first panel, Riku is sitting alone in class.
+In the second panel, Hina walks up to him.
+          </p>
           <motion.div className="documentation-image-card" whileHover={{ scale: 1.03 }}>
             <img src="/screenshots/character-management (1).png" alt="Character Management" />
             <img src="/screenshots/character-management (2).png" alt="Character Management" />

@@ -1,19 +1,47 @@
 {
   "name": "Mangafy.Ai",
   "version": "0.1.0",
+  "main": "main.js",
+  "description": "Mangafy AI Desktop App",
+  "author": "Kamsy Onyia",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "vercel-build": "npm ci && npm run build",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postbuild": "next-sitemap"
+    "start:electron": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && npx electron main.js\"",
+    "postbuild": "next-sitemap",
+    "dist": "next build && electron-builder"
+  },
+  "build": {
+    "appId": "com.mangafy.ai",
+    "productName": "MangafyAI",
+    "files": [
+      "main.js",
+      "electron.js",
+      "public/**/*",
+      ".next/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "win": {
+      "icon": "Logo.ico",
+      "target": "nsis",
+      "signAndEditExecutable": false
+    }
   },
   "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/cli": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
     "@gradio/client": "^1.15.3",
     "@heroicons/react": "^2.2.0",
     "@huggingface/inference": "^3.3.5",
+    "@napi-rs/canvas": "^0.1.86",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.48.1",
     "@types/cropperjs": "^1.1.5",
@@ -23,8 +51,8 @@
     "@upstash/redis": "^1.35.1",
     "airtable": "^0.12.2",
     "axios": "^1.8.1",
+    "bufferutil": "^4.1.0",
     "build": "^0.1.4",
-    "canvas": "^3.1.0",
     "cors": "^2.8.5",
     "cropperjs": "^1.6.2",
     "dotenv": "^16.4.7",
@@ -40,15 +68,16 @@
     "lucide-react": "^0.542.0",
     "lz-string": "^1.5.0",
     "mammoth": "^1.9.0",
-    "next": "15.1.7",
+    "next": "^16.0.10",
     "next-pwa": "^5.6.0",
     "next-sitemap": "^4.2.3",
+    "openai": "^6.15.0",
     "paper": "^0.12.18",
     "paper-jsdom": "^0.12.18",
     "prop-types": "^15.8.1",
     "quill": "^2.0.3",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
     "react-konva": "^19.0.6",
     "replicate": "^1.0.1",
     "stores": "^1.0.0",
@@ -67,8 +96,12 @@
     "@types/react": "^19.1.12",
     "@types/react-dom": "^19.1.9",
     "@types/webpack": "^5.28.5",
+    "concurrently": "^9.2.1",
+    "electron": "^28.2.10",
+    "electron-builder": "^26.0.12",
     "eslint": "^9",
     "eslint-config-next": "15.1.7",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wait-on": "^9.0.3"
   }
 }

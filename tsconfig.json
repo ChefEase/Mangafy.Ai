@@ -10,19 +10,19 @@
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
-    "forceConsistentCasingInFileNames": true,
+    "forceConsistentCasingInFileNames": false,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
-    "baseUrl": ".",
+    "baseUrl": "src",
     "paths": {
       "@/*": [
-        "./src/*"
+        "*"
       ]
     },
     "plugins": [
@@ -32,11 +32,15 @@
     ]
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-, "pages/api/generate-image.js", "src/components/Auth/GoogleLoginButton.jsx", "src/app/privacy-policy/privacy-policy.jsx"  ],
+    "next-env.d.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "types/**/*.ts",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    ".next"
   ]
 }

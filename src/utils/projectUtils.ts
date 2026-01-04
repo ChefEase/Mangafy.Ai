@@ -14,8 +14,13 @@ interface Project {
   
   // ✅ Fix: Explicitly type parameters for filtering
   export const filterProjects = (projects: Project[], searchTerm: string): Project[] => {
+    console.log("projects before filter:", projects);
+    if (!projects || !Array.isArray(projects)) {
+      console.warn("filterProjects: projects is not an array, returning empty array");
+      return [];
+    }
     return projects.filter((project) =>
-      project.title.toLowerCase().includes(searchTerm.toLowerCase())
+      project?.title?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   };
   

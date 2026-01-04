@@ -38,13 +38,14 @@ export default function CharactersPage() {
         }
     
         const data = await response.json();
+        console.log("Fetched data from Airtable:", data);
         setCharacters(
-          data.records.map((record: any) => ({
+          (data.records || []).map((record: any) => ({
             id: record.id,
-            name: record.fields.name,
-            description: record.fields.description,
-            role: record.fields.role,
-            image: record.fields.image?.[0]?.url || "",
+            name: record.fields?.name || "Unnamed",
+            description: record.fields?.description || "No description",
+            role: record.fields?.role || "supporting",
+            image: record.fields?.image?.[0]?.url || "",
           }))
         );
       } catch (error) {
@@ -99,7 +100,9 @@ export default function CharactersPage() {
         },
       });
   
-      setCharacters(characters.filter((char) => char.id !== id));
+      console.log("characters before filter:", characters);
+setCharacters((characters ?? []).filter((char) => char.id !== id));
+
     } catch (error) {
       console.error("Error deleting character:", error);
     }

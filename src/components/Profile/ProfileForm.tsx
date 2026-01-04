@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect, useRef } from "react";
 import  supabase  from "@/utils/supabaseClient";
 import "./styles/ProfileForm.css";

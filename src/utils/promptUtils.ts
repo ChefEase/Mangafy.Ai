@@ -2,6 +2,7 @@
 export function countWordsAndCommas(text: string) {
   const trimmed = (text || "").trim();
   if (!trimmed) return { words: 0, commas: 0 };
+  console.log("trimmed.split words before filter:", trimmed.split(/\s+/));
   const words = trimmed.split(/\s+/).filter(Boolean).length;
   const commas = (trimmed.match(/,/g) || []).length;
   return { words, commas };

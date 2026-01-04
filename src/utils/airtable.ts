@@ -15,7 +15,8 @@ export const fetchUserData = async (userId: string) => {
     }
 
     const data = await response.json();
-    if (data.records.length > 0) {
+    console.log("Fetched user data from Airtable:", data);
+    if (data.records && data.records.length > 0) {
       const userData = data.records[0].fields;
       return {
         characters: {
@@ -50,7 +51,8 @@ export const saveUserData = async (userId: string, data: any) => {
       }
   
       const userData = await response.json();
-      const recordId = userData.records[0]?.id;
+      console.log("Fetched user data for update:", userData);
+      const recordId = userData.records?.[0]?.id;
   
       // Merge existing characters with the new data
       const existingCharacters = userData.records[0]?.fields || {};

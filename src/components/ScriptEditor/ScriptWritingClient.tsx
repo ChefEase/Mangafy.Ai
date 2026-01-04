@@ -1,8 +1,8 @@
 'use client';
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Header from "../../app/script-writing/Header";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { autoSave, loadSavedContent } from "../../utils/autoSave";
+import { useRouter, useSearchParams } from "next/navigation";
+import { autoSave } from "../../utils/autoSave";
 import { validateScript } from "../../utils/scriptValidation";
 import ScriptEditorWrapper from "../ScriptEditorWrapper/ScriptEditorWrapper";
 import { aiService, ArtStyle } from "../../services/aiService";
@@ -12,7 +12,6 @@ import '../../app/script-writing/styles/ArtStyleDropDown.css'
 import styles from '../../app/script-writing/styles/AIImageGenerator.module.css';
 import LZString from 'lz-string'
 import { useUser } from "@/context/UserContext";
-import supabase from "@/utils/supabaseClient";
 import { useCredits } from "@/context/CreditContext";
 import { CharacterService, Character } from "@/services/CharacterService";
 import  CharactersPage  from "../../app/characters/page";
@@ -22,13 +21,6 @@ import MobileNav from "../../components/ScriptEditor/MobileNav"
 import '../../app/script-writing/styles/global.css';
 import { v4 as uuidv4 } from "uuid";
 import { saveSnapshotToDB, initDB } from '../../utils/db';
-
-interface User {
-  id: string;
-  credits: number;
-  subscription_tier: "free" | "starter" | "ultimate" | "starter_yearly" | "ultimate_yearly";
-  // add others if needed
-}
 
   interface PanelData {
     url: string;
@@ -42,10 +34,6 @@ interface User {
     onChange: (style: ArtStyle) => void;
   }
 
-  interface AIGenerateSectionProps {
-    onGenerate: (generatedScript: string) => Promise<void>;
-  }
-  
   type PanelType = 
   | 'one-portrait' 
   | 'two-vertical' 
@@ -72,6 +60,127 @@ interface User {
 
   type ColorOption = "black_white" | "colored";
 type GradioStyle = "Cinematic" | "Photographic" | "Anime" | "Manga" | "Digital Art" | "Pixel art" | "Fantasy art" | "Neonpunk" | "3D Model";
+// ================================
+// Narrative Controller (STEP 1.5)
+// ================================
+
+type PanelIntent =
+  | "establishing"
+  | "dialogue"
+  | "action"
+  | "transition"
+  | "hybrid";
+
+interface NarrativeState {
+  scriptId: string;
+  panelCount: number;
+  panelIndex: number;
+  activeCharacters: string[];
+  location: string | null;
+  mood: string | null;
+  lastPanelSummary: string | null;
+}
+
+class NarrativeController {
+  private state: NarrativeState;
+
+  constructor(scriptId: string, panelCount: number) {
+    this.state = {
+      scriptId,
+      panelCount,
+      panelIndex: 0,
+      activeCharacters: [],
+      location: null,
+      mood: null,
+      lastPanelSummary: null
+    };
+  }
+
+    /** Hard reset when starting a brand-new generation run */
+    resetForNewRun() {
+      this.state.panelIndex = 0;
+      this.state.lastPanelSummary = null;
+      this.persist();
+    }
+  
+  /** Reset controller if panel count changes */
+  resetIfNeeded(panelCount: number) {
+    if (this.state.panelCount !== panelCount) {
+      this.state.panelCount = panelCount;
+      this.state.panelIndex = 0;
+      this.state.lastPanelSummary = null;
+      this.persist();
+    }
+  }
+
+  /** Infer panel intent (HYBRID, rule-based only) */
+  inferPanelIntent(panel: {
+    scene: string;
+    dialogue?: string;
+  }): PanelIntent {
+    const dialogueLength = panel.dialogue?.length ?? 0;
+
+    if (dialogueLength > 120) return "dialogue";
+    if (/fight|run|attack|explosion|jump|punch/i.test(panel.scene)) return "action";
+    if (this.state.panelIndex === 0) return "establishing";
+
+    return "hybrid";
+  }
+
+  /** Build narrative directives (NO camera override) */
+  buildNarrativeDirectives(intent: PanelIntent): {
+    intent: PanelIntent;
+    continuity: "strict" | "loose" | "medium";
+    lockEnvironment: boolean;
+    allowPoseChange: boolean;
+    previousPanelSummary: string | null;
+  } {
+    return {
+      intent,
+      continuity:
+        intent === "dialogue"
+          ? "strict"
+          : intent === "action"
+          ? "loose"
+          : "medium",
+      lockEnvironment: intent === "dialogue",
+      allowPoseChange: intent !== "dialogue",
+      previousPanelSummary: this.state.lastPanelSummary
+    };
+  }
+
+  /** Update controller from generated image summary */
+  updateFromImageSummary(summary: string | null) {
+    if (!summary) return;
+    this.state.lastPanelSummary = summary;
+    this.state.panelIndex += 1;
+    this.persist();
+  }
+
+  /** Persist narrative memory per script */
+  persist() {
+    try {
+      localStorage.setItem(
+        `narrative_state_${this.state.scriptId}`,
+        JSON.stringify(this.state)
+      );
+    } catch (err) {
+      console.warn("Failed to persist narrative state", err);
+    }
+  }
+
+  /** Restore narrative memory (optional use later) */
+  restore() {
+    try {
+      const raw = localStorage.getItem(
+        `narrative_state_${this.state.scriptId}`
+      );
+      if (raw) this.state = JSON.parse(raw);
+    } catch (err) {
+      console.warn("Failed to restore narrative state", err);
+    }
+  }
+}
 
 const PANEL_CONFIG: Record<PanelType, PanelConfig> = {
   'one-portrait': {
@@ -483,7 +592,6 @@ layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
   export default function ScriptWritingPage() {
     const [content, setContent] = useState<string>("");
     const [errors, setErrors] = useState<string[]>([]);
-    const pathname = usePathname(); // Get the current route
 
     // Change the characters state line to:
     const [characters, setCharacters] = useState<Character[]>([]);
@@ -524,6 +632,8 @@ const [showNamePrompt, setShowNamePrompt] = useState(false);
 const [showConfirm, setShowConfirm] = useState(false);
 // near your other useState declarations
 const [zoomedId, setZoomedId] = useState<string | null>(null);
+const canTransition = panelCount > 1;
+const [transitioning, setTransitioning] = useState(true);
 
 
 let touchTimer: NodeJS.Timeout | null = null;
@@ -729,6 +839,14 @@ if (typeof window !== 'undefined') {
       return pages;
     };
 } 
+
+useEffect(() => {
+  if (!canTransition) {
+    setTransitioning(false); // 1 panel => forced off + greyed out
+  } else {
+    setTransitioning(true); // switching to 2+ panels => auto checked
+  }
+}, [canTransition]);
 
 useEffect(() => {
   function handleClickOutside(e: MouseEvent) {
@@ -987,43 +1105,6 @@ try {
       }
     };
   
-    const handleGenerateScript = async (generatedScript: string) => {
-      setContent(generatedScript); // Update the editor with the generated script
-    };
-  
-  
-    const handleResizeCharactersPage = (newWidth: number) => {
-      setCharactersPageWidth(newWidth);
-    };
-  
-    const processScriptContent = (script: string, characters: Character[]): string => {
-      // Add strict character validation
-      const missingChars = characters.filter(c => !script.includes(c.name));
-      if (missingChars.length > 0) {
-        console.warn("Characters not in script:", missingChars);
-      }
-    
-      // Enhanced replacement
-      return characters.reduce((processedScript, character) => {
-        const regex = new RegExp(`\\b${character.name}\\b`, 'gi');
-        return processedScript.replace(regex, character.description);
-      }, script.replace(/<[^>]*>?/gm, ''));
-    };
-  
-    // Add updateCreditsInBackend function
-const updateCreditsInBackend = async (newCredits: number) => {
-  if (!user?.id) return;
-  try {
-    await supabase
-      .from('users')
-      .update({ credits: newCredits })
-      .eq('id', user.id);
-    localStorage.setItem(`user-${user.id}-credits`, newCredits.toString());
-  } catch (error) {
-    console.error('Failed to update credits:', error);
-  }
-};
-
 function floorToMultipleOf8(n: number): number {
   return Math.floor(n / 8) * 8;
 }
@@ -1053,7 +1134,116 @@ function getOrUpdateSeed(currentScript: string): number {
 }
 
   const cost = getCostForPanelType(selectedPanelType);
+  function narrativeController_makeScriptIdFromText(text: string): string {
+    // simple deterministic hash (no crypto)
+    let hash = 0;
+    for (let i = 0; i < text.length; i++) {
+      hash = (hash * 31 + text.charCodeAt(i)) >>> 0;
+    }
+    return `script_${hash.toString(16)}`;
+  }
+ 
+  // NarrativeController helper: only pass characters that are mentioned in the panel text
+function narrativeControllerFilterCharactersForPanel(
+  sceneText: string,
+  allCharacters: any[]
+) {
+  const s = (sceneText || "").toLowerCase();
+  // match by character.name if present, else fallback to id or role
+  const matched = (allCharacters || []).filter((c: any) => {
+    const name = String(c?.name || "").toLowerCase().trim();
+    if (!name) return false;
+    return s.includes(name);
+  });
+
+  // fallback: if nothing matched, pass empty and let the prompt be scene-only
+  return matched;
+}
+
+function narrativeControllerApplyOutfitOverrides(
+  rawScene: string,
+  characters: any[]
+) {
+  let scene = rawScene;
+
+  const overrides: Record<string, string> = {};
+  // crude but effective: "NAME is wearing ..."
+  const re = /\b([A-Z][a-z]+)\s+is\s+wearing\s+([^.\n]+)/g;
+  let m: RegExpExecArray | null;
+
+  while ((m = re.exec(rawScene)) !== null) {
+    overrides[m[1].toLowerCase()] = m[2].trim();
+  }
+
+  const updatedChars = (characters || []).map((c: any) => {
+    const name = String(c?.name || "").trim();
+    const key = name.toLowerCase();
+    if (!overrides[key]) return c;
+
+    // append outfit to description (so it stays the same character, not a new one)
+    return {
+      ...c,
+      description: `${c.description}. Outfit override this panel: ${overrides[key]}`,
+    };
+  });
+
+  // optional: remove the outfit sentence from scene after capturing it (prevents double counting)
+  scene = scene.replace(re, "").trim();
+
+  return { scene, characters: updatedChars };
+}
+
+function narrativeControllerExtractOutfitOverrides(scene: string) {
+  const overrides: Record<string, string> = {};
+  const re = /\b([A-Z][a-z]+)\s+is\s+wearing\s+([^.\n]+)/g;
+  let m: RegExpExecArray | null;
+
+  while ((m = re.exec(scene)) !== null) {
+    overrides[m[1].toLowerCase()] = m[2].trim();
+  }
+  return overrides;
+}
+
+function narrativeControllerStripClothing(desc: string) {
+  // blunt but works: remove common clothing words + anything after them until comma/period
+  // tweak list anytime
+  const clothingWords = [
+    "suit","tie","shirt","t-shirt","tshirt","hoodie","jacket","coat","pants","trousers","jeans",
+    "skirt","dress","sweatpants","shorts","shoes","sneakers","sandals","boots","uniform"
+  ];
+
+  let out = desc;
+  for (const w of clothingWords) {
+    const r = new RegExp(`\\b${w}\\b[^,.;]*`, "gi");
+    out = out.replace(r, "");
+  }
+  return out.replace(/\s+,/g, ",").replace(/,+/g, ",").trim();
+}
+
+function narrativeControllerApplyOutfitOverridesToCharacters(
+  scene: string,
+  panelCharacters: any[]
+) {
+  const overrides = narrativeControllerExtractOutfitOverrides(scene);
+
+  const updated = (panelCharacters || []).map((c: any) => {
+    const name = String(c?.name || "").trim();
+    const key = name.toLowerCase();
+    if (!name || !overrides[key]) return c;
+
+    const stripped = narrativeControllerStripClothing(String(c.description || ""));
+    return {
+      ...c,
+      description: `${stripped}. Outfit THIS PANEL: ${overrides[key]}`,
+    };
+  });
+
+  return updated;
+}
+
     const handleGenerateManga = async () => {
+      let previousPanelSummary: string | null = null;
+
       originalImageRef.current = null;
       if (typeof window === 'undefined') return;
       const config = PANEL_CONFIG[selectedPanelType];
@@ -1082,6 +1272,12 @@ function getOrUpdateSeed(currentScript: string): number {
           alert("Your script is empty. Please write something before generating scenes.");
           return;
         }
+        const scriptId = narrativeController_makeScriptIdFromText(plainOutline);
+        const narrativeController = new NarrativeController(scriptId, panelCount);
+        narrativeController.resetIfNeeded(panelCount);
+        narrativeController.restore();
+        narrativeController.resetForNewRun();
+
         const rawPanels = await aiService.generateScenesFromOutline(plainOutline, panelCount);
         const limitedPanels = rawPanels.slice(0, MAX_PANELS);
         console.log("Limited Panels:", limitedPanels); // Debug log
@@ -1091,10 +1287,39 @@ function getOrUpdateSeed(currentScript: string): number {
         }
   
         
-      if (limitedPanels.some((panel: string | string[]) => panel.includes("undefined"))) {
-        console.warn("Undefined values detected in:", limitedPanels);
-        throw new Error("AI generated incomplete panels - try regenerating");
-      }
+      // ✅ object-safe validation
+const hasUndefined = limitedPanels.some((panel: any) => {
+  const scene = typeof panel?.scene === "string" ? panel.scene : "";
+  const camera = typeof panel?.camera === "string" ? panel.camera : "";
+  const dialogue = typeof panel?.dialogue === "string" ? panel.dialogue : "";
+
+  return (
+    scene.includes("undefined") ||
+    camera.includes("undefined") ||
+    dialogue.includes("undefined") ||
+    !scene.trim() ||
+    !camera.trim()
+  );
+});
+
+if (hasUndefined) {
+  console.warn("Undefined / invalid values detected in:", limitedPanels);
+  throw new Error("AI generated incomplete panels - try regenerating");
+}
+
+const invalid = limitedPanels.some((p: any) =>
+  !p || typeof p !== "object" ||
+  !String(p.scene || "").trim() ||
+  !String(p.camera || "").trim()
+  // dialogue can be empty sometimes, so don't hard-fail it unless you want to
+);
+
+if (invalid) {
+  console.warn("Invalid panels detected:", limitedPanels);
+  throw new Error("AI generated incomplete panels (missing scene/camera). Try regenerating.");
+}
+
+
       if (panelCount !== PANEL_CONFIG[selectedPanelType].panelCount) {
         throw new Error(`Panel count mismatch! UI: ${panelCount}, Config: ${PANEL_CONFIG[selectedPanelType].panelCount}`);
       }
@@ -1106,21 +1331,21 @@ function getOrUpdateSeed(currentScript: string): number {
   
         setGenerationProgress(p => ({...p, total: limitedPanels.length}));
         // Replace names with descriptions
-        const processedPanels = limitedPanels.map((panel: string, index: number) => {
-          setGenerationProgress(p => ({
-            current: index + 1,
-            total: limitedPanels.length,
-            status: `Processing panel ${index + 1}/${limitedPanels.length}`
-          }));
-          const dialogue = panel.match(/Dialogue:\s*"([^"]+)"/)?.[1] || '';
-          const scene = CharacterService.replaceNamesWithDescriptions(panel, latestCharacters);
-          return { 
-            scene,
+        const processedPanels = limitedPanels.map((panel: any) => {
+          const rawScene = String(panel.scene || "").trim();
+          const dialogue = String(panel.dialogue || "").trim();
+          const cameraAngle = String(panel.camera || "medium").trim();
+        
+          const panelCharacters = narrativeControllerFilterCharactersForPanel(rawScene, latestCharacters);
+        
+          return {
+            rawScene,
             dialogue,
-             cameraAngle: panel.match(/\(Camera:\s*(.+?)\)/)?.[1] || 'medium'
+            cameraAngle,
+            panelCharacters,
           };
         });
-
+        
         // Log processed panels to console
         console.log("Processed Panels with Descriptions:", processedPanels);
         setPanelPreviews(Array(panelCount).fill("generating"));
@@ -1132,21 +1357,48 @@ function getOrUpdateSeed(currentScript: string): number {
             const targetWidth = dimensions.width;
             const targetHeight = dimensions.height;
             const panelData = processedPanels[i];
+// STEP 1.5 — Narrative Controller integration
+const panelIntent = narrativeController.inferPanelIntent({
+  scene: panelData.rawScene,
+  dialogue: panelData.dialogue
+});
 
+const narrativeDirectives =
+  narrativeController.buildNarrativeDirectives(panelIntent);
+  const transitionEnabled = panelCount > 1 && transitioning;
+
+  const effectiveNarrativeDirectives = transitionEnabled
+    ? narrativeDirectives
+    : {
+        ...narrativeDirectives,
+        continuity: "loose" as const,
+        lockEnvironment: false,
+        allowPoseChange: true,
+        previousPanelSummary: null
+      };
+  
             const requestWidth = floorToMultipleOf8(targetWidth / 2);
             const requestHeight = floorToMultipleOf8(targetHeight / 2);
             const parsedGuidance = guidanceScale;
             const guidanceScaleToSend = !isNaN(parsedGuidance) ? parsedGuidance : 7;     
             const seed = seedValue !== null
             ? seedValue
-            : getOrUpdateSeed(panelData.scene);
+            : getOrUpdateSeed(panelData.rawScene);
             console.log("Guidance Scale being sent:", guidanceScaleToSend);
             console.log(`Sending to Replicate: ${requestWidth} x ${requestHeight}`);
+            const patched = narrativeControllerApplyOutfitOverrides(panelData.rawScene, panelData.panelCharacters);
+            const panelChars = narrativeControllerApplyOutfitOverridesToCharacters(
+              panelData.rawScene,
+              panelData.panelCharacters
+            );
+            const prevSummaryForThisPanel =
+  i === 0 ? null : effectiveNarrativeDirectives.previousPanelSummary;
+
             const panelImage = await aiService.generatePanel({
-              scene: panelData.scene,
-              characters: characters.filter(c => c.image),
-              style: selectedStyle,
+              scene: patched.scene,
+              characters: panelChars,
               cameraAngle: panelData.cameraAngle,
+              style: selectedStyle,
               width: requestWidth,
               height: requestHeight,
               color: selectedColor, // ✅ Fix: Include this
@@ -1154,9 +1406,32 @@ function getOrUpdateSeed(currentScript: string): number {
               seed,// ✅ custom or fallback
               guidanceScale: guidanceScaleToSend,                     // ✅ custom or fallback
               isMangafy,
-              customStyle: useCustomStyle ? (customStyleRef.current?.value ?? customStyleDescription) : null
+              customStyle: useCustomStyle ? (customStyleRef.current?.value ?? customStyleDescription) : null,
+              previousPanelSummary: prevSummaryForThisPanel,
+narrativeIntent: effectiveNarrativeDirectives.intent,
+continuityMode: effectiveNarrativeDirectives.continuity,
+lockEnvironment: effectiveNarrativeDirectives.lockEnvironment,
+allowPoseChange: effectiveNarrativeDirectives.allowPoseChange,
+transitionEnabled,
             });
 
+            let currentPanelSummary: string | null = null;
+
+            try {
+              currentPanelSummary = await aiService.generateImageDescription(panelImage);
+            } catch {
+              currentPanelSummary = null;
+            }
+
+            if (!currentPanelSummary) {
+              // NarrativeController fallback summary (no provider needed)
+              const names = (panelData.panelCharacters || []).map((c: any) => c?.name).filter(Boolean).join(", ");
+              currentPanelSummary = `Characters: ${names || "unknown"}. Scene: ${panelData.rawScene}. Camera: ${panelData.cameraAngle}.`;
+            }
+            // STEP 1.5 — update narrative memory
+            narrativeController.updateFromImageSummary(currentPanelSummary);
+            
+            console.log("characters before filter for images:", characters);
             if (!(panelImage instanceof Blob)) {
               console.error("Panel image is not a blob!", panelImage);
               throw new Error("Invalid panel image format");
@@ -1193,6 +1468,7 @@ function getOrUpdateSeed(currentScript: string): number {
         if (pages.length === 0) {
             throw new Error("Page generation returned empty array");
         }
+
         setGeneratedPanels(pages);
         // Save pages into IndexedDB + save small thumbnail + metadata to localStorage
 try {
@@ -1644,35 +1920,8 @@ function createThumbnailFromDataUrl(dataUrl: string, maxWidth = 300): Promise<st
 </div>
 
       <div className={styles.controlGroup}>
-  <label>
-    <input
-      type="checkbox"
-      checked={isMangafy}
-      disabled={selectedStyle === "default" || useCustomStyle}  // 🚫 disable if default manga
-      onChange={(e) => {
-        const checked = e.target.checked;
-        setIsMangafy(checked);
-
-        // Force black & white if mangafy checked
-        if (checked) {
-          setSelectedColor("black_white");
-        }
-      }}
-    />
-     <span>Mangafy (Optional)</span>
-  </label>
-
 {/* Use Custom Art Style */}
 <div className="form-group">
-  <label>
-    <input
-      type="checkbox"
-      checked={useCustomStyle}
-      onChange={(e) => setUseCustomStyle(e.target.checked)}
-      disabled={isMangafy} // disable toggle if Mangafy is active
-    />
-    Use Custom Art Style
-  </label>
 
   {/* Uncontrolled textarea to avoid re-render / IME focus loss while typing */}
   <textarea
@@ -1690,7 +1939,7 @@ function createThumbnailFromDataUrl(dataUrl: string, maxWidth = 300): Promise<st
 </div>
 
 <div className={styles.controlGroup}>
-  <label>Guidance Scale (1–15) (Optional):</label>
+  <label>Prompt Guide(The lower it is, the closer ai follows the prompt. Recommended 5-8) (1–15) (Optional):</label>
   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
 <input
 type="range"
@@ -1704,7 +1953,7 @@ onChange={(e) => setGuidanceScale(parseInt(e.target.value, 10))}
 </div>
 
 <div className={styles.controlGroup}>
-  <label>Seed: (Optional)</label>
+  <label>Charcter Conistency(Keep constant for consistent results) (Optional)</label>
   <div className={styles.controlGroupInner}>
     <input
       type="range"
@@ -1855,6 +2104,24 @@ return (
             onContentChange={setContent}
             onSave={handleSave}
           />
+          <div className={styles.transitionToggle}>
+            <label style={{ display: "flex", gap: 10, alignItems: "flex-start", opacity: canTransition ? 1 : 0.5 }}>
+              <input
+                type="checkbox"
+                checked={canTransition ? transitioning : false}
+                disabled={!canTransition}
+                onChange={(e) => setTransitioning(e.target.checked)}
+                style={{ marginTop: 3 }}
+              />
+              <div>
+                <div style={{ fontWeight: 600 }}>Transition</div>
+                <div style={{ fontSize: 12, lineHeight: 1.35, zIndex:1000 }}>
+                  When enabled, panels are generated with continuity from the previous panel (same scene flow).
+                  When disabled, each panel is generated independently.
+                </div>
+              </div>
+            </label>
+          </div>
         </div>
       )}
 
@@ -2066,6 +2333,7 @@ return (
       await deleteImageBlobFromDB(zoomedId);
 
       // 2) remove from UI gallery state (gallery stores JSON-stringified metadata)
+      console.log("prev gallery before filter:", setGallery);
       setGallery(prev => prev.filter(itemStr => {
         try {
           const item = typeof itemStr === 'string' ? JSON.parse(itemStr) : itemStr;
@@ -2078,6 +2346,7 @@ return (
       // 3) remove from localStorage 'gallery_meta' as well
       try {
         const meta = JSON.parse(localStorage.getItem('gallery_meta') || '[]');
+        console.log("meta before filter:", meta);
         const filtered = (Array.isArray(meta) ? meta : []).filter((m: any) => m.id !== zoomedId);
         localStorage.setItem('gallery_meta', JSON.stringify(filtered));
       } catch (err) {
@@ -2111,11 +2380,3 @@ return (
 
   }
   
-  const seedCache: Record<string, number> = {};
-
-export function getOrUpdateSeed(scene: string): number {
-  if (!seedCache[scene]) {
-    seedCache[scene] = Math.floor(Math.random() * 2_000_000); // new seed
-  }
-  return seedCache[scene];
-}

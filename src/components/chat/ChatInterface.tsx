@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect, useRef } from 'react';
 import { Chat, Message } from '@/types/chat';
 import ChatInput from './ChatInput';
@@ -108,7 +109,7 @@ const filteredMessages = (messageData.records || []).filter(
     const AIRTABLE_TOKEN = "patIcK5hqVA19dyEk.20411c3eb56f086697e63795bfd76519e8a8b866f01ccab3eef5e17a431df5bb";
     const userId = localStorage.getItem("userId"); // 🔐 make sure you save this on login
 
-    const chats: Chat[] = chatRecords
+    const chats: Chat[] = (chatRecords ?? [])
     .filter((record: any) => record.fields.userId === userId)
     .map(record => ({
       id: record.id,
@@ -153,8 +154,9 @@ const filteredMessages = (messageData.records || []).filter(
       const AIRTABLE_BASE_ID = "apppD5DROHf5ImEYG";
   
       // Optimistically remove chat and messages from UI
-      setChats(prev => prev.filter(chat => chat.id !== chatId));
-      setMessages(prev => prev.filter(msg => msg.chatId !== chatId));
+      setChats(prev => (prev ?? []).filter(chat => chat.id !== chatId));
+      setMessages(prev => (prev ?? []).filter(msg => msg.chatId !== chatId));
+      
   
       // 🔥 Step 1: Delete the chat from Chats table
       const chatDeleteRes = await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/Chats/${chatId}`, {
@@ -211,7 +213,7 @@ const filteredMessages = (messageData.records || []).filter(
     }
 const userId = localStorage.getItem("userId");
 
-const messages: Message[] = messageRecords
+const messages: Message[] = (messageRecords ?? [])
   .filter((record: any) => record.fields.userId === userId)
   .map(record => ({
     id: record.id,
@@ -418,11 +420,12 @@ if (userMessage.imageUrl) {
         {currentChat ? (
           <>
             <div className={styles.messagesContainer}>
-              {messages
-                .filter(msg => msg.chatId === currentChat.id)
-                .map(message => (
-                  <MessageComponent key={message.id} message={message} />
-                ))}
+            {(messages ?? [])
+  .filter(msg => msg.chatId === currentChat?.id)
+  .map(message => (
+    <MessageComponent key={message.id} message={message} />
+))}
+
               <div ref={messagesEndRef} />
               
               {isLoading && (

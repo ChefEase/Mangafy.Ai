@@ -6,4 +6,4 @@ Allow: /
 Host: https://www.mangafyai.com/
 
 # Sitemaps
-Sitemap: https://www.mangafyai.com//sitemap.xml
+Sitemap: https://www.mangafyai.com/sitemap.xml

@@ -1,5 +1,7 @@
 "use client"; // Mark as a client component
 
+export const dynamic = "force-dynamic"; // ✅ Disable SSR for this layout
+
 import { useEffect } from "react"; // Import useEffect
 import { Footer } from "../components/Footer/Footer";
 import "./globals.css";

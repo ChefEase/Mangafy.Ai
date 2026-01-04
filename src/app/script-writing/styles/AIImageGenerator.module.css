@@ -612,7 +612,7 @@
 /* === Snapshot Button === */
 .snapshotButton {
   position: relative;
-  bottom: 30px;
+  bottom: 0px;
   right: -630px;
   background: radial-gradient(circle at center, #ffb347, #ffcc33);
   color: #111;
@@ -709,6 +709,27 @@
   background: linear-gradient(90deg, #ffd966, #ffb347);
   box-shadow: 0 0 10px rgba(255, 204, 51, 0.6);
   transform: translateY(-2px);
+}
+
+/* Default (desktop) */
+.transitionToggle {
+  margin-top: 540px;
+}
+
+/* If you want it to stick near bottom on small screens */
+@media (max-width: 768px) {
+  .transitionToggle {
+    position: sticky;   /* sticks inside the sidebar while you scroll */
+    bottom: 1200px;
+    z-index: 50;
+
+    margin-top: 410px;
+    padding: 10px 12px;
+
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 12px;
+  }
 }
 
 /* ===== MOBILE & TABLET: Fullscreen Manga Page Scaling ===== */
@@ -1995,4 +2016,21 @@
     
     }
     
+    /* ===== FIX: stop overlap between mode switch + content ===== */
+
+/* Make sidebar (or the parent container that holds tab-header + content) be the stacking context */
+.script-sidebar-fixed {
+  position: relative; /* already relative, keep it */
+}
+
+/* Mode switch should stay on top and never be covered */
+.tab-header {
+  position: sticky;
+  top: 530px;
+  z-index: 1000;
+  margin-top: 12px;
+}
+
+/* The content below tabs must be in normal document flow */
+
     

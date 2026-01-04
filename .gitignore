@@ -3,5 +3,4 @@ node_modules/
 my-desktop-app/
 my-mobile-app/
 # build artifacts
-/dist/
-
+/dist/  

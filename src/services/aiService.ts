@@ -2,29 +2,6 @@
 import { HfInference, InferenceClient } from "@huggingface/inference";
 import {enforceNoDialogueAndStyle, calculateBudget, countWordsAndCommas} from '@/utils/promptUtils'
 
-interface Panel {
-  id: string;
-  generatedImage: string;
-  scriptSegment: string;
-  layoutPosition: number;
-}
-
-interface HuggingFaceStatusResponse {
-  data: {
-    loaded: boolean;
-    state?: string;
-    error?: string;
-    compute_type?: string;
-    transformers_version?: string;
-  };
-}
-interface HuggingFaceModelStatus {
-  loaded: boolean;
-  state?: 'Loaded' | 'Loading' | 'Failed';
-  compute_type?: string;
-  transformers_version?: string;
-  error?: string;
-}
 
 interface ArtStyleConfig {
   prompt: string;
@@ -58,6 +35,7 @@ function sanitizeScenePrompt(raw: string): string {
     .split(",")
     .map(p => p.trim())
     .filter(p => p.length > 0);
+    console.log("parts array before filter:", parts);
   const seen = new Set<string>();
   const deduped: string[] = [];
   for (const part of parts) {
@@ -71,16 +49,12 @@ function sanitizeScenePrompt(raw: string): string {
   return deduped.join(", ");
 }
 
-function escapeRegExp(s: string) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 // fallback function: keep leading character tags (1boy/1girl/2boys/2girls) and then greedily add comma segments until within budgets
 function fallbackTrimPreserveChars(text: string, maxW: number, maxC: number) {
   const { words: w0, commas: c0 } = countWordsAndCommas(text);
   // split into segments by comma (preserve trimmed segments)
   const segments = text.split(",").map(s => s.trim()).filter(Boolean);
-
+  console.log("segments before filter:", segments);
   // ensure first segments containing '1boy' / '1girl' are preserved
   const preserved: string[] = [];
   const rest: string[] = [];
@@ -113,6 +87,247 @@ function fallbackTrimPreserveChars(text: string, maxW: number, maxC: number) {
   }
   return resultSegments.join(", ");
 }
+
+function escapeRegExp(s: string) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function stripLeadingCounts(s: string) {
+  // removes "1boy," "1girl," "2 characters," etc if it appears at the start
+  return String(s || "")
+    .replace(/^\s*(\d+\s*characters?|1boy|1girl|2boys|2girls)\s*,\s*/i, "")
+    .trim();
+}
+
+function stripNameFromText(s: string, name?: string) {
+  if (!name) return s;
+  const re = new RegExp(`\\b${escapeRegExp(name)}\\b(?:'s)?`, "gi");
+  return s.replace(re, " ").replace(/\s{2,}/g, " ").trim();
+}
+
+function normalizeTag(character: any) {
+  // Best: store "1boy"/"1girl" in character.gender.
+  const g = String(character?.gender || "").trim();
+  if (/^(1boy|1girl|2boys|2girls)$/i.test(g)) return g.toLowerCase();
+  // fallback: if description begins with "1boy," etc
+  const d = String(character?.description || "").trim();
+  const m = d.match(/^\s*(1boy|1girl|2boys|2girls)\b/i);
+  if (m) return m[1].toLowerCase();
+  return "person"; // last resort
+}
+
+function getCleanTraits(character: any) {
+  const name = String(character?.name || "").trim();
+  const raw = String(character?.description || "").trim();
+  const noCount = stripLeadingCounts(raw);
+  const noName = stripNameFromText(noCount, name);
+  return noName.replace(/\s+/g, " ").trim();
+}
+
+// ✅ ONLY for multi-character formatting (keeps parentheses)
+function buildCharacterAnchor(character: any) {
+  const tag = normalizeTag(character);
+  const traits = getCleanTraits(character);
+
+  // no "role:" label anymore
+  return `(${tag}: ${traits})`.replace(/\s+/g, " ").trim();
+}
+
+function stripNamesFromScene(scene: string, characters: any[]) {
+  let s = String(scene || "");
+  for (const c of characters || []) {
+    const name = String(c?.name || "").trim();
+    if (!name) continue;
+    const re = new RegExp(`\\b${escapeRegExp(name)}\\b(?:'s)?`, "gi");
+    s = s.replace(re, "");
+  }
+  return s.replace(/\s{2,}/g, " ").trim();
+}
+
+function stripAllCharacterNamesEverywhere(s: string, characters: any[]) {
+  let out = String(s || "");
+
+  // Remove known character names (and possessives) anywhere in the string
+  for (const c of characters || []) {
+    const name = String(c?.name || "").trim();
+    if (!name) continue;
+    const re = new RegExp(`\\b${escapeRegExp(name)}\\b(?:'s)?`, "gi");
+    out = out.replace(re, " ");
+  }
+
+  // Cleanup spacing / commas
+  out = out
+    .replace(/\s{2,}/g, " ")
+    .replace(/\s*,\s*/g, ", ")
+    .replace(/(^,|,$)/g, "")
+    .trim();
+
+  return out;
+}
+
+function filterCharactersMentionedInText(text: string, characters: any[] = []) {
+  const t = (text || "").toLowerCase();
+  return (characters || []).filter((c) => {
+    const name = String(c?.name || "").trim().toLowerCase();
+    if (!name) return false;
+    return new RegExp(`\\b${escapeRegExp(name)}\\b`, "i").test(t);
+  });
+}
+
+function pickPrimaryCharacterFromText(panelText: string, characters: any[]): any[] {
+  const text = (panelText || "").toLowerCase();
+
+  // Find earliest mention among known character names
+  let best: { idx: number; c: any } | null = null;
+
+  for (const c of characters || []) {
+    const name = String(c?.name || "").trim();
+    if (!name) continue;
+
+    const i = text.indexOf(name.toLowerCase());
+    if (i >= 0 && (best === null || i < best.idx)) {
+      best = { idx: i, c };
+    }
+  }
+
+  return best ? [best.c] : [];
+}
+
+// --- OUTFIT LOCK (no clothing word list needed) ---
+// We only allow outfit-related phrases if they already appear in:
+// - the panel script (payload.scene / cleanedScene)
+// - the character descriptions (Airtable)
+// Anything else is stripped from the prompt before sending to the image model.
+
+function normalizeClause(s: string): string {
+  return s
+    .toLowerCase()
+    .replace(/[()]/g, "")
+    .replace(/\s+/g, " ")
+    .replace(/\s*,\s*/g, ", ")
+    .trim();
+}
+
+/**
+ * Extract outfit-related clauses like:
+ * - "wearing a yellow sundress"
+ * - "dressed in a black suit"
+ * - "in a white t-shirt and blue sweatpants" (ONLY when it follows "is/was/stands/sits/appears")
+ * - "outfit: ..."
+ * - "clothes: ..."
+ *
+ * We intentionally avoid needing a dictionary of clothing nouns.
+ * (Yes, this may sometimes catch "wearing a smile" — we filter that out.)
+ */
+function extractOutfitClauses(text: string): string[] {
+  const t = String(text || "");
+  const clauses: string[] = [];
+
+  // 1) wearing / dressed in / dressed as
+  const reWear = /\b(?:wearing|wears|dressed in|dressed as)\s+([^.;\n]+)\b/gi;
+  let m: RegExpExecArray | null;
+  while ((m = reWear.exec(t)) !== null) {
+    clauses.push(normalizeClause(`wearing ${m[1]}`));
+  }
+
+  // 2) explicit labels: outfit/clothes/attire
+  const reLabel = /\b(?:outfit|clothes|attire)\s*:\s*([^.;\n]+)/gi;
+  while ((m = reLabel.exec(t)) !== null) {
+    clauses.push(normalizeClause(`outfit: ${m[1]}`));
+  }
+
+  // 3) “is in a/an ...” patterns (guarded so we don’t grab random "in the room")
+  // We only take it if it follows a describing verb (is/was/looks/appears/stands/sits)
+  const reIn = /\b(?:is|was|looks|appears|standing|sitting)\s+in\s+(a|an)\s+([^.;\n]+)/gi;
+  while ((m = reIn.exec(t)) !== null) {
+    clauses.push(normalizeClause(`in a ${m[2]}`));
+  }
+
+  // filter common false positives
+  const falsePositives = [
+    "wearing a smile",
+    "wearing a grin",
+    "wearing an expression",
+    "wearing a look",
+  ];
+  const filtered = clauses.filter(c => !falsePositives.some(fp => c.includes(fp)));
+
+  return Array.from(new Set(filtered));
+}
+
+function buildAllowedOutfitSet(scene: string, characters: any[]): Set<string> {
+  const allowed = new Set<string>();
+
+  // Allow outfit clauses mentioned by the user in the panel text
+  for (const c of extractOutfitClauses(scene)) allowed.add(c);
+
+  // Allow outfit clauses mentioned in character descriptions (Airtable)
+  for (const ch of (characters || [])) {
+    for (const c of extractOutfitClauses(String(ch?.description || ""))) {
+      allowed.add(c);
+    }
+  }
+
+  return allowed;
+}
+
+/**
+ * Remove any outfit clauses in generated text that aren't in allowed set.
+ * If allowed set is empty => remove ALL outfit clauses (hard stop on invention).
+ */
+function stripDisallowedOutfitClauses(generated: string, allowed: Set<string>): string {
+  let out = String(generated || "");
+
+  // Strip wearing/dressed clauses
+  out = out.replace(/\b(?:wearing|wears|dressed in|dressed as)\s+([^.;\n]+)\b/gi, (full, rest) => {
+    const normalized = normalizeClause(`wearing ${rest}`);
+    if (allowed.size === 0) return ""; // nothing allowed => strip all outfits
+    return allowed.has(normalized) ? full : "";
+  });
+
+  // Strip outfit/clothes/attire labels
+  out = out.replace(/\b(?:outfit|clothes|attire)\s*:\s*([^.;\n]+)/gi, (full, rest) => {
+    const normalized = normalizeClause(`outfit: ${rest}`);
+    if (allowed.size === 0) return "";
+    return allowed.has(normalized) ? full : "";
+  });
+
+  // Strip "is in a ..." clauses
+  out = out.replace(/\b(?:is|was|looks|appears|standing|sitting)\s+in\s+(a|an)\s+([^.;\n]+)/gi, (full, _a, rest) => {
+    const normalized = normalizeClause(`in a ${rest}`);
+    if (allowed.size === 0) return "";
+    return allowed.has(normalized) ? full : "";
+  });
+
+  // cleanup
+  out = out
+    .replace(/\s{2,}/g, " ")
+    .replace(/\s+,/g, ",")
+    .replace(/,\s*,/g, ",")
+    .replace(/(^\s*,\s*|\s*,\s*$)/g, "")
+    .trim();
+
+  return out;
+}
+
+function stripPeopleAndAppearanceishTagsForSingleChar(s: string) {
+  let out = String(s || "");
+
+  // remove common “person count” tags if they sneak in
+  out = out.replace(/\b\d+\s*(girl|boy|people|characters)\b/gi, " ");
+  out = out.replace(/\b1girl\b|\b1boy\b/gi, " ");
+
+  // remove parenthetical blocks entirely (shouldn’t exist in single-char mode)
+  out = out.replace(/\([^)]*\)/g, " ");
+
+  // cleanup
+  return out
+    .replace(/\s{2,}/g, " ")
+    .replace(/\s*,\s*/g, ", ")
+    .replace(/(^,|,$)/g, "")
+    .trim();
+}
+
 
 // Added log to show the mapping for debugging
 console.log("GRADIO_TO_REPLICATE_STYLE mapping:", GRADIO_TO_REPLICATE_STYLE);
@@ -218,7 +433,7 @@ export class AIService {
 // replace existing compressPrompt with this
 async compressPrompt(
   prompt: string,
-  options?: { maxWords?: number; maxCommas?: number; allowParentheses?: boolean }
+  options?: { maxWords?: number; maxCommas?: number; allowParentheses?: boolean; noAppearance?: boolean;  }
 ): Promise<string> {
   const client = new InferenceClient(process.env.NEXT_PUBLIC_HF_TOKEN);
 
@@ -228,6 +443,18 @@ You are a prompt compression tool for AI image generation.
 Convert a natural-language scene description into a concise, comma-separated list of visual tags under 77 tokens.
 Output only the compressed scene, no explanations.
 `;
+
+ // ✅ NEW: single-character mode – ban appearance/clothing/hair/person-count
+ if (options?.noAppearance) {
+  systemInstruction += `
+  CRITICAL RULES (NO APPEARANCE MODE):
+- DO NOT mention clothing, outfit, dress, shoes, accessories.
+- DO NOT mention hair style/color, eyes, face traits, body traits.
+- DO NOT mention gender tags (1girl/1boy), character count, or names.
+- ONLY include: action/pose, facial expression, environment/setting, camera/framing, lighting/mood.
+- DO NOT invent new objects/wardrobe.
+`.trim();
+  }
 
   // If caller allows parentheses (for multi-character scenes), relax rule
   if (options?.allowParentheses) {
@@ -243,6 +470,7 @@ Formatting and Structure Rules:
 1. Output pure comma-separated tags, no full sentences, no explanations, no line breaks.
 2. Start with character count or character tag (1girl, 1boy) if present, and then tags.
 3. Remove dialogue and quoted text, dedupe descriptors, keep under token budget.
+4) Dedupe descriptors.
 `;
   }
 
@@ -299,15 +527,25 @@ Formatting and Structure Rules:
         }),
       });
     
-      const data = await res.json();
-    
-      if (!res.ok || !data?.image?.url) {
-        console.error("Backend error response:", data);
-        throw new Error(data.error || "Image generation failed");
+      const text = await res.text();
+      let data: any = null;
+      
+      try {
+        data = text ? JSON.parse(text) : null;
+      } catch {
+        data = null;
+      }
+      
+      if (!res.ok) {
+        console.error("Backend error response:", text);
+        throw new Error((data && data.error) ? data.error : `Request failed: ${res.status}`);
       }
     
       const imageUrl = data.image.url;
-    
+      if (!data?.image?.url) {
+        console.error("Malformed response:", data);
+        throw new Error("Image generation failed: missing image.url");
+      }
       // 🖼️ Fetch the actual image
       const imageResponse = await fetch(imageUrl);
 if (!imageResponse.ok) {
@@ -359,28 +597,28 @@ const blob = await imageResponse.blob();
     }
   }
 
-  async generateImageDescription(image: Blob): Promise<string> {
+  async generateImageDescription(image: Blob): Promise<string | null> {
     try {
-      const response = await this.hf.imageToText({
-        data: image,
+      const client = new InferenceClient(process.env.NEXT_PUBLIC_HF_TOKEN);
+  
+      const res = await client.imageToText({
+        provider: "hf-inference", // ✅ key fix
         model: this.IMAGE_TO_TEXT_MODEL,
+        data: image,
       });
   
-      if (!response?.generated_text) {
-        throw new Error("No description generated from image");
-      }
+      const text = (res as any)?.generated_text?.trim();
+      if (!text) return null;
   
-      // Enhance the description with explicit details
-      return response.generated_text
-    .replace(/a (cartoon|anime|manga) of/gi, '')
-    .replace(/[\-•]/g, '')
-    .replace(/\([^)]*\)/g, '') // Remove parentheses
-    .replace(/\b(character|person|woman|man)\b/gi, '')
-    .substring(0, 300); // Limit length
-  
-    } catch (error) {
-      this.handleError(error, "image-to-text");
-      throw error;
+      return text
+        .replace(/a (cartoon|anime|manga) of/gi, "")
+        .replace(/[\-•]/g, "")
+        .replace(/\([^)]*\)/g, "")
+        .replace(/\b(character|person|woman|man)\b/gi, "")
+        .substring(0, 300);
+    } catch (err) {
+      console.warn("Image captioning failed, returning null:", err);
+      return null; // ✅ do NOT throw (you already handle null)
     }
   }
   
@@ -439,6 +677,12 @@ async generatePanel(payload: {
   guidanceScale?: number;   // ✅ new
   isMangafy?: boolean;      // ✅ new
   customStyle?: string | null; // ✅ new
+  previousPanelSummary?: string | null;
+  narrativeIntent?: "establishing" | "dialogue" | "action" | "transition" | "hybrid";
+  continuityMode?: "strict" | "loose" | "medium";
+  lockEnvironment?: boolean;
+  allowPoseChange?: boolean;
+  transitionEnabled?: boolean; // ✅ add this
 }) {
   {
     const styleConfig = this.ART_STYLES[payload.style] ?? this.ART_STYLES.default; 
@@ -455,6 +699,22 @@ async generatePanel(payload: {
     const rawScene = payload.scene;
 const sanitizedScene = sanitizeScenePrompt(rawScene);
 const cleanedScene = sanitizedScene.replace(/\(Camera:.*?\)/gi, '').trim();
+// --- transition semantics (default ON) ---
+const transitionEnabled = payload.transitionEnabled !== false;
+
+// If transition is OFF, only include characters explicitly mentioned in THIS panel's script text.
+const rawPanelTextForMatching = String(payload.scene || cleanedScene || "");
+const allChars = payload.characters || [];
+
+const panelCharacters = transitionEnabled
+  ? allChars
+  : (
+      // transition OFF: pick the primary character if possible
+      pickPrimaryCharacterFromText(rawPanelTextForMatching, allChars).length > 0
+        ? pickPrimaryCharacterFromText(rawPanelTextForMatching, allChars)
+        : filterCharactersMentionedInText(rawPanelTextForMatching, allChars)
+    );
+
 
 // --- base setup ---
 const negativePrompt = `${styleConfig.negative_prompt}, ${colorConfig.negative_prompt}`;
@@ -535,90 +795,115 @@ if ((!Array.isArray((payload as any).characters) || (payload as any).characters.
 
 // --- Build character data ---
 let charactersText = "";
-if (Array.isArray(payload.characters) && payload.characters.length > 0) {
-  if (payload.characters.length === 1) {
-    const c = payload.characters[0];
-    const gender = (c.gender || "1girl").toLowerCase();
-    const desc = (typeof c === "string" ? c : c.description || "").trim();
-    charactersText = `${gender}: ${desc}`;
+if (Array.isArray(panelCharacters) && panelCharacters.length > 0) {
+  if (panelCharacters.length === 1) {
+    charactersText = getCleanTraits(panelCharacters[0]); // ✅ no parentheses, no label
   } else {
-    const countLabel = `${payload.characters.length} characters`;
-    const parts = payload.characters.map((c: any) => {
-      const g = (c.gender || "1girl").toLowerCase();
-      const d = (typeof c === "string" ? c : c.description || "").trim();
-      return `(${g}: ${d})`;
-    });
-    charactersText = `${countLabel}, ${parts.join(", ")}`;
-  }
+    const anchors = panelCharacters.map((c: any) =>
+      buildCharacterAnchor(c)
+    );
+    charactersText = anchors.join(", ");
+
+  }  
 }
 
-// --- prepare compressor input ---
-// For multiple characters, feed compressor *explicitly* the full formatted character block.
 // We will NOT pass "comma separated tags" instruction — instead we allow parentheses.
-let compressionInput = cleanedScene;
-if (Array.isArray(payload.characters) && payload.characters.length > 1) {
+let continuityHint = "";
+if (transitionEnabled && payload.previousPanelSummary) {
+  continuityHint = `
+Previous panel visual context:
+${payload.previousPanelSummary}
+
+Maintain visual continuity (characters, pose, environment, mood).
+`;
+}
+
+const nameStrippedScene = stripNamesFromScene(cleanedScene, panelCharacters);
+
+let compressionInput = `
+${continuityHint}
+Scene: ${nameStrippedScene}
+`.trim();
+
+if (Array.isArray(panelCharacters) && panelCharacters.length > 1) {
   compressionInput = `
-There are ${payload.characters.length} characters in the scene.
 Describe each one using parentheses in this exact format:
 (1girl: traits...), (1boy: traits...)
 After describing them, describe their shared action and environment.
 
 Characters:
-${payload.characters.map((c: any) => {
-  const g = (c.gender || "1girl").toLowerCase();
-  const d = (typeof c === "string" ? c : c.description || "").trim();
-  return `- ${g}: ${d}`;
+${panelCharacters.map((c: any) => {
+  const tag = normalizeTag(c);        // ✅ FIX: derive 1boy/1girl correctly
+  const traits = getCleanTraits(c);   // ✅ FIX: removes the leading count + name
+  return `- ${tag}: ${traits}`;
 }).join("\n")}
 
-Scene: ${cleanedScene}
+Scene: ${nameStrippedScene}
 `;
 }
-
+const isSingleCharacter = Array.isArray(panelCharacters) && panelCharacters.length === 1;
 // --- compress ---
 const compressedScene = await this.compressPrompt(compressionInput, {
   maxWords: wordBudget,
   maxCommas: commaBudget,
-  allowParentheses: Array.isArray(payload.characters) && payload.characters.length > 1
+  allowParentheses: Array.isArray(panelCharacters) && panelCharacters.length > 1,
+  noAppearance: isSingleCharacter, // ✅ NEW
 });
 
 let finalCompressed = compressedScene || "";
+const allowedOutfits = buildAllowedOutfitSet(String(payload.scene || cleanedScene || ""), panelCharacters);
+finalCompressed = stripDisallowedOutfitClauses(finalCompressed, allowedOutfits);
+if (isSingleCharacter) {
+  finalCompressed = stripPeopleAndAppearanceishTagsForSingleChar(finalCompressed);
+}
+
+// ✅ HARD ENFORCE: do not allow compressor to invent extra characters
+// ✅ HARD ENFORCE: keep at most N parenthetical character blocks (no "N characters" label)
+if (Array.isArray(panelCharacters) && panelCharacters.length > 1) {
+  const expected = panelCharacters.length;
+  const blocks = (finalCompressed.match(/\([^)]*:\s*[^)]*\)/g) || []);
+
+  if (blocks.length > expected) {
+    const kept = blocks.slice(0, expected);
+    const withoutBlocks = finalCompressed
+      .replace(/\([^)]*:\s*[^)]*\)/g, "")
+      .replace(/\s*,\s*/g, ", ")
+      .replace(/(^,|,$)/g, "")
+      .trim();
+
+    finalCompressed = `${kept.join(", ")}${withoutBlocks ? `, ${withoutBlocks}` : ""}`.trim();
+  }
+}
+
 console.log("compressionInput:", compressionInput);
 console.log("compressedScene (raw):", compressedScene);
 console.log("finalCompressed (after fallback):", finalCompressed);
 
 // --- ensure explicit count label for multi-character scenes ---
-// If we have multiple characters, always prepend "N characters" if it's not already present.
-// This covers the case where the compressor returned parenthetical blocks but omitted the count label.
-if (Array.isArray(payload.characters) && payload.characters.length > 1) {
-  if (!/^\s*\d+\s*characters\b/i.test(finalCompressed)) {
-    // Avoid adding a trailing comma duplication when finalCompressed is empty
-    finalCompressed = `${payload.characters.length} characters` + (finalCompressed ? `, ${finalCompressed}` : "");
-    finalCompressed = finalCompressed.trim();
-  }
-}
+
 
 // If we expected multiple characters but compressor didn't return any parenthetical blocks,
 // construct them deterministically from payload.characters.
-if (Array.isArray(payload.characters) && payload.characters.length > 1 && !/\([^)]+:\s*[^)]+\)/.test(finalCompressed)) {
-  const charParts = payload.characters.map((c: any) => {
+if (Array.isArray(panelCharacters) && panelCharacters.length > 1 && !/\([^)]+:\s*[^)]+\)/.test(finalCompressed)) {
+  const charParts = panelCharacters.map((c: any) => {
     // Use provided description if present, otherwise leave short placeholder like "unspecified appearance"
     const desc = (typeof c === "string" ? c : (c.description || "")).trim() || "unspecified appearance";
-    const genderTag = (c.gender || "1girl").toString().toLowerCase();
+    const genderTag = normalizeTag(c); // ✅ fixes your 1girl/1boy flipping
     return `(${genderTag}: ${desc})`;
   });
   // Prepend explicit count label and the constructed character blocks, then append original compressed scene.
-  finalCompressed = `${payload.characters.length} characters, ${charParts.join(", ")}` + (finalCompressed ? `, ${finalCompressed}` : "");
+  finalCompressed = `${panelCharacters.length} characters, ${charParts.join(", ")}` + (finalCompressed ? `, ${finalCompressed}` : "");
 }
 
 // --- assemble prompt correctly ---
-let assembledParts: string[];
-if (Array.isArray(payload.characters) && payload.characters.length > 1) {
-  assembledParts = [artStyleTag, finalCompressed, finalStylePromptTag];
+let assembledParts: string[] = [];
+if (Array.isArray(panelCharacters) && panelCharacters.length > 1) {
+  assembledParts = [artStyleTag, finalCompressed, finalStylePromptTag].filter(Boolean);
 } else {
-  assembledParts = [artStyleTag, charactersText, finalCompressed, finalStylePromptTag];
+  assembledParts = [artStyleTag, charactersText, finalCompressed, finalStylePromptTag].filter(Boolean);
 }
-
-const finalPromptRaw = assembledParts.filter(Boolean).map(s => s.trim()).join(", ");
+console.log("assembledParts before filter:", assembledParts);
+const finalPromptRaw = (assembledParts || []).filter(Boolean).map(s => s.trim()).join(", ");
 const finalPrompt = enforceNoDialogueAndStyle(finalPromptRaw, artStyleTag, finalStylePromptTag);
 let shortenedPrompt = finalPrompt.trim();
     // -------------------- Mangafy: second-pass compression (replace existing block) --------------------
@@ -833,26 +1118,6 @@ private validateModel(model: string) {
       }
     });
   }
-
-  // aiService.ts - Add to AIService class
-  async generateStoryboard(panels: Panel[], scriptContent: string) {
-    try {
-      return await this.hf.textToImage({
-        model: "black-forest-labs/FLUX.1-dev",
-        inputs: `Storyboard for: ${scriptContent}\nPanels: ${panels.map(p => p.scriptSegment).join('\n')}`,
-        parameters: {
-          width: 1792,
-          height: 1024,
-          guidance_scale: 13.5,
-          num_inference_steps: 50
-        }
-      });
-    } catch (error) {
-      this.handleError(error, "storyboard-generation");
-      throw error;
-    }
-  }
-    // 🚀 **3. Ensure Character Consistency**
   async ensureCharacterConsistency(image: Blob, prompt: string) {
     try {
       return await this.hf.imageToImage({
@@ -908,9 +1173,13 @@ private validateModel(model: string) {
       }
 
     
-      return data.panels.map((panel: any) => 
-        `${panel.scene} (Camera: ${panel.camera}) - Dialogue: "${panel.dialogue}"`
-      );
+      return data.panels.map((panel: any) => ({
+        scene: String(panel.scene || "").trim(),
+        camera: String(panel.camera || "").trim(),
+        dialogue: String(panel.dialogue || "").trim(),
+      }));
+      
+      
 
     } catch (error) {
       this.handleError(error, "scene-generation");

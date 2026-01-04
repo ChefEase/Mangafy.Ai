@@ -20,7 +20,11 @@ interface CharacterCardProps {
 export default function CharacterCard({ character, onDelete, onEdit }: CharacterCardProps) {
   return (
     <div className="character-card">
-      <img src={character.image} alt={character.name} className="character-image" />
+      {character.image ? (
+  <img src={character.image} alt={character.name} className="character-image" />
+) : (
+  <div className="character-image placeholder">No image</div>
+)}
       <h3>{character.name}</h3>
       <div className="actions">
         <button onClick={onEdit}>Edit</button>

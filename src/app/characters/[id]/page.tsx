@@ -22,33 +22,46 @@ export default function CharacterDetailPage() {
   const router = useRouter();
   const [character, setCharacter] = useState<Character | null>(null);
 
-  useEffect(() => {
-    const fetchCharacter = async () => {
-      try {
-        console.log("Fetching character with ID:", characterId); // Log the character ID
+  // characters/[id]/page.tsx
 
-        const response = await fetch(`${AIRTABLE_API_URL}/${characterId}`, {
-          headers: {
-            Authorization: `Bearer ${AIRTABLE_TOKEN}`,
-          },
-        });
+useEffect(() => {
+  const fetchCharacter = async () => {
+    try {
+      console.log("Fetching character with ID:", characterId);
 
-        if (!response.ok) {
-          throw new Error(`Failed to fetch character: ${response.statusText}`);
-        }
+      const response = await fetch(`${AIRTABLE_API_URL}/${characterId}`, {
+        headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` },
+      });
 
-        const data = await response.json();
-        console.log("Fetched character data:", data); // Log the fetched data
-
-        const characterData = { id: data.id, ...data.fields };
-        setCharacter(characterData);
-      } catch (error) {
-        console.error("Error fetching character:", error);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch character: ${response.statusText}`);
       }
-    };
 
-    fetchCharacter();
-  }, [characterId]);
+      const data = await response.json();
+      console.log("Fetched character data:", data);
+
+      // ✅ Normalize Airtable attachment array -> string URL
+      const imageUrl =
+        Array.isArray(data.fields?.image) && data.fields.image.length > 0
+          ? data.fields.image[0]?.url || ""
+          : "";
+
+      const characterData: Character = {
+        id: data.id,
+        name: data.fields?.name || "",
+        description: data.fields?.description || "",
+        role: data.fields?.role || "protagonist",
+        image: imageUrl,
+      };
+
+      setCharacter(characterData);
+    } catch (error) {
+      console.error("Error fetching character:", error);
+    }
+  };
+
+  fetchCharacter();
+}, [characterId]);
 
   const handleUpdateCharacter = async (updatedCharacter: Partial<Character>) => {
     try {
@@ -91,7 +104,10 @@ export default function CharacterDetailPage() {
         name: updatedCharacter.name || prev!.name,
         description: updatedCharacter.description || prev!.description,
         role: updatedCharacter.role || prev!.role,
-        image: updatedCharacter.image || prev!.image
+        image:
+      updatedCharacter.image === undefined
+        ? prev?.image
+        : updatedCharacter.image, // allow "" to clear
       }));
   
       alert("Character updated successfully!");

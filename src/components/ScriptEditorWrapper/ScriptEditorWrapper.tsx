@@ -1,7 +1,21 @@
 "use client";
 
-import React, { memo } from "react";
+import React, { memo, useEffect } from "react";
 import ScriptEditor from "../ScriptEditor/ScriptEditor";
+
+export function UseStableViewportHeight() {
+  useEffect(() => {
+    const setVH = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty("--app-vh", `${vh}px`);
+    };
+    setVH();
+    window.addEventListener("resize", setVH);
+    return () => window.removeEventListener("resize", setVH);
+  }, []);
+
+  return null;
+}
 
 interface ScriptEditorWrapperProps {
   content: string;

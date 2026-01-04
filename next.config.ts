@@ -1,9 +1,18 @@
 import type { NextConfig } from "next";
 
+const withPWA = require("next-pwa")({
+  dest: "public",
+  register: true,
+  skipWaiting: true,
+});
+
 const nextConfig: NextConfig = {
+  reactStrictMode: true,
+  // Turbopack configuration for Next.js 16 (empty to silence warning, webpack used for builds)
+  turbopack: {},
+  // Webpack configuration for build process
   webpack(config) {
     // stub Node modules that @gradio/client imports but does NOT actually need in the browser
-    
     config.resolve.fallback = {
       ...(config.resolve.fallback || {}),
       fs: false,
@@ -16,23 +25,6 @@ const nextConfig: NextConfig = {
       crypto: false
     };
     return config;
-  },
-};
-
-const withPWA = require("next-pwa")({
-  dest: "public",
-  register: true,
-  skipWaiting: true,
-});
-
-module.exports = withPWA({
-  reactStrictMode: true,
-});
-
-// next.config.js
-module.exports = {
-  eslint: {
-    ignoreDuringBuilds: true, // ✅ TEMP disable build-breaking lint
   },
   async headers() {
     return [
@@ -49,5 +41,7 @@ module.exports = {
   },
 };
 
-
-export default nextConfig;
+// Export with PWA wrapper if PWA is enabled, otherwise export config directly
+module.exports = process.env.NODE_ENV === "production" 
+  ? withPWA(nextConfig)
+  : nextConfig;

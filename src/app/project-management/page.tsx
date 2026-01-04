@@ -127,13 +127,14 @@ export default function ProjectManagementPage() {
   const handleDeleteChapter = async (chapterId: string) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this chapter?");
     if (confirmDelete) {
-      const updatedProjects = projects.map((project) => {
+      const updatedProjects = (projects || []).map((project) => {
         if (project.id === selectedProject?.id) {
           return {
             ...project,
-            chapters: project.chapters.filter((chapter) => chapter.id !== chapterId),
+            chapters: (project.chapters || []).filter((chapter) => chapter.id !== chapterId),
           };
         }
+        console.log("project.chapters before filter:", project.chapters);
         return project;
       });
       setProjects(updatedProjects);
@@ -149,7 +150,8 @@ export default function ProjectManagementPage() {
   const handleDeleteProject = async (projectId: string) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this project?");
     if (confirmDelete) {
-      const updatedProjects = projects.filter((project) => project.id !== projectId);
+      console.log("projects before filter:", projects);
+      const updatedProjects = (projects || []).filter((project) => project.id !== projectId);
       setProjects(updatedProjects);
 
       // Save updated projects to Airtable

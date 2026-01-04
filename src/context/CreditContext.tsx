@@ -94,9 +94,28 @@ export const CreditProvider = ({ children }: { children: React.ReactNode }) => {
 };
 
 export const useCredits = () => {
-  const context = useContext(CreditContext);
-  if (!context) {
-    throw new Error("useCredits must be used within a CreditProvider");
+  try {
+    const context = useContext(CreditContext);
+    if (!context) {
+      if (typeof window === "undefined") {
+        // Return harmless fallback during SSR
+        return {
+          credits: 0,
+          deductCredits: async () => false,
+          refreshCredits: async () => {},
+          addCredits: async () => {}
+        };
+      }
+      throw new Error("useCredits must be used within a CreditProvider");
+    }
+    return context;
+  } catch {
+    // Extra protection for edge cases (like _error.js prerender)
+    return {
+      credits: 0,
+      deductCredits: async () => false,
+      refreshCredits: async () => {},
+      addCredits: async () => {}
+    };
   }
-  return context;
 };
