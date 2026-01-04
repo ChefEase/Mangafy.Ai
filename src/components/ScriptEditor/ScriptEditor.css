@@ -169,7 +169,7 @@
 
 @media (max-width: 1024px) {
   .script-editor {
-    position: realtive;
+    position: relative;
     width: 85%; /* ✅ already relative — leave it */
     height: auto;
   
@@ -177,7 +177,7 @@
     top: calc(625 / 844 * 100vh);
   
     /* Convert 30px → relative to 390px width */
-    left: calc(30 / 390 * 100vw);
+    left: calc(0 / 390 * 100vw);
   
     transform: none;
     margin: 16px auto;
@@ -472,7 +472,7 @@
   /* --- SCRIPT TAB WRAPPER (optional, only applies when visible) --- */
   .script-tab-active .script-editor,
   .script-editor {
-    position: absollute !important;
+    position: absolute !important;
     top: 1330px;                        /* 🔧 was 700px — reduced to fit viewport better */
     left: 510px;
     transform: translateX(-50%) !important;
@@ -513,7 +513,7 @@
   /* --- SCRIPT TAB WRAPPER (optional, only applies when visible) --- */
   .script-tab-active .script-editor,
   .script-editor {
-    position: absollute !important;
+    position: absolute !important;
     top: 1330px;                        /* 🔧 was 700px — reduced to fit viewport better */
     left: 510px;
     transform: translateX(-50%) !important;
