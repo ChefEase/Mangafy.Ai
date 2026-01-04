@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import CharacterForm from "@/components/Character/CharacterForm";
 import "./CharacterDetailPage.css";
+import MobileNav from "@/components/ScriptEditor/MobileNav"
 
 interface Character {
   id: string;
@@ -123,6 +124,7 @@ useEffect(() => {
   }
 
   return (
+    <>
     <div className="character-detail-page">
       <h1>Edit Character</h1>
       <CharacterForm
@@ -130,5 +132,9 @@ useEffect(() => {
         onSubmit={handleUpdateCharacter}
       />
     </div>
+    <div>
+        <MobileNav /> {/* Only visible on mobile */}
+        </div>
+  </>
   );
 }
