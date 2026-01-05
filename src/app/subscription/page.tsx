@@ -104,6 +104,7 @@ export default function SubscriptionPage() {
       price: "$95.99",
       priceId:"price_1RnV9mCfqQf6EFEyBT96MPqv",
       features: [
+        "🚀 14,400 Credits",
         "💰 Save 20% (Normally $120)",
         "🧠 Character Consistency AI",
         "🎨 Cover Art & Story Generator",
@@ -118,6 +119,7 @@ export default function SubscriptionPage() {
       price: "$239.99",
       priceId: "price_1RnVCJCfqQf6EFEyvODEySQl",
       features: [
+        "🚀 42,000 Credits",
         "🔥 Early Access to New Features",
         "👥 Priority Support & Creator Chatbot",
         "🎁 Referral: Earn 125 Credits Each"
@@ -131,21 +133,25 @@ export default function SubscriptionPage() {
   const handlePurchase = async (priceId: string) => {
     const res = await fetch("/api/checkout", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        priceId,
-        userId: user?.id,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ priceId, userId: user?.id }),
     });
   
-    const data = await res.json();
-    if (data.url) {
-      window.location.href = data.url;
+    const text = await res.text(); // safer than res.json()
+    let data: any = {};
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch {}
+  
+    if (!res.ok) {
+      console.error("Checkout failed:", res.status, data);
+      alert(data?.error || "Checkout failed");
+      return;
     }
+  
+    if (data.url) window.location.href = data.url;
   };
-
+  
   const renderPlans = (plans: Plan[]) =>
     plans.map((plan, index) => (
       <div key={index} className="plan-card">
