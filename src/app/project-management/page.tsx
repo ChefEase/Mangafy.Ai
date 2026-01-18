@@ -8,9 +8,8 @@ import CreateProjectModal from "./components/CreateProjectModal";
 import ChapterList from "./components/ChapterList";
 import "./styles/projectManagement.css";
 import { fetchUserData, saveUserData } from "@/utils/airtable";
-import Head from "next/head";
 
-// ✅ Define TypeScript interfaces for Projects & Chapters
+// Define TypeScript interfaces for Projects & Chapters
 interface Chapter {
   id: string;
   title: string;
@@ -42,13 +41,16 @@ export default function ProjectManagementPage() {
     localStorage.setItem("projects", JSON.stringify(projects));
   }, [projects]);
 
-  // ✅ Fixing `handleCreateProject`
-  const handleCreateProject = async (projectData: { title: string; description: string; thumbnail: string }) => {
+  const handleCreateProject = async (projectData: {
+    title: string;
+    description: string;
+    thumbnail: string;
+  }) => {
     const userId = localStorage.getItem("userId");
     console.log(localStorage.getItem("userId"));
 
     if (!userId) {
-      console.error("❌ No userId found in localStorage");
+      console.error("No userId found in localStorage");
       alert("You're not signed in properly. Please log in again.");
       return;
     }
@@ -62,18 +64,17 @@ export default function ProjectManagementPage() {
     const updatedProjects = [...projects, newProject];
     setProjects(updatedProjects);
 
-    console.log("✅ Saving project to Airtable...");
+    console.log("Saving project to Airtable...");
 
-    try {// Save updated projects to Airtable
+    try {
       await saveUserData(userId, { projects: updatedProjects, characters: {} });
-      console.log("✅ Project saved to Airtable");
+      console.log("Project saved to Airtable");
 
       window.dispatchEvent(new CustomEvent("projectCreated"));
-
     } catch (error) {
-      console.error("❌ Error saving project to Airtable:", error);
+      console.error("Error saving project to Airtable:", error);
       alert("Something went wrong saving your project.");
-    } 
+    }
     setShowCreateModal(false);
   };
 
@@ -89,7 +90,6 @@ export default function ProjectManagementPage() {
     });
     setProjects(updatedProjects);
 
-    // Save updated projects to Airtable
     const userId = localStorage.getItem("userId");
     if (userId) {
       saveUserData(userId, { projects: updatedProjects, characters: {} });
@@ -101,7 +101,7 @@ export default function ProjectManagementPage() {
       if (project.id === projectId) {
         const newChapter = {
           id: crypto.randomUUID(),
-          title: chapterTitle, // Use the provided chapter title
+          title: chapterTitle,
         };
         return {
           ...project,
@@ -112,7 +112,6 @@ export default function ProjectManagementPage() {
     });
     setProjects(updatedProjects);
 
-    // Save updated projects to Airtable
     const userId = localStorage.getItem("userId");
     if (userId) {
       await saveUserData(userId, { projects: updatedProjects, characters: {} });
@@ -120,7 +119,6 @@ export default function ProjectManagementPage() {
   };
 
   const handleEditChapter = (chapterId: string) => {
-    // Redirect to the script-writing page
     window.location.href = `/script-writing?chapterId=${chapterId}`;
   };
 
@@ -139,7 +137,6 @@ export default function ProjectManagementPage() {
       });
       setProjects(updatedProjects);
 
-      // Save updated projects to Airtable
       const userId = localStorage.getItem("userId");
       if (userId) {
         await saveUserData(userId, { projects: updatedProjects, characters: {} });
@@ -154,7 +151,6 @@ export default function ProjectManagementPage() {
       const updatedProjects = (projects || []).filter((project) => project.id !== projectId);
       setProjects(updatedProjects);
 
-      // Save updated projects to Airtable
       const userId = localStorage.getItem("userId");
       if (userId) {
         await saveUserData(userId, { projects: updatedProjects, characters: {} });
@@ -164,54 +160,11 @@ export default function ProjectManagementPage() {
 
   return (
     <div>
-      <Head>
-  <title>Project Management – Mangafy.Ai</title>
-  <meta
-    name="description"
-    content="Manage your manga projects effortlessly on Mangafy.Ai. Create, organize, and track your manga stories and chapters with ease."
-  />
-  <meta
-    name="description"
-    lang="ja"
-    content="Mangafy.Aiでマンガプロジェクトを効率的に管理。ストーリーや章を簡単に作成・整理・追跡できます。"
-  />
-
-  {/* Open Graph */}
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://www.mangafyai.com//project-management" />
-  <meta property="og:title" content="Project Management – Mangafy.Ai" />
-  <meta
-    property="og:description"
-    content="Manage your manga projects effortlessly on Mangafy.Ai. Create, organize, and track your manga stories and chapters with ease."
-  />
-  <meta
-    property="og:description"
-    lang="ja"
-    content="Mangafy.Aiでマンガプロジェクトを効率的に管理。ストーリーや章を簡単に作成・整理・追跡できます。"
-  />
-  <meta property="og:image" content="https://www.mangafyai.com//logo.png" />
-
-  {/* Twitter */}
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:url" content="https://www.mangafyai.com//project-management" />
-  <meta name="twitter:title" content="Project Management – Mangafy.Ai" />
-  <meta
-    name="twitter:description"
-    content="Manage your manga projects effortlessly on Mangafy.Ai. Create, organize, and track your manga stories and chapters with ease."
-  />
-  <meta
-    name="twitter:description"
-    lang="ja"
-    content="Mangafy.Aiでマンガプロジェクトを効率的に管理。ストーリーや章を簡単に作成・整理・追跡できます。"
-  />
-  <meta name="twitter:image" content="https://www.mangafyai.com//logo.png" />
-</Head>
-
       <Header />
       <div className="project-management-page">
         <ProjectSidebar
           projects={projects}
-          onSelectProject={(project) => setSelectedProject(project)} // ✅ Now passing full project object
+          onSelectProject={(project) => setSelectedProject(project)}
           onCreateProject={() => setShowCreateModal(true)}
         />
 
@@ -236,8 +189,8 @@ export default function ProjectManagementPage() {
                   project={project}
                   onSelect={(p) => setSelectedProject(p)}
                   onDeleteProject={handleDeleteProject}
-                  onCreateChapter={handleCreateChapter} // Pass the function here
-                  onRenameProject={handleRenameProject} // Pass the function here
+                  onCreateChapter={handleCreateChapter}
+                  onRenameProject={handleRenameProject}
                 />
               ))}
             </div>

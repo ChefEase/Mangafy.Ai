@@ -1,22 +1,33 @@
+// app/api/generate-image/route.js
 import { Client } from "@gradio/client";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// Reusable Gradio client
-const clientPromise = Client.connect("black-forest-labs/FLUX.1-Kontext-Dev");
+let cachedClient = null;
+
+async function getClient() {
+  if (cachedClient) return cachedClient;
+
+  // If this model/space requires auth, uncomment and set HF_TOKEN in .env.local
+  // cachedClient = await Client.connect("black-forest-labs/FLUX.1-Kontext-Dev", {
+  //   hf_token: process.env.HF_TOKEN,
+  // });
+
+  cachedClient = await Client.connect("black-forest-labs/FLUX.1-Kontext-Dev");
+  return cachedClient;
+}
 
 export async function POST(req) {
   try {
     const formData = await req.formData();
 
-    const prompt = (formData.get("prompt") || "").toString();
-    const guidance_scale = parseFloat((formData.get("guidance_scale") || "7.5").toString());
-    const num_inference_steps = parseInt((formData.get("num_inference_steps") || "20").toString(), 10);
-    const seed = parseInt((formData.get("seed") || "0").toString(), 10);
+    const prompt = String(formData.get("prompt") || "");
+    const guidance_scale = parseFloat(String(formData.get("guidance_scale") || "7.5"));
+    const num_inference_steps = parseInt(String(formData.get("num_inference_steps") || "20"), 10);
+    const seed = parseInt(String(formData.get("seed") || "0"), 10);
 
     const imageFile = formData.get("image");
-
     if (!imageFile) {
       return new Response(JSON.stringify({ error: "Missing reference image" }), {
         status: 400,
@@ -24,11 +35,10 @@ export async function POST(req) {
       });
     }
 
-    // File -> Buffer
     const arrayBuffer = await imageFile.arrayBuffer();
     const imageBuffer = Buffer.from(arrayBuffer);
 
-    const client = await clientPromise;
+    const client = await getClient();
 
     const result = await client.predict("/infer", {
       input_image: imageBuffer,
@@ -61,10 +71,13 @@ export async function POST(req) {
       });
     }
 
-    return new Response(JSON.stringify({ error: "Unexpected image data format from model", result }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ error: "Unexpected image data format from model", result }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   } catch (error) {
     console.error("Generation error:", error);
     return new Response(JSON.stringify({ error: error?.message || "Unknown error" }), {

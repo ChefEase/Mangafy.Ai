@@ -8,12 +8,13 @@
   "scripts": {
     "dev": "next dev",
     "vercel-build": "npm ci && npm run build",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "next lint",
     "start:electron": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && npx electron main.js\"",
     "postbuild": "next-sitemap",
-    "dist": "next build && electron-builder"
+    "dist": "next build --webpack && electron-builder"
+
   },
   "build": {
     "appId": "com.mangafy.ai",

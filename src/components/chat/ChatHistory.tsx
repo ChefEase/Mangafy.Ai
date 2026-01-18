@@ -19,13 +19,17 @@ export default function ChatHistory({
   return (
     <div className={styles.sidebar}>
       <div className={styles.header}>
-        <h2>Chats</h2>
+        <div>
+          <h2>Story Sessions</h2>
+          <p className={styles.subtitle}>Your manga ideas, saved here</p>
+        </div>
         <button onClick={onCreateNewChat} className={styles.newChatButton}>
-          +
+          New Story
         </button>
       </div>
 
       <div className={styles.chatList}>
+        <div className={styles.sectionLabel}>Recent Conversations</div>
         {chats.map(chat => (
           <div
             key={chat.id}

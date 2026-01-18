@@ -3,13 +3,19 @@
   flex-direction: column;
   gap: 1.5rem;
   align-items: center;
-  background: #f8f9ff;
+  background: #fff7ed;
   padding: 2rem;
   border-radius: 16px;
-  border: 1px solid #e8eefe;
+  border: 1px solid rgba(249, 115, 22, 0.35);
   margin: 2rem 0;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 112, 243, 0.08);
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.12);
+}
+
+:root[data-theme="dark"] .subscription-status {
+  background: #141414;
+  border-color: rgba(249, 115, 22, 0.35);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
 }
 
 .subscription-status p {
@@ -21,13 +27,13 @@
 }
 
 .subscription-status p strong {
-  color: #0070f3;
+  color: #f97316;
   font-weight: 600;
 }
 
 .subscription-status button {
   padding: 0.875rem 2rem;
-  background: linear-gradient(135deg, #0070f3, #0061d1);
+  background: linear-gradient(135deg, #ff8a00, #f97316);
   color: white;
   border: none;
   border-radius: 8px;
@@ -37,13 +43,13 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  box-shadow: 0 4px 12px rgba(0, 112, 243, 0.15);
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
 }
 
 .subscription-status button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(0, 112, 243, 0.2);
-  background: linear-gradient(135deg, #0061d1, #0052b8);
+  box-shadow: 0 6px 16px rgba(249, 115, 22, 0.25);
+  background: linear-gradient(135deg, #ea580c, #f97316);
 }
 
 .subscription-section h2 {
@@ -62,7 +68,7 @@
   top: 50%;
   width: 30%;
   height: 1px;
-  background: #e0e0e0;
+  background: rgba(249, 115, 22, 0.3);
 }
 
 .subscription-section h2::before {

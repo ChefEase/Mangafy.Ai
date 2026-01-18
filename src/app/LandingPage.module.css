@@ -119,6 +119,16 @@
   .ctaButton:hover {
     background-color: #dd6b20; /* orange-700 */
   }
+
+  .ctaRow {
+    margin-top: 1rem;
+  }
+
+  .ctaRowCenter {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+  }
   
   .samplesSection {
     max-width: 80rem;

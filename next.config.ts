@@ -24,6 +24,13 @@ const nextConfig: NextConfig = {
       zlib: false,
       crypto: false
     };
+
+    // Force consistent casing in file paths
+    config.resolve.modules = [
+      config.resolve.modules[0], // node_modules
+      ...config.resolve.modules.slice(1)
+    ];
+
     return config;
   },
   async headers() {

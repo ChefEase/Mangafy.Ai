@@ -594,6 +594,7 @@ layout: (panels, ctx, A4_WIDTH, A4_HEIGHT) => {
     const [content, setContent] = useState<string>("");
     const [errors, setErrors] = useState<string[]>([]);
 
+
     // Change the characters state line to:
     const [characters, setCharacters] = useState<Character[]>([]);
     const [charactersPageWidth, setCharactersPageWidth] = useState(250); // Default width for characters panel

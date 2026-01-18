@@ -1,5 +1,5 @@
 .logout-button {
-    background-color: #2563eb; /* Tailwind blue-600 */
+    background-color: #f97316;
     color: white;
     padding: 0.75rem 1.5rem;
     font-size: 1rem;
@@ -11,19 +11,19 @@
   }
   
   .logout-button:hover {
-    background-color: #1e40af; /* Tailwind blue-800 */
+    background-color: #ea580c;
   }
   
   @media (max-width: 1024px) {
     .logout-button {
-      background-color: #ef4444; /* Override with Tailwind red-500 */
+      background-color: #f97316;
       padding: 0.5rem 1rem;      /* Smaller padding */
       font-size: 0.875rem;       /* Smaller font */
       box-shadow: none;          /* Remove shadow */
     }
   
     .logout-button:hover {
-      background-color: #b91c1c; /* Darker red on hover */
+      background-color: #ea580c;
     }
   }
   

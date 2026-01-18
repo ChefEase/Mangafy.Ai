@@ -713,7 +713,7 @@
 
 /* Default (desktop) */
 .transitionToggle {
-  margin-top: 540px;
+  margin-top: 560px;
 }
 
 /* If you want it to stick near bottom on small screens */
@@ -2022,6 +2022,8 @@
 .script-sidebar-fixed {
   position: relative; /* already relative, keep it */
 }
+
+
 
 
     

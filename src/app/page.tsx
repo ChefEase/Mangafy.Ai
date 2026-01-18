@@ -245,6 +245,11 @@ export default function LandingPage() {
             </div>
           ))}
         </div>
+        <div className={styles.ctaRowCenter}>
+          <Link href="/splash-screen" legacyBehavior>
+            <a className={styles.ctaButton}>Try Mangafy Now For Free</a>
+          </Link>
+        </div>
       </section>
 
       {/* FEATURES */}
@@ -255,6 +260,11 @@ export default function LandingPage() {
             <div className={styles.featureText}>
               <h3 className={styles.featureTitle}>{title}</h3>
               <p className={styles.featureDescription}>{description}</p>
+              <div className={styles.ctaRow}>
+                <Link href="/splash-screen" legacyBehavior>
+                  <a className={styles.ctaButton}>Try Mangafy Now For Free</a>
+                </Link>
+              </div>
             </div>
             <div className={styles.featureMedia}>
             {isVideo ? (
@@ -314,6 +324,11 @@ export default function LandingPage() {
               Enjoy faster performance, offline capabilities, and a smoother manga creation experience
               with our desktop app.
             </p>
+            <div className={styles.ctaRowCenter}>
+              <Link href="/splash-screen" legacyBehavior>
+                <a className={styles.ctaButton}>Try Mangafy Now For Free</a>
+              </Link>
+            </div>
             <div className={styles.downloadButtons}>
               <a href="/dist/Mangafy.Ai Setup 0.1.0.exe" className={styles.downloadButtonWindows}>
                 <img src="/icons/windows3.svg" alt="Windows" /> Download for Windows

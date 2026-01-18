@@ -19,7 +19,12 @@ export default function ChatInterface() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const CHAT_COST_PER_MESSAGE = 0.05; // Cost per AI response
   const [chatRecords, setChatRecords] = useState<any[]>([]);
-const [messageRecords, setMessageRecords] = useState<any[]>([]);
+  const [messageRecords, setMessageRecords] = useState<any[]>([]);
+  const samplePrompts = [
+    "Create a shonen rivalry between two friends who awaken cursed powers.",
+    "Design a villain with a tragic backstory and a signature weapon.",
+    "Turn my idea into 4 manga panels with camera angles and dialogue cues."
+  ];
 const isSending = useRef(false); // Lock to prevent concurrent requests
 
 async function uploadImageToCloudinary(base64Image: string): Promise<string | null> {
@@ -445,12 +450,49 @@ if (userMessage.imageUrl) {
           </>
         ) : (
           <div className={styles.emptyState}>
-            <h2>Story Assistant</h2>
-            <p>Upload images for character descriptions or ask for story ideas</p>
-            <button  onClick={() => createNewChat("Untitled Chat")}
-              className={styles.newChatButton}>
-              Start New Chat
-            </button>
+            <div className={styles.emptyHero}>
+              <div className={styles.emptyBadge}>Mangafy Story Assistant</div>
+              <h2>Build manga scenes, fast</h2>
+              <p>
+                Start with a character idea or drop in an image. The assistant helps with
+                story beats, panels, and dialogue rhythm.
+              </p>
+              <button
+                onClick={() => createNewChat("Untitled Chat")}
+                className={styles.newChatButton}
+              >
+                Start a Manga Idea
+              </button>
+              <div className={styles.emptyHint}>
+                You can upload character images or begin with a single sentence.
+              </div>
+            </div>
+
+            <div className={styles.emptyGrid}>
+              <div className={styles.emptyCard}>
+                <div className={styles.emptyCardHeader}>Prompt ideas</div>
+                <div className={styles.promptList}>
+                  {samplePrompts.map((prompt) => (
+                    <button
+                      key={prompt}
+                      className={styles.promptChip}
+                      onClick={() => navigator.clipboard.writeText(prompt)}
+                      title="Click to copy"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className={styles.emptyCard}>
+                <div className={styles.emptyCardHeader}>What it does</div>
+                <ul className={styles.emptyBullets}>
+                  <li>Character-aware story beats</li>
+                  <li>Manga panel pacing suggestions</li>
+                  <li>Dialogue + scene mood guidance</li>
+                </ul>
+              </div>
+            </div>
           </div>
         )}
       </div>

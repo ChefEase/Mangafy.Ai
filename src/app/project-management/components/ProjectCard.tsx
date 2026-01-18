@@ -24,42 +24,8 @@ export default function ProjectCard({
   onRenameProject,
   onDeleteProject,
 }: ProjectCardProps) {
-  const [showContextMenu, setShowContextMenu] = useState(false);
-  const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
-  const longPressTimer = useRef<number | null>(null);
-  const contextMenuRef = useRef<HTMLDivElement | null>(null);
-
-  const handleRightClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setContextMenuPosition({ x: e.clientX, y: e.clientY });
-    setShowContextMenu(true);
-  };
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (e.touches.length !== 1) return; // Only single touch
-    const touch = e.touches[0];
-
-    longPressTimer.current = window.setTimeout(() => {
-      setContextMenuPosition({ x: touch.clientX, y: touch.clientY });
-      setShowContextMenu(true);
-    }, 600); // 600ms for long press
-  };
-
-  // Cancel long press if touch ends or moves
-  const cancelLongPress = () => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-  };
-
-  const handleTouchEnd = () => {
-    cancelLongPress();
-  };
-
-  const handleTouchMove = () => {
-    cancelLongPress();
-  };
+  const [showActions, setShowActions] = useState(false);
+  const cardRef = useRef<HTMLDivElement | null>(null);
 
   const handleAddChapter = (e: React.MouseEvent | React.TouchEvent) => {
     e.stopPropagation();
@@ -67,7 +33,7 @@ export default function ProjectCard({
     if (chapterTitle) {
       onCreateChapter(project.id, chapterTitle);
     }
-    setShowContextMenu(false);
+    setShowActions(false);
   };
 
   const handleRename = (e: React.MouseEvent | React.TouchEvent) => {
@@ -76,7 +42,7 @@ export default function ProjectCard({
     if (newTitle) {
       onRenameProject(project.id, newTitle);
     }
-    setShowContextMenu(false);
+    setShowActions(false);
   };
 
   const handleDeleteProject = (e: React.MouseEvent | React.TouchEvent, projectId: string) => {
@@ -85,21 +51,27 @@ export default function ProjectCard({
     if (confirmDelete) {
       onDeleteProject(projectId);
     }
-    setShowContextMenu(false);
+    setShowActions(false);
   };
 
-  // Close menu when clicking/tapping outside
+  const handleOpenProject = (e: React.MouseEvent | React.TouchEvent) => {
+    e.stopPropagation();
+    onSelect(project);
+    setShowActions(false);
+  };
+
+  // Close actions when clicking/tapping outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent | TouchEvent) => {
       if (
-        contextMenuRef.current &&
-        !contextMenuRef.current.contains(e.target as Node)
+        cardRef.current &&
+        !cardRef.current.contains(e.target as Node)
       ) {
-        setShowContextMenu(false);
+        setShowActions(false);
       }
     };
 
-    if (showContextMenu) {
+    if (showActions) {
       document.addEventListener("mousedown", handleClickOutside);
       document.addEventListener("touchstart", handleClickOutside);
     } else {
@@ -111,38 +83,43 @@ export default function ProjectCard({
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("touchstart", handleClickOutside);
     };
-  }, [showContextMenu]);
+  }, [showActions]);
 
   return (
     <div
-      className="project-card"
-      onClick={() => onSelect(project)}
-      onContextMenu={handleRightClick}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      onTouchMove={handleTouchMove}
+      ref={cardRef}
+      className={`project-card${showActions ? " is-open" : ""}`}
+      onClick={() => setShowActions((prev) => !prev)}
+      role="button"
+      tabIndex={0}
+      aria-expanded={showActions}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setShowActions((prev) => !prev);
+        }
+      }}
     >
       <img src={project.thumbnail} alt={project.title} />
       <h3>{project.title}</h3>
       <p>{project.description}</p>
-      {showContextMenu && (
-        <div
-          ref={contextMenuRef}
-          className="context-menu"
-          style={{
-            position: "fixed",
-            top: 100,
-            left: 100,
-            zIndex: 1000,
-            backgroundColor: "darkgrey",
-            border: "1px solid #ccc",
-            padding: "8px",
-            borderRadius: "4px",
-          }}
-        >
-          <button onClick={handleRename}>Rename</button>
-          <button onClick={handleAddChapter}>Add Chapter</button>
-          <button onClick={(e) => handleDeleteProject(e, project.id)}>Delete Project</button>
+      {showActions && (
+        <div className="project-card-actions" onClick={(e) => e.stopPropagation()}>
+          <button className="project-card-action primary" onClick={handleOpenProject}>
+            Open Project
+          </button>
+          <button className="project-card-action" onClick={handleAddChapter}>
+            Add Chapter
+          </button>
+          <button className="project-card-action" onClick={handleRename}>
+            Rename
+          </button>
+          <button
+            className="project-card-action danger"
+            onClick={(e) => handleDeleteProject(e, project.id)}
+          >
+            Delete
+          </button>
         </div>
       )}
     </div>
