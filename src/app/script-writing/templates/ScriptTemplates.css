@@ -1,205 +1,284 @@
-/* ===== Updated Header ===== */
-.custom-header {
-    font-size: 32px; /* Slightly smaller but prominent */
-    font-weight: 700; /* Semi-bold instead of heavy bold */
-    color: #1a1a1a; /* Darker text for better contrast */
-    text-align: center;
-    margin: 40px 0;
-    position: relative;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+/* ===== Script Templates Page ===== */
+.templates-section {
+  min-height: 100vh;
+  background: radial-gradient(circle at top, rgba(249, 115, 22, 0.18), transparent 45%), #0b0b0b;
+  color: #f9fafb;
+  padding: 2.5rem 1.5rem 4rem;
+  display: block;
 }
 
-.custom-header::after {
-    content: '';
-    display: block;
-    width: 60px;
-    height: 3px;
-    background: #0070f3; /* GoDaddy's blue accent */
-    margin: 15px auto 0;
+.templates-header {
+  max-width: 1100px;
+  margin: 0 auto 2rem;
+  text-align: center;
 }
 
-/* ===== Modern Grid Layout ===== */
+.templates-title h2 {
+  font-size: 2.6rem;
+  font-weight: 700;
+  margin: 0.5rem 0 0.75rem;
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.templates-kicker {
+  display: inline-block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: #f97316;
+}
+
+.templates-title p {
+  color: #d1d5db;
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.templates-toolbar {
+  max-width: 1100px;
+  margin: 0 auto 2rem;
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto auto;
+  gap: 1rem;
+  align-items: center;
+  width: 100%;
+}
+
+.templates-search {
+  flex: 1 1 280px;
+}
+
+.templates-search input {
+  width: 100%;
+  background: #111111;
+  border: 1px solid #262626;
+  border-radius: 10px;
+  color: #f9fafb;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+}
+
+.templates-search input:focus {
+  outline: none;
+  border-color: #f97316;
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.3);
+}
+
+.templates-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-start;
+}
+
+.template-chip {
+  background: #111111;
+  border: 1px solid #2a2a2a;
+  color: #d1d5db;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.template-chip:hover,
+.template-chip.is-active {
+  border-color: #f97316;
+  color: #fff7ed;
+  background: rgba(249, 115, 22, 0.18);
+}
+
+.templates-toolbar-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-self: end;
+}
+
+.templates-count {
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+.templates-group {
+  max-width: 1100px;
+  margin: 0 auto 2.5rem;
+  width: 100%;
+}
+
+.templates-group-header {
+  margin-bottom: 1rem;
+}
+
+.templates-group-header h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 0.35rem;
+}
+
+.templates-group-header p {
+  margin: 0;
+  color: #9ca3af;
+}
+
 .templates-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* More responsive */
-    gap: 30px;
-    padding: 0 20px;
-    max-width: 1200px;
-    margin: 100px auto;
-    margin-left: -800px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
 }
 
-/* ===== Elevated Card Design ===== */
 .template-card {
-    background: #ffffff;
-    border-radius: 16px; /* Larger radius */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Softer shadow */
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
-    position: relative;
-    border: 1px solid rgba(0, 0, 0, 0.05); /* Subtle border */
+  background: #101010;
+  border: 1px solid #1f1f1f;
+  border-radius: 16px;
+  padding: 1.25rem 1.25rem 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-/* Card Hover Effect */
 .template-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-3px);
+  border-color: #2a2a2a;
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.35);
 }
 
-/* ===== Card Content Styling ===== */
-.template-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #0070f3 0%, #00c7b1 100%); /* Gradient accent */
+.template-card.is-expanded {
+  border-color: #f97316;
+  box-shadow: 0 18px 34px rgba(249, 115, 22, 0.18);
+}
+
+.template-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
 }
 
 .template-card h3 {
-    font-size: 20px;
-    font-weight: 600;
-    color: #1a1a1a;
-    margin: 24px 20px 16px;
-    text-align: left; /* Left-aligned like GoDaddy's card titles */
-    padding-bottom: 12px;
-    border-bottom: 1px solid #eee;
+  font-size: 1.1rem;
+  margin: 0 0 0.4rem;
+  font-weight: 600;
 }
 
-/* ===== Card Body Styling ===== */
-.template-content {
-    padding: 0 20px 20px;
-    color: #666;
-    line-height: 1.6;
-    font-size: 15px;
+.template-summary {
+  margin: 0;
+  color: #9ca3af;
+  line-height: 1.5;
+  font-size: 0.9rem;
 }
 
-/* ===== Action Button Style ===== */
+.template-badge {
+  background: rgba(249, 115, 22, 0.2);
+  color: #ffedd5;
+  border: 1px solid rgba(249, 115, 22, 0.6);
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
 .template-actions {
-    display: flex;
-    gap: 12px;
-    padding: 20px;
-    border-top: 1px solid #f5f5f5;
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
 }
 
-.template-button {
-    flex: 1;
-    padding: 12px;
-    border: none;
-    border-radius: 8px;
-    background: #f8f9fa;
-    color: #0070f3;
-    font-weight: 500;
-    transition: all 0.2s ease;
+.template-toggle,
+.template-use {
+  flex: 1;
+  border-radius: 10px;
+  padding: 0.65rem 0.8rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
 }
 
-.template-button:hover {
-    background: #0070f3;
-    color: white;
-    transform: translateY(-1px);
+.template-toggle {
+  background: transparent;
+  border-color: #2a2a2a;
+  color: #e5e7eb;
 }
 
-/* ===== Scrollbar Styling ===== */
-.template-card::-webkit-scrollbar {
-    width: 6px;
+.template-toggle:hover {
+  border-color: #f97316;
+  color: #fff7ed;
 }
 
-.template-card::-webkit-scrollbar-thumb {
-    background: #ddd;
-    border-radius: 4px;
+.template-use {
+  background: #f97316;
+  color: #0b0b0b;
 }
 
-/* ===== Loading Animation ===== */
-@keyframes cardLoading {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
+.template-use:hover {
+  background: #fb923c;
 }
 
-.template-card.loading {
-    background: linear-gradient(90deg, #f6f6f6 25%, #f0f0f0 50%, #f6f6f6 75%);
-    background-size: 200% 100%;
-    animation: cardLoading 1.5s infinite;
+.template-body {
+  margin-top: 1rem;
+  border-top: 1px solid #1f1f1f;
+  padding-top: 1rem;
+  background: #0d0d0d;
+  border-radius: 12px;
 }
 
-.templates-section h2 {
-    font-size: 2.4rem; /* Increase text size */
-    font-weight: bold; /* Make text bold */
-    font-family: 'Pacifico', cursive; /* Example of a clean handwriting font */
-    text-align: center; /* Center the text */
-    margin-top: -30px; /* Add space below the header */
-    margin-left: 600px;
+.template-paragraph {
+  margin: 0 0 0.85rem;
+  color: #d1d5db;
+  line-height: 1.6;
+  font-size: 0.9rem;
 }
 
-@media (max-width: 1024px) {
-  /* Header smaller and less margin */
-  .custom-header {
-    font-size: 24px;
-    margin: 20px 0;
-    text-align: center; /* Center the header on mobile */
+.template-paragraph:last-child {
+  margin-bottom: 0;
+}
+
+.templates-empty {
+  max-width: 1100px;
+  margin: 0 auto 2rem;
+  color: #fcd34d;
+  font-weight: 600;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+@media (max-width: 900px) {
+  .templates-title h2 {
+    font-size: 2.1rem;
   }
 
-  .custom-header::after {
-    width: 40px;
-    height: 2px;
-    margin: 10px auto 0; /* Center underline */
-  }
-
-  /* Grid becomes single column with proper padding */
-  .templates-grid {
+  .templates-toolbar {
     grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 0 15px; /* Slight padding so cards don't touch edges */
-    max-width: 400px; /* Reduced from 500px to fit smaller screens better */
-    margin: 40px auto; /* Center grid */
+    align-items: stretch;
   }
 
-  /* Smaller card radius, less shadow */
-  .template-card {
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    width: 100%; /* Make card fit container */
-    max-width: 100%; /* Prevent overflow */
-    box-sizing: border-box; /* Ensure padding doesn’t push width */
-    margin: 0 auto; /* Center the card in the grid */
+  .templates-toolbar-meta {
+    justify-content: space-between;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 600px) {
+  .templates-section {
+    padding: 2rem 1rem 3rem;
   }
 
-  .template-card:hover {
-    transform: none; /* Disable hover transform on touch */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  }
-
-  /* Smaller headings */
-  .template-card h3 {
-    font-size: 18px;
-    margin: 16px 16px 12px;
-    text-align: left; /* Keep text aligned nicely */
-  }
-
-  /* Smaller body text */
-  .template-content {
-    font-size: 14px;
-    padding: 0 16px 16px;
-  }
-
-  /* Smaller buttons, less padding */
   .template-actions {
-    padding: 12px;
-    gap: 8px;
-  }
-
-  .template-button {
-    padding: 10px;
-    font-size: 14px;
-    border-radius: 6px;
-  }
-
-  /* Header section title smaller and fully centered */
-  .templates-section h2 {
-    font-size: 2rem;
-    margin: 0 auto 15px auto; /* Remove left/right margin push */
-    text-align: center; /* Force center alignment */
-    max-width: 90%; /* Prevent it from stretching too far right */
+    flex-direction: column;
   }
 }

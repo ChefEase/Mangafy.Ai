@@ -3,118 +3,249 @@
    Theme: Orange, Black, White, Gray
    ========================= */
 
-   .documentation-page {
-    min-height: 100vh;
-    background-color: #f9fafb;
-    color: #111827;
-    font-family: 'Inter', sans-serif;
+.documentation-page {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  color: #111827;
+  font-family: "Inter", sans-serif;
+}
+
+/* ---------- HEADER ---------- */
+.documentation-header {
+  background-color: #0b0b0b;
+  color: #ffffff;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.documentation-header h1 {
+  font-size: 2.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.documentation-header p {
+  margin-top: 0.75rem;
+  font-size: 1.15rem;
+  color: #f97316;
+  font-weight: 500;
+}
+
+/* ---------- MAIN CONTENT ---------- */
+.documentation-main {
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.doc-intro {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.doc-intro-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;
+  padding: 1.75rem;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.doc-intro-card h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.doc-intro-card p {
+  color: #4b5563;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.doc-toc {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.doc-toc h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: #111827;
+}
+
+.doc-toc ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.doc-toc a {
+  color: #ea580c;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.doc-toc a:hover {
+  text-decoration: underline;
+}
+
+/* ---------- SECTION STYLES ---------- */
+.documentation-section {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid #f97316;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+}
+
+.documentation-section h2 {
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.75rem;
+}
+
+.documentation-section p {
+  margin-bottom: 1rem;
+  color: #374151;
+  line-height: 1.7;
+}
+
+.doc-lead {
+  font-size: 1.05rem;
+  color: #1f2937;
+  font-weight: 500;
+}
+
+.doc-subsection {
+  margin-bottom: 1.5rem;
+}
+
+.doc-subsection h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #111827;
+}
+
+.doc-list {
+  margin: 0.75rem 0 1.25rem 1.25rem;
+  color: #374151;
+}
+
+.doc-list li {
+  margin-bottom: 0.5rem;
+}
+
+.doc-code {
+  background: #0f172a;
+  color: #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  font-size: 0.95rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.doc-callout {
+  border-radius: 0.75rem;
+  padding: 0.9rem 1rem;
+  margin: 1rem 0;
+  font-weight: 500;
+}
+
+.doc-tip {
+  background: #ecfeff;
+  border: 1px solid #67e8f9;
+  color: #0f172a;
+}
+
+.doc-important {
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  color: #7c2d12;
+}
+
+.doc-warning {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #7f1d1d;
+}
+
+.highlight {
+  color: #f97316;
+  font-weight: 600;
+}
+
+/* ---------- IMAGE CARDS ---------- */
+.documentation-image-card {
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  transition: all 0.3s ease;
+}
+
+.documentation-image-card img {
+  width: 100%;
+  max-width: 460px;
+  border-radius: 0.75rem;
+  object-fit: contain;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.documentation-image-card:hover img {
+  transform: scale(1.03);
+  box-shadow: 0 8px 20px rgba(255, 165, 0, 0.3);
+}
+
+/* ---------- FOOTER ---------- */
+.documentation-footer {
+  background-color: #0b0b0b;
+  color: #d1d5db;
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (min-width: 900px) {
+  .doc-intro {
+    grid-template-columns: 2fr 1fr;
+    align-items: start;
   }
-  
-  /* ---------- HEADER ---------- */
-  .documentation-header {
-    background-color: #000;
-    color: white;
-    padding: 2rem 1.5rem;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  
+}
+
+@media (max-width: 768px) {
   .documentation-header h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
+    font-size: 2.1rem;
   }
-  
-  .documentation-header p {
-    margin-top: 0.75rem;
-    font-size: 1.125rem;
-    color: #f97316;
-    font-weight: 500;
-  }
-  
-  /* ---------- MAIN CONTENT ---------- */
+
   .documentation-main {
-    max-width: 72rem;
-    margin: 0 auto;
-    padding: 3rem 1.5rem;
+    padding: 2rem 1rem;
   }
-  
+
   .documentation-section {
-    margin-bottom: 4rem;
-  }
-  
-  .documentation-section h2 {
-    font-size: 1.875rem;
-    font-weight: 600;
-    color: #000;
-    margin-bottom: 1rem;
-  }
-  
-  .documentation-section p {
-    margin-bottom: 1rem;
-    color: #374151;
-    line-height: 1.6;
-  }
-  
-  .doc-list {
-    margin: 1rem 0 1.5rem 1.25rem;
-    color: #444;
-  }
-  
-  .doc-list li {
-    margin-bottom: 0.5rem;
-  }
-  
-  .highlight {
-    color: #f97316;
-    font-weight: 600;
-  }
-  
-  /* ---------- IMAGE CARDS ---------- */
-  .documentation-image-card {
-    background-color: #f3f4f6;
-    border: 1px solid #d1d5db;
-    border-radius: 0.75rem;
     padding: 1.5rem;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-    transition: all 0.3s ease;
   }
-  
+
   .documentation-image-card img {
-    width: 100%;
-    max-width: 480px;
-    border-radius: 0.75rem;
-    object-fit: contain;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    max-width: 100%;
   }
-  
-  .documentation-image-card:hover img {
-    transform: scale(1.03);
-    box-shadow: 0 8px 20px rgba(255, 165, 0, 0.3);
-  }
-  
-  /* ---------- FOOTER ---------- */
-  .documentation-footer {
-    background-color: #000;
-    color: #d1d5db;
-    text-align: center;
-    padding: 1.5rem 0;
-  }
-  
-  /* ---------- RESPONSIVE ---------- */
-  @media (max-width: 768px) {
-    .documentation-header h1 {
-      font-size: 2rem;
-    }
-    .documentation-main {
-      padding: 2rem 1rem;
-    }
-    .documentation-image-card img {
-      max-width: 100%;
-    }
-  }
-  
+}

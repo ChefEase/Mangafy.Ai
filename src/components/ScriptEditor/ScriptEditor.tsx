@@ -60,10 +60,8 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({
       });
 
       // Load existing content
-      const savedScript = localStorage.getItem(LOCAL_STORAGE_KEY);
       const initialHtml =
         (content && content.trim()) ||
-        (savedScript && savedScript.trim()) ||
         (initialContent && initialContent.trim()) ||
         "";
 
@@ -95,13 +93,12 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({
   // Update editor when parent changes
   useEffect(() => {
     if (!quillRef.current) return;
-    if (!content || !content.trim()) return;
-
     const current = quillRef.current.root.innerHTML;
     if (content !== current) {
-      quillRef.current.clipboard.dangerouslyPasteHTML(content);
+      quillRef.current.clipboard.dangerouslyPasteHTML(content || "");
     }
   }, [content]);
+  
 
   // === SAVE SCRIPT ===
   const handleSave = () => {

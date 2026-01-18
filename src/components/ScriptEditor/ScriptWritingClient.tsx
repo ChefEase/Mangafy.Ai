@@ -869,38 +869,7 @@ useEffect(() => {
         canvasRef.current.width = 2480;
         canvasRef.current.height = 3508;
       }
-      const params = new URLSearchParams(window.location.search);
-      const source = params.get("source");
 
-      const savedScript = localStorage.getItem("saved-script");
-      const selectedTemplate = localStorage.getItem("selected-template");
-      const generatedScript = localStorage.getItem("script-content");
-      // Fix: Ensure setContent always receives a string, never null
-let initialContent = "";
-
-    if (source === "ai" && generatedScript) {
-      initialContent = generatedScript;
-    } else if (source === "template" && selectedTemplate) {
-      initialContent = selectedTemplate;
-    } else {
-      initialContent = savedScript || "";
-    }
-      setContent(initialContent);
-      // Clean up used keys (optional)
-    if (source === "template") {
-      localStorage.removeItem("selected-template");
-    }
-
-    // Remove the query param from URL after use
-    if (source) {
-      const cleanURL = window.location.origin + window.location.pathname;
-      window.history.replaceState({}, document.title, cleanURL);
-    }
-    console.log("selectedTemplate", selectedTemplate);
-    console.log("savedScript", savedScript);
-    console.log("generatedScript", generatedScript)
-      console.log("Loaded initial script content:", initialContent);
-    
       const loadCharacters = async () => {
         try {
           const chars = await CharacterService.getCharacters();
@@ -914,20 +883,29 @@ let initialContent = "";
     }, []);
     
     useEffect(() => {
-      if (!searchParams) return; // 👈 prevent null access
-    
       const source = searchParams.get("source");
-      if (source === "template") {
-        const tpl = localStorage.getItem("selected-template");
-        if (tpl) {
-          setContent(tpl);                           // put template into editor state
-          localStorage.setItem("saved-script", tpl); // optional: keep as last saved
-          localStorage.removeItem("selected-template");
-        }
-        // Clean up URL so refresh won't re-apply
-        router.replace("/script-writing");
+    
+      const savedScript = localStorage.getItem("saved-script") || "";
+      const selectedTemplate = localStorage.getItem("selected-template");
+      const generatedScript = localStorage.getItem("script-content");
+    
+      let next = savedScript;
+    
+      if (source === "ai" && generatedScript) next = generatedScript;
+      if (source === "template" && selectedTemplate) next = selectedTemplate;
+    
+      setContent(next);
+    
+      // optional: make template become the current saved script
+      if (source === "template" && selectedTemplate) {
+        localStorage.setItem("saved-script", selectedTemplate);
+        localStorage.removeItem("selected-template");
       }
+    
+      // clean URL
+      if (source) router.replace("/script-writing");
     }, [searchParams, router]);
+    
     
     async function deleteImageBlobFromDB(id: string) {
       const db = await openImageDB();
@@ -2094,8 +2072,8 @@ return (
               <div>
                 <div style={{ fontWeight: 600 }}>Transition</div>
                 <div style={{ fontSize: 12, lineHeight: 1.35, zIndex:1000 }}>
-                  When enabled, panels are generated with continuity from the previous panel (same scene flow).
-                  When disabled, each panel is generated independently.
+                On: Panels flow together as one continuous scene.
+                Off: Each panel is created as a separate moment.
                 </div>
               </div>
             </label>

@@ -4,88 +4,216 @@ import "./privacy-policy.css";
 const PrivacyPolicy = () => {
   return (
     <div className="privacy-container">
-      {/* Page Title */}
-      <h1>
-        Privacy Policy for Mangafy-ai <br />
-        <span lang="ja">マガファイAIのプライバシーポリシー</span>
-      </h1>
-      <p>Last updated: July 19, 2025 <br />
-        <span lang="ja">最終更新日: 2025年7月19日</span>
-      </p>
+      <header className="privacy-hero" id="summary">
+        <h1>Privacy Policy for Mangafy-ai</h1>
+        <p className="privacy-updated">Last updated: July 19, 2025</p>
 
-      <p>
-        This Privacy Policy describes Our policies and procedures on the collection, use, 
-        and disclosure of Your information when You use the Service and tells You about 
-        Your privacy rights and how the law protects You.
-        <br />
-        <span lang="ja">
-          本プライバシーポリシーは、サービス利用時における情報の収集、利用、開示に関する当社の方針および手続きを説明し、
-          お客様のプライバシー権利と法律による保護についてお知らせします。
-        </span>
-      </p>
+        <div className="privacy-summary">
+          <h2>In short</h2>
+          <ul>
+            <li>We only collect data needed to run Mangafy.</li>
+            <li>Your content is used to provide the service, not sold.</li>
+            <li>You can request access or deletion of your data anytime.</li>
+          </ul>
+        </div>
+      </header>
 
-      <h2>
-        Interpretation and Definitions <br />
-        <span lang="ja">解釈および定義</span>
-      </h2>
+      <nav className="privacy-toc" aria-label="Privacy policy table of contents">
+        <h2>Contents</h2>
+        <ul>
+          <li><a href="#summary">Summary</a></li>
+          <li><a href="#definitions">Interpretation and Definitions</a></li>
+          <li><a href="#data">Information We Collect</a></li>
+          <li><a href="#usage">How We Use Your Data</a></li>
+          <li><a href="#content">User Content & AI Processing</a></li>
+          <li><a href="#sharing">Sharing & Third Parties</a></li>
+          <li><a href="#retention">Data Retention</a></li>
+          <li><a href="#security">Security</a></li>
+          <li><a href="#rights">Your Rights</a></li>
+          <li><a href="#cookies">Cookies</a></li>
+          <li><a href="#children">Children’s Privacy</a></li>
+          <li><a href="#changes">Policy Updates</a></li>
+          <li><a href="#contact">Contact Us</a></li>
+        </ul>
+      </nav>
 
-      <h3>
-        Interpretation <br />
-        <span lang="ja">解釈</span>
-      </h3>
-      <p>
-        Words with initial capital letters have meanings defined under the conditions below.
-        <br />
-        <span lang="ja">大文字で始まる用語は、以下の条件に基づいて定義されています。</span>
-      </p>
+      {/* DEFINITIONS */}
+      <section className="privacy-section" id="definitions">
+        <details>
+          <summary>1. Interpretation and Definitions</summary>
+          <div className="privacy-section-body">
+            <p>Words with capitalized initial letters have meanings defined below.</p>
+            <ul>
+              <li><strong>Account:</strong> A unique account created to access Mangafy.</li>
+              <li><strong>Company:</strong> Mangafy-ai.</li>
+              <li><strong>Personal Data:</strong> Any information that identifies you.</li>
+              <li><strong>Service:</strong> The Mangafy website and applications.</li>
+              <li><strong>Website:</strong> <a href="https://www.mangafyai.com">https://www.mangafyai.com</a></li>
+            </ul>
+          </div>
+        </details>
+      </section>
 
-      <h3>
-        Definitions <br />
-        <span lang="ja">定義</span>
-      </h3>
-      <ul>
-        <li><strong>Account:</strong> A unique account created for You to access our Service. <br />
-          <span lang="ja">アカウント：サービスを利用するために作成される一意のアカウント。</span>
-        </li>
-        <li><strong>Affiliate:</strong> An entity controlling or controlled by the Company. <br />
-          <span lang="ja">関連会社：当社を支配、または当社に支配される事業体。</span>
-        </li>
-        <li><strong>Company:</strong> Refers to Mangafy-ai. <br />
-          <span lang="ja">会社：Mangafy-aiを指します。</span>
-        </li>
-        <li><strong>Cookies:</strong> Small files placed on Your device to track activity. <br />
-          <span lang="ja">クッキー：利用状況を追跡するためにデバイスに保存される小さなファイル。</span>
-        </li>
-        <li><strong>Country:</strong> New Brunswick, Canada <br />
-          <span lang="ja">国：カナダ、ニューブランズウィック州</span>
-        </li>
-        <li><strong>Device:</strong> Any device used to access the Service. <br />
-          <span lang="ja">デバイス：サービスにアクセスするために使用されるあらゆる機器。</span>
-        </li>
-        <li><strong>Personal Data:</strong> Information that identifies You. <br />
-          <span lang="ja">個人データ：お客様を識別できる情報。</span>
-        </li>
-        <li><strong>Service:</strong> Refers to the Website. <br />
-          <span lang="ja">サービス：本ウェブサイトを指します。</span>
-        </li>
-        <li>
-          <strong>Website:</strong> Mangafy-ai, accessible from 
-          <a href="https://www.mangafyai.com"> https://www.mangafyai.com</a> <br />
-          <span lang="ja">ウェブサイト：Mangafy-ai（上記URLからアクセス可能）。</span>
-        </li>
-      </ul>
+      {/* DATA COLLECTION */}
+      <section className="privacy-section" id="data">
+        <details>
+          <summary>2. Information We Collect</summary>
+          <div className="privacy-section-body">
+            <ul>
+              <li>Account information (email, login credentials)</li>
+              <li>User-generated content (scripts, prompts, images you upload)</li>
+              <li>Usage data (features used, interactions, error logs)</li>
+              <li>Device and browser information</li>
+            </ul>
+          </div>
+        </details>
+      </section>
 
-      {/* … you can repeat this pattern for other sections, keeping Japanese short if needed … */}
+      {/* USAGE */}
+      <section className="privacy-section" id="usage">
+        <details>
+          <summary>3. How We Use Your Data</summary>
+          <div className="privacy-section-body">
+            <ul>
+              <li>To operate and maintain the Mangafy service</li>
+              <li>To generate manga panels, characters, and stories</li>
+              <li>To improve performance, quality, and reliability</li>
+              <li>To provide customer support and respond to requests</li>
+              <li>To prevent abuse, fraud, or misuse</li>
+            </ul>
+          </div>
+        </details>
+      </section>
 
-      <h2>
-        Contact Us <br />
-        <span lang="ja">お問い合わせ</span>
-      </h2>
-      <p>
-        Email: <a href="mailto:mangaficustomercare@gmail.com">mangaficustomercare@gmail.com</a>
-        <br />
-        <span lang="ja">メール: 上記アドレスまでご連絡ください。</span>
-      </p>
+      {/* AI CONTENT */}
+      <section className="privacy-section" id="content">
+        <details>
+          <summary>4. User Content & AI Processing</summary>
+          <div className="privacy-section-body">
+            <p>
+              Mangafy processes user-submitted text and images to generate manga-related outputs.
+              Your content is used only to provide the service.
+            </p>
+            <p>
+              We do not sell your content. Uploaded content may be temporarily stored to deliver
+              results and improve system reliability.
+            </p>
+          </div>
+        </details>
+      </section>
+
+      {/* SHARING */}
+      <section className="privacy-section" id="sharing">
+        <details>
+          <summary>5. Sharing & Third-Party Services</summary>
+          <div className="privacy-section-body">
+            <p>
+              We may share limited data with trusted service providers to operate Mangafy, including:
+            </p>
+            <ul>
+              <li>Cloud hosting and storage providers</li>
+              <li>Authentication services</li>
+              <li>Payment processors (if applicable)</li>
+              <li>AI inference and processing services</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      {/* RETENTION */}
+      <section className="privacy-section" id="retention">
+        <details>
+          <summary>6. Data Retention</summary>
+          <div className="privacy-section-body">
+            <p>
+              We retain personal data only as long as necessary to provide the service or comply with
+              legal obligations. You may request deletion at any time.
+            </p>
+          </div>
+        </details>
+      </section>
+
+      {/* SECURITY */}
+      <section className="privacy-section" id="security">
+        <details>
+          <summary>7. Security</summary>
+          <div className="privacy-section-body">
+            <p>
+              We implement reasonable safeguards to protect your data. However, no method of
+              transmission or storage is 100% secure.
+            </p>
+          </div>
+        </details>
+      </section>
+
+      {/* RIGHTS */}
+      <section className="privacy-section" id="rights">
+        <details>
+          <summary>8. Your Rights</summary>
+          <div className="privacy-section-body">
+            <p>You may request to:</p>
+            <ul>
+              <li>Access your data</li>
+              <li>Correct inaccurate information</li>
+              <li>Delete your account and associated data</li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      {/* COOKIES */}
+      <section className="privacy-section" id="cookies">
+        <details>
+          <summary>9. Cookies</summary>
+          <div className="privacy-section-body">
+            <p>
+              Cookies are used to maintain sessions, improve performance, and understand usage
+              patterns. You can disable cookies in your browser settings.
+            </p>
+          </div>
+        </details>
+      </section>
+
+      {/* CHILDREN */}
+      <section className="privacy-section" id="children">
+        <details>
+          <summary>10. Children’s Privacy</summary>
+          <div className="privacy-section-body">
+            <p>
+              Mangafy is not intended for children under 13. We do not knowingly collect personal
+              data from children.
+            </p>
+          </div>
+        </details>
+      </section>
+
+      {/* CHANGES */}
+      <section className="privacy-section" id="changes">
+        <details>
+          <summary>11. Changes to This Policy</summary>
+          <div className="privacy-section-body">
+            <p>
+              We may update this policy from time to time. Changes will be posted on this page with
+              an updated date.
+            </p>
+          </div>
+        </details>
+      </section>
+
+      {/* CONTACT */}
+      <section className="privacy-section" id="contact">
+        <details>
+          <summary>12. Contact Us</summary>
+          <div className="privacy-section-body">
+            <p>
+              Email:{" "}
+              <a href="mailto:mangaficustomercare@gmail.com">
+                mangaficustomercare@gmail.com
+              </a>
+            </p>
+          </div>
+        </details>
+      </section>
     </div>
   );
 };

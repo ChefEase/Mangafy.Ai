@@ -21,18 +21,65 @@ const DocumentationPage: React.FC = () => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          How to use our platform
+          Everything you need to plan, write, and generate your manga.
         </motion.p>
       </header>
 
       {/* Main Content */}
       <main className="documentation-main">
+        <section className="doc-intro">
+          <div className="doc-intro-card">
+            <h2>Quick Summary</h2>
+            <p>
+              This guide walks you through logging in, writing scripts, controlling generation,
+              managing characters, and exporting your final panels.
+            </p>
+            <div className="doc-callout doc-tip">
+              <strong>Tip:</strong> Start with the story box format if you are new, then refine with
+              Advanced Options.
+            </div>
+          </div>
+
+          <nav className="doc-toc" aria-label="Documentation table of contents">
+            <h3>On this page</h3>
+            <ul>
+              <li>
+                <a href="#login">Logging In</a>
+              </li>
+              <li>
+                <a href="#story-writing">Writing Your Story</a>
+              </li>
+              <li>
+                <a href="#advanced-options">Advanced Options</a>
+              </li>
+              <li>
+                <a href="#character-management">Character Management</a>
+              </li>
+              <li>
+                <a href="#referrals">Referrals</a>
+              </li>
+              <li>
+                <a href="#chatbot-templates">Chatbot, Templates, Ideas</a>
+              </li>
+              <li>
+                <a href="#generate-gallery">Generate and Gallery</a>
+              </li>
+              <li>
+                <a href="#upgrading">Upgrading to Premium</a>
+              </li>
+              <li>
+                <a href="#text-box">Text Box</a>
+              </li>
+            </ul>
+          </nav>
+        </section>
+
         {/* 1. Logging In */}
-        <section className="documentation-section">
+        <section className="documentation-section" id="login">
           <h2>1. Logging In</h2>
           <p>
-            You can log in either using Google or via our website credentials.
-            Logging in through the website gives you extra referral credits.
+            You can log in either using Google or via our website credentials. Logging in through
+            the website gives you extra referral credits.
           </p>
           <motion.div className="documentation-image-card" whileHover={{ scale: 1.03 }}>
             <img src="/screenshots/login-placeholder (1).png" alt="Login Screen" />
@@ -41,22 +88,26 @@ const DocumentationPage: React.FC = () => {
         </section>
 
         {/* 2. Story Editor */}
-        <section className="documentation-section">
+        <section className="documentation-section" id="story-writing">
           <h2>2. Writing Your Story</h2>
-          <p>
-            Once inside your project, you'll see a <span className="highlight">tab header</span> that lets you switch between
-            the <strong>Story Text Box</strong> and the <strong>Advanced Options</strong> panel.
+          <p className="doc-lead">
+            Inside a project, use the tab header to switch between the Story Text Box and Advanced
+            Options.
           </p>
-          <p>
-            In the story box, you can <span className="highlight">write directly</span> or
-            <span className="highlight"> upload a Word or PDF file</span>. 
-            Each scene or panel should follow this format:
-          </p>
-          <ul className="doc-list">
-            <li><b>For one panel:</b> In first panel (action), (setting), (camera angle)</li>
-            <li><b>For two panels:</b> In first panel (action)... In second panel (action)...</li>
-            <li><b>For three panels:</b> Continue the same pattern</li>
-          </ul>
+          <div className="doc-subsection">
+            <h3>Story box format</h3>
+            <p>
+              You can write directly or upload a Word or PDF file. Use the panel format below to
+              keep scenes consistent.
+            </p>
+            <pre className="doc-code">
+              <code>
+                {`In first panel, (action), (setting), (camera angle).
+In second panel, (action), (setting), (camera angle).
+In third panel, (action), (setting), (camera angle).`}
+              </code>
+            </pre>
+          </div>
           <motion.div className="documentation-image-card" whileHover={{ scale: 1.03 }}>
             <img src="/screenshots/storybox (1).png" alt="Story Text Box" />
             <img src="/screenshots/storybox (2).png" alt="Story Text Box" />
@@ -65,25 +116,51 @@ const DocumentationPage: React.FC = () => {
         </section>
 
         {/* 3. Advanced Options */}
-        <section className="documentation-section">
+        <section className="documentation-section" id="advanced-options">
           <h2>3. Advanced Options</h2>
-          <p>
-            Switch to the <span className="highlight">Advanced Options</span> tab to control generation settings.
-            Here, you’ll find:
+          <p className="doc-lead">
+            Switch to the Advanced Options tab to control generation settings.
           </p>
           <ul className="doc-list">
-            <li><b>Style Presets</b> – Choose from predefined looks (Cinematic, Photographic, Anime, Digital Art e.t.c).</li>
-            <li><b>Art Style</b> – Pick your preferred drawing style (Default Manga, One Piece, Jujutsu Kaisen, My Hero Academi e.t.c).</li>
-            <li><b>Panel Layout</b> – Select your manga/comic panel layout.</li>
-            <li><b>Color Options</b> – Choose between full color or black & white.</li>
-            <li><b>Lightning/Mood Preset</b> – Choose from predefined filters(Neon, Sunset, Cinematic e.t.c).</li>
-            <li><b>Mangafy Checkbox</b> – Adds traditional manga effects like inking, cross-hatching, shading, etc. (Not applicable for the "Default Manga” option.)</li>
-            <li><b>Custom Art Style</b> – Input your own prompt if you want a unique art style.</li>
-            <li><b>Guidance Scale</b> – (1–15) controls how closely the AI sticks to your prompt. The lower the guidance scale the more Ai sticks to your prompt. The less creative it is. The hugher the guidancescale number, the more Ai deviates from your prompt and the more createive is. Ideal or recommended guidance scale is 7</li>
-            <li><b>Seed & Randomizer</b> – Seeds keep results consistent; randomizing changes the look. We recommend you keep your seed consistent throughout generation</li>
+            <li>
+              <strong>Style Presets:</strong> Choose a look like Cinematic, Photographic, Anime, or
+              Digital Art.
+            </li>
+            <li>
+              <strong>Art Style:</strong> Select Default Manga, One Piece, Jujutsu Kaisen, My Hero
+              Academia, and more.
+            </li>
+            <li>
+              <strong>Panel Layout:</strong> Choose your manga or comic grid layout.
+            </li>
+            <li>
+              <strong>Color Options:</strong> Full color or black and white.
+            </li>
+            <li>
+              <strong>Lighting and Mood:</strong> Presets like Neon, Sunset, or Cinematic.
+            </li>
+            <li>
+              <strong>Mangafy Checkbox:</strong> Adds traditional manga effects like inking and
+              cross-hatching.
+            </li>
+            <li>
+              <strong>Custom Art Style:</strong> Add your own style prompt.
+            </li>
+            <li>
+              <strong>Guidance Scale:</strong> 1-15 controls how closely the AI sticks to your
+              prompt. Recommended value is 7.
+            </li>
+            <li>
+              <strong>Seed and Randomizer:</strong> Keep a seed for consistent results, randomize
+              for variation.
+            </li>
           </ul>
+          <div className="doc-callout doc-important">
+            <strong>Important:</strong> Keep your seed consistent across chapters if you want a
+            unified art style.
+          </div>
           <motion.div className="documentation-image-card" whileHover={{ scale: 1.03 }}>
-          <img src="/screenshots/advanced-options.png" alt="Advanced Options Panel" />
+            <img src="/screenshots/advanced-options.png" alt="Advanced Options Panel" />
             <img src="/screenshots/advanced-options (1).png" alt="Advanced Options Panel" />
             <img src="/screenshots/advanced-options (2).png" alt="Advanced Options Panel" />
             <img src="/screenshots/advanced-options (3).png" alt="Advanced Options Panel" />
@@ -93,59 +170,40 @@ const DocumentationPage: React.FC = () => {
         </section>
 
         {/* 4. Character Management */}
-        <section className="documentation-section">
+        <section className="documentation-section" id="character-management">
           <h2>4. Character Management</h2>
-          <p>
-            In the <span className="highlight">Character Bar</span>, you can upload, edit, or delete your characters.
-            Each character includes an image, name, role, and a detailed description for the AI.
+          <p className="doc-lead">
+            Use the Character Bar to upload, edit, or delete characters. Each character includes an
+            image, name, role, and description for the AI.
           </p>
-          <p>
-            Use this format for accurate generation:  
-            <i>1girl, black hair, white skirt, blue eyes, smiling, school uniform. This is only an example.</i>
-          </p>
-          <p>
-            You can search characters by <strong>name</strong>, <strong>role</strong>, or <strong>creation date</strong>, 
-            and sort results ascending or descending.
-          </p>
-          <p>
-          <span className="highlight">Note: </span> </p> 
-          
-          <p> Character Description (Who they are)
-Use this for permanent traits only:
-Hair (style, color),
-Eyes,
-Face features,
-Body type,
-Age / vibe,
-Scars, tattoos, glasses, etc.
-🚫 Do NOT include clothing here unless it never changes.
-Script / Story Box (What happens per panel)
-</p>
-<p>
-Use this for anything that can change panel to panel:
-Clothing,
-Accessories,
-Actions,
-Emotions,
-Environment,
-Who enters or leaves the scene
-✅ This is where outfits belong if they change.
-</p>
-<p> <span className="highlight">Example: </span></p>
-
-<p>Character Description
+          <div className="doc-subsection">
+            <h3>Character description vs script box</h3>
+            <p>Use the character description for permanent traits only:</p>
+            <ul className="doc-list">
+              <li>Hair, eyes, face features, body type</li>
+              <li>Age or vibe</li>
+              <li>Scars, tattoos, glasses, etc.</li>
+            </ul>
+            <div className="doc-callout doc-warning">
+              <strong>Common mistake:</strong> Do not include clothing here unless it never changes.
+            </div>
+            <p>Use the script box for anything that can change panel to panel:</p>
+            <ul className="doc-list">
+              <li>Clothing and accessories</li>
+              <li>Actions and emotions</li>
+              <li>Environment and scene changes</li>
+            </ul>
+            <pre className="doc-code">
+              <code>
+                {`Character Description
 Riku is a teenage boy with messy black hair, blue eyes, and a tired expression.
+
 Script
 In the first panel, Riku is crying at home. He is wearing a white t-shirt and blue sweatpants.
-In the second panel, his sister Hina enters the room.
-</p>
-<p> <span className="highlight">Example (when clothing is constant): </span></p>
-<p>Character Description
-Riku wears a black school uniform at all times.
-Script
-In the first panel, Riku is sitting alone in class.
-In the second panel, Hina walks up to him.
-          </p>
+In the second panel, his sister Hina enters the room.`}
+              </code>
+            </pre>
+          </div>
           <motion.div className="documentation-image-card" whileHover={{ scale: 1.03 }}>
             <img src="/screenshots/character-management (1).png" alt="Character Management" />
             <img src="/screenshots/character-management (2).png" alt="Character Management" />
@@ -154,7 +212,7 @@ In the second panel, Hina walks up to him.
         </section>
 
         {/* 5. Referrals */}
-        <section className="documentation-section">
+        <section className="documentation-section" id="referrals">
           <h2>5. Referrals</h2>
           <p>
             Share your referral link from the website (not Google login) to earn an extra{" "}
@@ -167,11 +225,12 @@ In the second panel, Hina walks up to him.
         </section>
 
         {/* 6. Chatbot & Templates */}
-        <section className="documentation-section">
-          <h2>6. Chatbot, Templates & Ideas</h2>
+        <section className="documentation-section" id="chatbot-templates">
+          <h2>6. Chatbot, Templates and Ideas</h2>
           <p>
-            Use our <span className="highlight">AI Chatbot</span> to ask questions, upload pictures, or get feedback.
-            You can also explore <strong>script templates</strong> and <strong>panel format ideas</strong> to help structure your manga.
+            Use the <span className="highlight">AI Chatbot</span> to ask questions, upload pictures,
+            or get feedback. Explore script templates and panel format ideas to structure your
+            manga quickly.
           </p>
           <motion.div className="documentation-image-card" whileHover={{ scale: 1.03 }}>
             <img src="/screenshots/chatbot (1).png" alt="Chatbot Screen" />
@@ -182,12 +241,12 @@ In the second panel, Hina walks up to him.
         </section>
 
         {/* 7. Generating & Gallery */}
-        <section className="documentation-section">
-          <h2>7. Generate & Gallery</h2>
+        <section className="documentation-section" id="generate-gallery">
+          <h2>7. Generate and Gallery</h2>
           <p>
-            Once ready, hit <span className="highlight">Generate</span> to create your manga panels.
-            All generated panels are saved in the <strong>Gallery</strong> below the canvas, where you can
-            view, redownload, or share your creations anytime.
+            When you are ready, hit <span className="highlight">Generate</span> to create manga
+            panels. Generated panels are saved in the Gallery below the canvas for easy download or
+            sharing.
           </p>
           <motion.div className="documentation-image-card" whileHover={{ scale: 1.03 }}>
             <img src="/screenshots/gallery.png" alt="Gallery Example" />
@@ -195,27 +254,32 @@ In the second panel, Hina walks up to him.
         </section>
 
         {/* 8. Upgrading */}
-        <section className="documentation-section">
+        <section className="documentation-section" id="upgrading">
           <h2>8. Upgrading to Premium</h2>
           <p>
-            Go to your profile → Subscription → Select a plan (Standard or Premium) and complete payment to upgrade.
+            Go to Profile &gt; Subscription. Select a plan (Standard or Premium) and complete
+            payment to upgrade.
           </p>
           <motion.div className="documentation-image-card" whileHover={{ scale: 1.03 }}>
             <img src="/screenshots/subscription-placeholder (1).png" alt="Subscription Screen" />
           </motion.div>
         </section>
 
-        <section className="documentation-section">
+        <section className="documentation-section" id="text-box">
           <h2>9. Text Box</h2>
           <p>
-            To create/add text box we recommend you use other apps such as medibang paint or clip studio paint. To make edits to the genrated images we recommend you use other third party apps as we do not have editing features at the moment.
+            To create or add text boxes, use other apps like Medibang Paint or Clip Studio Paint. To
+            edit generated images, use third-party apps since in-app editing is not available yet.
           </p>
+          <div className="doc-callout doc-tip">
+            <strong>Tip:</strong> Keep a layered PSD or CLIP file so edits are easier later.
+          </div>
         </section>
       </main>
 
       {/* Footer */}
       <footer className="documentation-footer">
-        <p>© {new Date().getFullYear()} Mangafy.AI. All rights reserved.</p>
+        <p>(c) {new Date().getFullYear()} Mangafy.AI. All rights reserved.</p>
       </footer>
     </div>
   );
