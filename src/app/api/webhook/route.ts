@@ -38,8 +38,9 @@ export async function POST(req: Request) {
     if (event.type === "invoice.paid") {
       const invoice = event.data.object as Stripe.Invoice;
 
-      const invoiceId = invoice.id;
-      const subscriptionId = invoice.subscription as string | null;
+      const invoiceId = (invoice as any).id as string;
+      const subscriptionId = (invoice as any).subscription as string | null;
+
 
       // 1) Prevent double-processing (Stripe can retry events)
       const { data: alreadyProcessed, error: checkErr } = await supabaseAdmin
@@ -78,7 +79,8 @@ export async function POST(req: Request) {
       let creditsToAdd = 0;
 
       for (const line of lines.data) {
-        const priceId = line.price?.id;
+        const priceId = (line as any).price?.id as string | undefined;
+
         if (!priceId) continue;
 
         const credits = priceToCredits[priceId] ?? 0;
