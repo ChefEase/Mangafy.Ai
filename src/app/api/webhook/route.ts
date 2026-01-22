@@ -10,6 +10,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
+// Keep your mapping if you want (fast + simple).
+// Later you can move this into Stripe Price metadata.
 const priceToCredits: Record<string, number> = {
   "price_1RnV3NCfqQf6EFEyrJGUcfkP": 1200,
   "price_1RnV5nCfqQf6EFEyvx3H79KA": 3500,
@@ -32,35 +34,89 @@ export async function POST(req: Request) {
   }
 
   try {
-    if (event.type === "checkout.session.completed") {
-      const session = event.data.object as Stripe.Checkout.Session;
+    // ✅ Monthly recurring payments land here
+    if (event.type === "invoice.paid") {
+      const invoice = event.data.object as Stripe.Invoice;
 
-      const userId = session?.metadata?.userId;
-      const priceId = session?.metadata?.priceId;
+      const invoiceId = invoice.id;
+      const subscriptionId = invoice.subscription as string | null;
 
-      const credits = priceId ? priceToCredits[priceId] ?? 0 : 0;
+      // 1) Prevent double-processing (Stripe can retry events)
+      const { data: alreadyProcessed, error: checkErr } = await supabaseAdmin
+        .from("processed_stripe_invoices")
+        .select("invoice_id")
+        .eq("invoice_id", invoiceId)
+        .maybeSingle();
+
+      if (checkErr) {
+        console.error("❌ Failed to check processed invoice:", checkErr.message);
+        // return 200 so Stripe doesn’t retry forever if your DB hiccups
+        return new Response("DB check failed", { status: 200 });
+      }
+
+      if (alreadyProcessed) {
+        console.log("ℹ️ Invoice already processed:", invoiceId);
+        return new Response("Already processed", { status: 200 });
+      }
+
+      // 2) Find userId via subscription metadata (best)
+      let userId: string | undefined;
+
+      if (subscriptionId) {
+        const sub = await stripe.subscriptions.retrieve(subscriptionId);
+        userId = sub.metadata?.userId;
+      }
 
       if (!userId) {
-        console.warn("⚠️ Webhook missing userId in metadata");
-      } else if (!credits) {
-        console.warn("⚠️ Webhook unknown/zero credits for priceId:", priceId);
-      } else {
-        // ✅ Best: increment via RPC
-        const { error } = await supabaseAdmin.rpc("increment_user_credits", {
-          user_id: userId,
-          amount: credits,
-        });
-
-        if (error) {
-          console.error("❌ Failed to increment credits:", error.message);
-          return new Response(JSON.stringify({ error: error.message }), {
-            status: 500,
-            headers: { "Content-Type": "application/json" },
-          });
-        }
-
-        console.log(`✅ Added ${credits} credits to user ${userId}`);
+        console.warn("⚠️ No userId on subscription metadata for invoice:", invoiceId);
+        return new Response("No userId", { status: 200 });
       }
+
+      // 3) Determine credits from invoice line items
+      const lines = await stripe.invoices.listLineItems(invoiceId, { limit: 100 });
+
+      let creditsToAdd = 0;
+
+      for (const line of lines.data) {
+        const priceId = line.price?.id;
+        if (!priceId) continue;
+
+        const credits = priceToCredits[priceId] ?? 0;
+        if (credits <= 0) continue;
+
+        creditsToAdd += credits * (line.quantity ?? 1);
+      }
+
+      if (creditsToAdd <= 0) {
+        console.warn("⚠️ No credits found for invoice lines. invoice:", invoiceId);
+        return new Response("No credits configured", { status: 200 });
+      }
+
+      // 4) Add credits (atomic)
+      const { error: incErr } = await supabaseAdmin.rpc("increment_user_credits", {
+        user_id: userId,
+        amount: creditsToAdd,
+      });
+
+      if (incErr) {
+        console.error("❌ Failed to increment credits:", incErr.message);
+        return new Response("Credit increment failed", { status: 200 });
+      }
+
+      // 5) Mark invoice as processed
+      const { error: insErr } = await supabaseAdmin.from("processed_stripe_invoices").insert({
+        invoice_id: invoiceId,
+        user_id: userId,
+      });
+
+      if (insErr) {
+        console.error("❌ Failed to insert processed invoice:", insErr.message);
+        // Not fatal, but it is important — could allow double credits if retried.
+        // Still return 200 to prevent Stripe retries loop.
+        return new Response("Processed insert failed", { status: 200 });
+      }
+
+      console.log(`✅ Added ${creditsToAdd} credits to user ${userId} for invoice ${invoiceId}`);
     }
 
     return new Response(JSON.stringify({ received: true }), {

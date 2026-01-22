@@ -207,15 +207,14 @@ const filteredMessages = (messageData.records || []).filter(
 
   const sendMessage = async (content: string, imageUrl?: string) => {
     if (isSending.current) return;
-    isSending.current = true;
-    setIsLoading(true);
-    
     if (!currentChat || (!content.trim() && !imageUrl)) return;
-  
     if (credits < CHAT_COST_PER_MESSAGE) {
       alert(`You need at least ${CHAT_COST_PER_MESSAGE} credits to send a message`);
       return;
     }
+
+    isSending.current = true;
+    setIsLoading(true);
 const userId = localStorage.getItem("userId");
 
 const messages: Message[] = (messageRecords ?? [])
@@ -324,12 +323,17 @@ if (userMessage.imageUrl) {
           },
           body: JSON.stringify({ messages: hfMessages }),
         });
-    
-        const data = await response.json();
-    
+
+        let data: any = null;
+        try {
+          data = await response.json();
+        } catch {
+          data = null;
+        }
+
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || "API error");
+          const errorMessage = data?.error || `API error (${response.status})`;
+          throw new Error(errorMessage);
         }
   
         const assistantMessage: Message = {

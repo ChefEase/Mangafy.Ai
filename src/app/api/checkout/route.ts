@@ -29,11 +29,19 @@ export async function POST(req: Request) {
       mode: "subscription",
       payment_method_types: ["card"],
       line_items: [{ price: priceId, quantity: 1 }],
+    
+      // Keep this
       metadata: { userId },
+    
+      // Add this (important)
+      subscription_data: {
+        metadata: { userId },
+      },
+    
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/subscription`,
     });
-
+    
     return new Response(JSON.stringify({ url: session.url }), {
       status: 200,
       headers: { "Content-Type": "application/json" },

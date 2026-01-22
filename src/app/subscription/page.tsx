@@ -70,12 +70,10 @@ export default function SubscriptionPage() {
     {
       type: "Starter Creator",
       price: "$9.99",
-      priceId: "price_1RnV3NCfqQf6EFEyrJGUcfkP",
+      priceId: "price_1SsTAzCzofb0Va6RvAHCXJRf",
       features: [
         "1,200 Credits",
         "Character Consistency AI",
-        "Cover Art & Story Generator",
-        "Referral: Earn 125 Credits Each",
       ],
       buttonText: "Get Starter Creator",
       disabled: false,
@@ -84,7 +82,7 @@ export default function SubscriptionPage() {
     {
       type: "Ultimate Creator",
       price: "$24.99",
-      priceId: "price_1RnV5nCfqQf6EFEyvx3H79KA",
+      priceId: "price_1SsTDMCzofb0Va6RglYhZ2Xp",
       features: [
         "3,500 Credits",
         "Early Access to New Features",
@@ -101,13 +99,11 @@ export default function SubscriptionPage() {
     {
       type: "Starter Creator (Yearly)",
       price: "$95.99",
-      priceId: "price_1RnV9mCfqQf6EFEyBT96MPqv",
+      priceId: "price_1SsTEQCzofb0Va6RTi28brjc",
       features: [
         "14,400 Credits",
         "Save 20% (Normally $120)",
         "Character Consistency AI",
-        "Cover Art & Story Generator",
-        "Referral: Earn 125 Credits Each",
       ],
       buttonText: "Get Yearly Starter",
       disabled: false,
@@ -116,12 +112,11 @@ export default function SubscriptionPage() {
     {
       type: "Ultimate Creator (Yearly)",
       price: "$239.99",
-      priceId: "price_1RnVCJCfqQf6EFEyvODEySQl",
+      priceId: "price_1SsTFhCzofb0Va6RfoeTz6j9",
       features: [
         "42,000 Credits",
-        "Early Access to New Features",
-        "Priority Support & Creator Chatbot",
-        "Referral: Earn 125 Credits Each",
+        "Save 20% (Normally $300)",
+        "Character Consistency AI",
       ],
       buttonText: "Go Yearly Ultimate",
       disabled: false,
