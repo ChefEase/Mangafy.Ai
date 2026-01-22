@@ -13,10 +13,10 @@ const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 // Keep your mapping if you want (fast + simple).
 // Later you can move this into Stripe Price metadata.
 const priceToCredits: Record<string, number> = {
-  "price_1RnV3NCfqQf6EFEyrJGUcfkP": 1200,
-  "price_1RnV5nCfqQf6EFEyvx3H79KA": 3500,
-  "price_1RnV9mCfqQf6EFEyBT96MPqv": 14400,
-  "price_1RnVCJCfqQf6EFEyvODEySQl": 42000,
+  "price_1SsTAzCzofb0Va6RvAHCXJRf": 1200,
+  "price_1SsTDMCzofb0Va6RglYhZ2Xp": 3500,
+  "price_1SsTEQCzofb0Va6RTi28brjc": 14400,
+  "price_1SsTFhCzofb0Va6RfoeTz6j9": 42000,
 };
 
 export async function POST(req: Request) {
