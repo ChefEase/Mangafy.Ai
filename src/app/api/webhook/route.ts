@@ -69,7 +69,7 @@ export async function POST(req: Request) {
 // Try subscription metadata first
 if (subscriptionId) {
   const sub = await stripe.subscriptions.retrieve(subscriptionId);
-  userId = sub.metadata?.userId;
+  if (sub.metadata?.userId) userId = sub.metadata.userId;
 }
 
 // Fallback 1: invoice.subscription_details.metadata.userId
@@ -95,14 +95,21 @@ if (!userId) {
       let creditsToAdd = 0;
 
       for (const line of lines.data) {
-        const priceId = (line as any).price?.id as string | undefined;
+        const anyLine = line as any;
 
+        const priceId: string | undefined =
+          anyLine?.price?.id ||
+          anyLine?.pricing?.price_details?.price;
+        
         if (!priceId) continue;
-
-        const credits = priceToCredits[priceId] ?? 0;
-        if (credits <= 0) continue;
-
-        creditsToAdd += credits * (line.quantity ?? 1);
+        
+        const price = await stripe.prices.retrieve(priceId);
+        const credits = Number(price.metadata?.credits || 0);
+        
+        if (!Number.isFinite(credits) || credits <= 0) continue;
+        
+        creditsToAdd += credits * (anyLine.quantity ?? 1);
+        
       }
 
       if (creditsToAdd <= 0) {
