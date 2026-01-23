@@ -96,21 +96,32 @@ if (!userId) {
 
       for (const line of lines.data) {
         const anyLine = line as any;
-
+      
         const priceId: string | undefined =
           anyLine?.price?.id ||
-          anyLine?.pricing?.price_details?.price;
-        
+          anyLine?.pricing?.price_details?.price ||
+          anyLine?.plan?.id;
+      
+        console.log("LINE PRICEID", {
+          derivedPriceId: priceId,
+          a: anyLine?.price?.id,
+          b: anyLine?.pricing?.price_details?.price,
+          c: anyLine?.plan?.id,
+        });
+      
         if (!priceId) continue;
-        
+      
         const price = await stripe.prices.retrieve(priceId);
+        console.log("PRICE RETRIEVED", { priceId, metadata: price.metadata });
+      
         const credits = Number(price.metadata?.credits || 0);
-        
+        console.log("CREDITS PARSED", { priceId, credits });
+      
         if (!Number.isFinite(credits) || credits <= 0) continue;
-        
+      
         creditsToAdd += credits * (anyLine.quantity ?? 1);
-        
       }
+      
 
       if (creditsToAdd <= 0) {
         console.warn("⚠️ No credits found for invoice lines. invoice:", invoiceId);
