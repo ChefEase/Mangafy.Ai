@@ -38,6 +38,50 @@
   border: 1px solid rgba(255,122,0,0.04); /* subtle orange outline */
 }
 
+.projects-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.project-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.chapter-toolbar {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.empty-state {
+  min-height: 55vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.empty-state-link {
+  color: #cfcfcf;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.empty-state-link:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
 .project-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 200fr));
@@ -331,6 +375,12 @@ box-shadow: 0 12px 40px rgba(255,122,0,0.22);
 opacity: 0.98;
 }
 
+.add-project-button--large {
+  font-size: 1.15rem;
+  padding: 0.9rem 2rem;
+  border-radius: 10px;
+}
+
 /* Add Chapter Button */
 .add-chapter-button {
 background: #ff9800;
@@ -339,6 +389,12 @@ color: white;
 
 .add-chapter-button:hover {
 background: #e68900;
+}
+
+.add-chapter-button--large {
+  font-size: 1.1rem;
+  padding: 0.85rem 2rem;
+  border-radius: 10px;
 }
 
 /* Edit Button */

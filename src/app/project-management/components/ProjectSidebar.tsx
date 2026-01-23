@@ -15,10 +15,9 @@ interface Project {
 interface ProjectSidebarProps {
   projects: Project[];
   onSelectProject: (project: Project) => void;
-  onCreateProject: () => void;
 }
 
-export default function ProjectSidebar({ projects, onSelectProject, onCreateProject }: ProjectSidebarProps) {
+export default function ProjectSidebar({ projects, onSelectProject }: ProjectSidebarProps) {
   const [isProjectsCollapsed, setIsProjectsCollapsed] = useState(false);
   const handleShare = (e: React.MouseEvent, projectId: string) => {
     e.stopPropagation();
@@ -46,9 +45,6 @@ export default function ProjectSidebar({ projects, onSelectProject, onCreateProj
           ))}
         </ul>        
         )}
-        <button className="button add-project-button" onClick={onCreateProject}>
-          Add Project
-        </button>
       </div>
     </div>
   );

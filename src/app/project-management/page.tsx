@@ -41,6 +41,18 @@ export default function ProjectManagementPage() {
     localStorage.setItem("projects", JSON.stringify(projects));
   }, [projects]);
 
+  useEffect(() => {
+    if (!selectedProject) return;
+    const refreshedProject = projects.find((project) => project.id === selectedProject.id) || null;
+    if (!refreshedProject) {
+      setSelectedProject(null);
+      return;
+    }
+    if (refreshedProject !== selectedProject) {
+      setSelectedProject(refreshedProject);
+    }
+  }, [projects, selectedProject]);
+
   const handleCreateProject = async (projectData: {
     title: string;
     description: string;
@@ -122,6 +134,13 @@ export default function ProjectManagementPage() {
     window.location.href = `/script-writing?chapterId=${chapterId}`;
   };
 
+  const promptCreateChapter = (projectId: string) => {
+    const chapterTitle = prompt("Enter the chapter title:");
+    if (chapterTitle) {
+      handleCreateChapter(projectId, chapterTitle);
+    }
+  };
+
   const handleDeleteChapter = async (chapterId: string) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this chapter?");
     if (confirmDelete) {
@@ -165,34 +184,85 @@ export default function ProjectManagementPage() {
         <ProjectSidebar
           projects={projects}
           onSelectProject={(project) => setSelectedProject(project)}
-          onCreateProject={() => setShowCreateModal(true)}
         />
 
         <div className="main-content">
           {selectedProject ? (
-            <>
-              <button onClick={() => setSelectedProject(null)} className="button back-button">
-                Back to Projects
-              </button>
+            <div className="project-detail">
+              <div className="project-detail-header">
+                <button onClick={() => setSelectedProject(null)} className="button back-button">
+                  Back to Projects
+                </button>
+              </div>
               <h2>{selectedProject.title}</h2>
-              <ChapterList
-                chapters={selectedProject.chapters}
-                onEditChapter={handleEditChapter}
-                onDeleteChapter={handleDeleteChapter}
-              />
-            </>
-          ) : (
-            <div className="project-grid">
-              {projects.map((project) => (
-                <ProjectCard
-                  key={project.id}
-                  project={project}
-                  onSelect={(p) => setSelectedProject(p)}
-                  onDeleteProject={handleDeleteProject}
-                  onCreateChapter={handleCreateChapter}
-                  onRenameProject={handleRenameProject}
+              {selectedProject.chapters?.length > 0 && (
+                <div className="chapter-toolbar">
+                  <button
+                    className="button add-chapter-button"
+                    onClick={() => promptCreateChapter(selectedProject.id)}
+                  >
+                    Add Chapter
+                  </button>
+                </div>
+              )}
+              {selectedProject.chapters?.length === 0 ? (
+                <div className="empty-state">
+                  <button
+                    className="button add-chapter-button add-chapter-button--large"
+                    onClick={() => promptCreateChapter(selectedProject.id)}
+                  >
+                    Add Chapter
+                  </button>
+                </div>
+              ) : (
+                <ChapterList
+                  chapters={selectedProject.chapters}
+                  onEditChapter={handleEditChapter}
+                  onDeleteChapter={handleDeleteChapter}
                 />
-              ))}
+              )}
+            </div>
+          ) : (
+            <div className="projects-section">
+              <div className="projects-header">
+                <h2>Projects</h2>
+                {projects.length > 0 && (
+                  <button
+                    className="button add-project-button"
+                    onClick={() => setShowCreateModal(true)}
+                  >
+                    Add Project
+                  </button>
+                )}
+              </div>
+              {projects.length === 0 ? (
+                <div className="empty-state">
+                  <button
+                    className="button add-project-button add-project-button--large"
+                    onClick={() => setShowCreateModal(true)}
+                  >
+                    Add Project
+                  </button>
+                  <a
+                    className="empty-state-link"
+                    href="/documentation-project-management"
+                  >
+                    New to MangafyAi? Learn how to create a project
+                  </a>
+                </div>
+              ) : (
+                <div className="project-grid">
+                  {projects.map((project) => (
+                    <ProjectCard
+                      key={project.id}
+                      project={project}
+                      onSelect={(p) => setSelectedProject(p)}
+                      onDeleteProject={handleDeleteProject}
+                      onRenameProject={handleRenameProject}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>

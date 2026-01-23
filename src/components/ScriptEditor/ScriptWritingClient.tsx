@@ -2106,7 +2106,7 @@ return (
         </div>
       )}
     </div>
-    <div className={styles.generateWrapper}>
+    <div>
   <button 
     onClick={handleGenerateManga} 
     className={styles.generateButton}
@@ -2114,6 +2114,23 @@ return (
   >
     <CreditIcon cost={cost} /> 🎨 Generate
   </button>
+  <a
+    href="/documentation#generate-gallery"
+      style={{
+        position: "absolute",
+        top: "900px",
+        left: "13%",
+        transform: "translateX(-50%)",
+        color: "#ffb347",
+        fontWeight: 600,
+        textDecoration: "underline",
+        fontSize: "0.95rem",
+        cursor: "pointer",
+        zIndex: 400,
+      }}
+    >
+    New to MangafyAi? Learn how to generate Manga
+  </a>
 </div>
     {/* Right sidebar */}
     <div className="characters-sidebar-fixed desktop-only">

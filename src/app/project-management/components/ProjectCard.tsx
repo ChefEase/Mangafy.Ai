@@ -12,7 +12,6 @@ interface Project {
 interface ProjectCardProps {
   project: Project;
   onSelect: (project: Project) => void;
-  onCreateChapter: (projectId: string, chapterTitle: string) => void;
   onRenameProject: (projectId: string, newTitle: string) => void;
   onDeleteProject: (projectId: string) => void;
 }
@@ -20,21 +19,11 @@ interface ProjectCardProps {
 export default function ProjectCard({
   project,
   onSelect,
-  onCreateChapter,
   onRenameProject,
   onDeleteProject,
 }: ProjectCardProps) {
   const [showActions, setShowActions] = useState(false);
   const cardRef = useRef<HTMLDivElement | null>(null);
-
-  const handleAddChapter = (e: React.MouseEvent | React.TouchEvent) => {
-    e.stopPropagation();
-    const chapterTitle = prompt("Enter the chapter title:");
-    if (chapterTitle) {
-      onCreateChapter(project.id, chapterTitle);
-    }
-    setShowActions(false);
-  };
 
   const handleRename = (e: React.MouseEvent | React.TouchEvent) => {
     e.stopPropagation();
@@ -107,9 +96,6 @@ export default function ProjectCard({
         <div className="project-card-actions" onClick={(e) => e.stopPropagation()}>
           <button className="project-card-action primary" onClick={handleOpenProject}>
             Open Project
-          </button>
-          <button className="project-card-action" onClick={handleAddChapter}>
-            Add Chapter
           </button>
           <button className="project-card-action" onClick={handleRename}>
             Rename
