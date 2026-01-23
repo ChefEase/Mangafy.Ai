@@ -60,18 +60,34 @@ export async function POST(req: Request) {
         return new Response("Already processed", { status: 200 });
       }
 
-      // 2) Find userId via subscription metadata (best)
-      let userId: string | undefined;
+     // 2) Find userId via subscription metadata (best) with fallbacks
+     let userId =
+     (invoice as any)?.parent?.subscription_details?.metadata?.userId ||
+     (invoice as any)?.lines?.data?.[0]?.metadata?.userId ||
+     undefined;
+   
+// Try subscription metadata first
+if (subscriptionId) {
+  const sub = await stripe.subscriptions.retrieve(subscriptionId);
+  userId = sub.metadata?.userId;
+}
 
-      if (subscriptionId) {
-        const sub = await stripe.subscriptions.retrieve(subscriptionId);
-        userId = sub.metadata?.userId;
-      }
+// Fallback 1: invoice.subscription_details.metadata.userId
+if (!userId) {
+  userId = (invoice as any)?.parent?.subscription_details?.metadata?.userId as string | undefined;
+}
 
-      if (!userId) {
-        console.warn("⚠️ No userId on subscription metadata for invoice:", invoiceId);
-        return new Response("No userId", { status: 200 });
-      }
+// Fallback 2: invoice line item metadata.userId
+if (!userId) {
+  const lineUserId =
+    (invoice as any)?.lines?.data?.[0]?.metadata?.userId as string | undefined;
+  userId = lineUserId;
+}
+
+if (!userId) {
+  console.warn("⚠️ No userId found anywhere for invoice:", invoiceId);
+  return new Response("No userId", { status: 200 });
+}
 
       // 3) Determine credits from invoice line items
       const lines = await stripe.invoices.listLineItems(invoiceId, { limit: 100 });
