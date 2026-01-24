@@ -78,12 +78,15 @@ export default function CreateProjectModal({ onCreate, onClose }: CreateProjectM
           onChange={(e) => setDescription(e.target.value)}
           className="modal-textarea"
         />
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageUpload}
-          className="modal-file-input"
-        />
+        <label className="modal-file-label">
+          Project Cover Image
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="modal-file-input"
+          />
+        </label>
         <div className="modal-actions">
           <button onClick={handleCreate} className="modal-button primary">
             Create

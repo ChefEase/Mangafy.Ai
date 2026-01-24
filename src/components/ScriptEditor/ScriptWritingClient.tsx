@@ -2250,7 +2250,7 @@ return (
     // You can tweak position here by changing the CSS variables:
     // e.g. set top to '48px' or left to '50%' or left to '60%' etc.
     style={{
-      ['--download-top' as any]: '528px',     // desktop top offset
+      ['--download-top' as any]: '100px',     // desktop top offset
       ['--download-left' as any]: '50%',     // horizontal center
       ['--download-translateX' as any]: '-50%' // default center transform
     }}

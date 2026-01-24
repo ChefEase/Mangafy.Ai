@@ -7,6 +7,22 @@ import "./DocumentationPage.css";
 const DocumentationPage: React.FC = () => {
   return (
     <div className="documentation-page">
+      <div className="doc-video-cta">
+        <span className="doc-video-kicker">Prefer video?</span>
+        <a
+          className="doc-video-button"
+          href="https://www.youtube.com"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <span className="doc-video-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+              <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.6 3.5 12 3.5 12 3.5s-7.6 0-9.4.6A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.8.6 9.4.6 9.4.6s7.6 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.8 15.5V8.5l6.2 3.5-6.2 3.5z" />
+            </svg>
+          </span>
+          Watch the 5-minute tutorial on YouTube
+        </a>
+      </div>
       {/* Header */}
       <header className="documentation-header">
         <motion.h1
@@ -278,6 +294,22 @@ In the second panel, his sister Hina enters the room.`}
       </main>
 
       {/* Footer */}
+      <div className="doc-video-cta doc-video-cta-bottom">
+        <span className="doc-video-kicker">Prefer video?</span>
+        <a
+          className="doc-video-button"
+          href="https://www.youtube.com"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <span className="doc-video-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+              <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.6 3.5 12 3.5 12 3.5s-7.6 0-9.4.6A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.8.6 9.4.6 9.4.6s7.6 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.8 15.5V8.5l6.2 3.5-6.2 3.5z" />
+            </svg>
+          </span>
+          Watch the 5-minute tutorial on YouTube
+        </a>
+      </div>
       <footer className="documentation-footer">
         <p>(c) {new Date().getFullYear()} Mangafy.AI. All rights reserved.</p>
       </footer>

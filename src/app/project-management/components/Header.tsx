@@ -49,7 +49,7 @@ export default function Header() {
 
       <nav className="nav">
         <Link href="/project-management">Projects Tab</Link>
-        <Link href="/documentation-project-management">Documentation</Link>
+        <Link href="/documentation-project-management">Getting Started (5-Minute Guide)</Link>
       </nav>
       
       <div className="user-credit-container">

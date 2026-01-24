@@ -385,7 +385,7 @@
   min-height: 180px; /* 👁 ensures it's visible even when empty */
   background: rgba(255, 255, 255, 0.05); /* faint background */
   position: relative;
-  top: 700px;
+  top: 300px;
 }
 
 /* Each gallery item (thumbnail card) */
