@@ -109,10 +109,11 @@ const DocumentationPage: React.FC = () => {
           <div className="doc-figure-grid">
             <figure className="doc-figure">
               <img src="/screenshots/add-project-placeholder.png" alt="Add Project Screen" />
+              <img src="/screenshots/add-project-placeholder(1).png" alt="Add Project Screen" />
               <figcaption>Add project form</figcaption>
             </figure>
             <figure className="doc-figure">
-              <img src="/screenshots/add-project-placeholder(1).png" alt="Add Project Screen" />
+              <img src="/screenshots/add-project-placeholder(2).png" alt="Add Project Screen" />
               <figcaption>Project created</figcaption>
             </figure>
           </div>
@@ -129,7 +130,7 @@ const DocumentationPage: React.FC = () => {
           </div>
           <ol className="doc-steps">
             <li>Select a project card to open the action panel.</li>
-            <li>Choose Open, Add Chapter, Rename, or Delete.</li>
+            <li>Choose Open, Rename, or Delete.</li>
           </ol>
           <div className="doc-figure-grid">
             <figure className="doc-figure">
@@ -139,10 +140,34 @@ const DocumentationPage: React.FC = () => {
           </div>
         </section>
 
+        <section className="documentation-section doc-card">
+          <div className="doc-card-header">
+            <h2>4. Start Creating</h2>
+            <p className="doc-lead">
+              Open a project and click on add chapter, add a chapter name and click ok.
+            </p>
+          </div>
+          <ol className="doc-steps">
+            <li>After Creating a chapter</li>
+            <li>Click Edit Chapters to start creating.</li>
+          </ol>
+          <div className="doc-figure-grid">
+            <figure className="doc-figure">
+              <img src="/screenshots/chapter (1).png" alt="Chapter Editor" />
+              <img src="/screenshots/chapter (2).png" alt="Chapter Editor" />
+              <figcaption>Adding a Chapter</figcaption>
+            </figure>
+            <figure className="doc-figure">
+            <img src="/screenshots/chapter (3).png" alt="Chapter Editor" />
+              <figcaption>Editing a chapter</figcaption>
+            </figure>
+          </div>
+        </section>
+
         {/* 4. Referrals */}
         <section className="documentation-section doc-card">
           <div className="doc-card-header">
-            <h2>4. Referrals</h2>
+            <h2>5. Referrals</h2>
             <p className="doc-lead">
               Share your referral link from the website to earn credits when new users sign up.
             </p>
@@ -169,7 +194,7 @@ const DocumentationPage: React.FC = () => {
         {/* 5. Upgrading */}
         <section className="documentation-section doc-card">
           <div className="doc-card-header">
-            <h2>5. Upgrading to Premium</h2>
+            <h2>6. Upgrading to Premium</h2>
             <p className="doc-lead">
               Go to your profile &gt; Subscription, choose a plan, and complete payment to upgrade.
             </p>
@@ -194,28 +219,6 @@ const DocumentationPage: React.FC = () => {
           </div>
         </section>
 
-        <section className="documentation-section doc-card">
-          <div className="doc-card-header">
-            <h2>6. Start Creating</h2>
-            <p className="doc-lead">
-              Open a project and choose Edit Chapters to begin working on your scenes.
-            </p>
-          </div>
-          <ol className="doc-steps">
-            <li>Open a project card.</li>
-            <li>Click Edit Chapters to start creating.</li>
-          </ol>
-          <div className="doc-figure-grid">
-            <figure className="doc-figure">
-              <img src="/screenshots/chapter (1).png" alt="Chapter Editor" />
-              <figcaption>Chapter list</figcaption>
-            </figure>
-            <figure className="doc-figure">
-              <img src="/screenshots/chapter (2).png" alt="Chapter Editor" />
-              <figcaption>Editing a chapter</figcaption>
-            </figure>
-          </div>
-        </section>
       </main>
 
       {/* Footer */}
