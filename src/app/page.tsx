@@ -60,25 +60,56 @@ const CAROUSEL_IMAGES = [
 
 const FEATURES = [
   {
-title: 'Ai Character Consistency Engine',
-description: 'Mangafy.ai uses your uploaded characters and their descriptions to maintain consistent appearances across all manga panels. Our AI parses character roles, traits, and visuals from your input to ensure visual continuity. The more detailed and concise the description, the better the results with up to 85% accuracy in maintaining character consistency across scenes.',
-media: '/samples/sample3.png',
-  },
-  {
-    title: 'AI Story Panel Generator',
+    title: 'AI Character Consistency Engine',
     description:
-      'Effortlessly create manga-style stories with our AI-powered panel generator. Choose from a variety of story templates or generate original plots, then apply them directly to your script box. Each story is broken into dynamic panels ready for editing, making storytelling faster, more flexible, and visually captivating.',
-    media: '/features/feature3.mp4',
-    isVideo: true
+      'Mangafy.AI uses your uploaded characters and their descriptions to maintain consistent appearances across all manga panels. Our AI parses character roles, traits, and visuals to ensure visual continuity across scenes. Concise and clear descriptions yield the best results, achieving up to 85% character consistency.',
+    media: '/samples/sample3.png',
   },
-  
+
+  {
+    title: 'Character Library & Profiles',
+    description:
+      'Store your characters in a dedicated library with saved images, roles, and descriptions. Once added, you no longer need to rewrite full character descriptions for every panel—just reference the character. Only describe clothing when it changes or is panel-specific, saving time and improving consistency.',
+      media: [
+        '/features/character-library.png',
+        '/features/character-library (2).png',
+      ],
+  },
+
+  {
+    title: 'Snapshot & Preset Saves',
+    description:
+      'Save snapshots of your scripts, generation settings, and advanced options in one click. Re-import them anytime to reuse, tweak, or iterate on previous ideas without starting from scratch. Perfect for experimenting with variations or continuing unfinished projects.',
+      media: [
+        '/features/snapshots.png',
+        '/features/snapshots(1).png',
+        '/features/snapshots(2).png',
+      ],
+  },
+
+  {
+    title: 'Genre-Based Script Templates',
+    description:
+      'Get started instantly with professionally designed script templates tailored for different genres such as action, romance, fantasy, horror, and slice of life. Templates help structure scenes, panel flow, and pacing for better AI-generated results.',
+    media: '/features/script-templates.png',
+  },
+
+  {
+    title: 'AI Recommended Settings',
+    description:
+      'Mangafy.AI analyzes the content of your script and automatically recommends advanced generation settings. From style strength to composition and continuity options, the AI optimizes technical parameters so creators can focus on storytelling instead of tweaking sliders.',
+    media: '/features/ai-recommendations.png',
+  },
+
   {
     title: 'AI Chatbot with Image Upload',
     description:
-      'Engage in seamless conversations with our AI chatbot that understands and responds in real-time. Upload images to ask questions or get insights based on the visual content. Supports file uploads with a size limit to ensure smooth performance. Perfect for interactive chats that combine text and images effortlessly.',
-    media: '/features/feature5.png',
-  }
-  
+      'Engage in seamless conversations with our AI chatbot that understands your creative intent. Upload images, ask questions, refine prompts, or get real-time guidance on improving panel composition and storytelling.',
+    media: [ 
+      '/features/feature.png',
+      '/features/feature(1).png',
+    ]
+  },
 ];
 
 const PRICING = [
@@ -255,7 +286,7 @@ export default function LandingPage() {
       {/* FEATURES */}
       <section className={styles.featuresSection}>
         <h2 className={styles.sectionTitleFeatures}>Features</h2>
-        {FEATURES.map(({ title, description, media, isVideo }, i) => (
+        {FEATURES.map(({ title, description, media,}, i) => (
           <div key={i} className={styles.featureItem}>
             <div className={styles.featureText}>
               <h3 className={styles.featureTitle}>{title}</h3>
@@ -267,26 +298,40 @@ export default function LandingPage() {
               </div>
             </div>
             <div className={styles.featureMedia}>
-            {isVideo ? (
-        <video
-          src={media}
-          width={500}
-          height={350}
-          className={styles.featureImage}
-          autoPlay
-          muted
-          loop
-          playsInline
-        />
-      ) : (
-        <Image
-          src={media}
-          alt={title}
-          width={500}
-          height={350}
-          className={styles.featureImage}
-        />
-      )}
+              {Array.isArray(media) ? (
+                <div className={styles.featureMediaGrid}>
+                  {media.map((imgSrc, idx) => (
+                    <div key={`${title}-${idx}`} className={styles.featureMediaItem}>
+                      <Image
+                        src={imgSrc}
+                        alt={`${title} preview ${idx + 1}`}
+                        width={420}
+                        height={280}
+                        className={styles.featureImage}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : typeof media === "string" && (media.endsWith(".mp4") || media.endsWith(".webm")) ? (
+                <video
+                  src={media}
+                  width={500}
+                  height={350}
+                  className={styles.featureImage}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                />
+              ) : (
+                <Image
+                  src={media}
+                  alt={title}
+                  width={500}
+                  height={350}
+                  className={styles.featureImage}
+                />
+              )}
             </div>
           </div>
         ))}
