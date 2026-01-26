@@ -262,8 +262,11 @@
 .documentation-image-card img {
   width: 100%;
   max-width: 460px;
+  max-height: 320px;
+  height: auto;
   border-radius: 0.75rem;
   object-fit: contain;
+  object-position: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 

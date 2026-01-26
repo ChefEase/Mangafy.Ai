@@ -266,6 +266,7 @@ In the second panel, his sister Hina enters the room.`}
           </p>
           <motion.div className="documentation-image-card" whileHover={{ scale: 1.03 }}>
             <img src="/screenshots/gallery.png" alt="Gallery Example" />
+            <img src="/screenshots/gallery(1).png" alt="Gallery Example" />
           </motion.div>
         </section>
 
