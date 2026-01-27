@@ -12,7 +12,7 @@ const DocumentationPage: React.FC = () => {
         <span className="doc-video-kicker">Prefer video?</span>
         <a
           className="doc-video-button"
-          href="https://www.youtube.com"
+          href="https://youtu.be/2cWoyazCpBY"
           target="_blank"
           rel="noreferrer"
         >
@@ -226,7 +226,7 @@ const DocumentationPage: React.FC = () => {
         <span className="doc-video-kicker">Prefer video?</span>
         <a
           className="doc-video-button"
-          href="https://www.youtube.com"
+          href="https://youtu.be/2cWoyazCpBY"
           target="_blank"
           rel="noreferrer"
         >
