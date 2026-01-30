@@ -202,13 +202,15 @@ const initializeWithCustomHeaders = async (userId, email) => {
         avatar: data.user.user_metadata?.avatar_url || "/default-avatar.svg"
       });
 
+      // Store userId in localStorage immediately
       if (typeof window !== "undefined") {
         localStorage.setItem("userId", data.user.id);
       }
 
+      // Brief delay to ensure localStorage is set
       setTimeout(() => {
         router.push("/project-management");
-      }, 1000); // even 10ms is often enough
+      }, 100);
       
     } catch (error) {
       alert(error.message);

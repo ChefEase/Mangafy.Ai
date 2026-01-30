@@ -205,6 +205,11 @@ const initializeWithCustomHeaders = async (userId, email) => {
             avatar: session.user.user_metadata?.avatar_url || "/default-avatar.svg"
           });
 
+          // Store userId in localStorage for compatibility
+          if (typeof window !== "undefined") {
+            localStorage.setItem("userId", session.user.id);
+          }
+
           router.push("/project-management");
           subscription.unsubscribe();
         }

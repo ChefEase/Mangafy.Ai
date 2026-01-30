@@ -8,6 +8,7 @@ import CreateProjectModal from "./components/CreateProjectModal";
 import ChapterList from "./components/ChapterList";
 import "./styles/projectManagement.css";
 import { fetchUserData, saveUserData } from "@/utils/airtable";
+import { useUser } from "@/context/UserContext";
 
 // Define TypeScript interfaces for Projects & Chapters
 interface Chapter {
@@ -24,18 +25,38 @@ interface Project {
 }
 
 export default function ProjectManagementPage() {
+  const { user } = useUser();
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Get userId from UserContext or fallback to localStorage
+  const userId = user?.id || (typeof window !== "undefined" ? localStorage.getItem("userId") : null);
 
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
+    // Check if user is authenticated
+    if (user === null && !userId) {
+      // User is not authenticated, redirect to login
+      if (typeof window !== "undefined") {
+        window.location.href = "/login";
+      }
+      return;
+    }
+
     if (userId) {
+      setIsLoading(true);
       fetchUserData(userId).then((data) => {
         setProjects(data.projects || []);
+      }).catch((error) => {
+        console.error("Error fetching user data:", error);
+      }).finally(() => {
+        setIsLoading(false);
       });
+    } else {
+      setIsLoading(false);
     }
-  }, []);
+  }, [userId, user]);
 
   useEffect(() => {
     localStorage.setItem("projects", JSON.stringify(projects));
@@ -58,11 +79,10 @@ export default function ProjectManagementPage() {
     description: string;
     thumbnail: string;
   }) => {
-    const userId = localStorage.getItem("userId");
-    console.log(localStorage.getItem("userId"));
+    console.log("Creating project for userId:", userId);
 
     if (!userId) {
-      console.error("No userId found in localStorage");
+      console.error("No userId found");
       alert("You're not signed in properly. Please log in again.");
       return;
     }
@@ -102,7 +122,6 @@ export default function ProjectManagementPage() {
     });
     setProjects(updatedProjects);
 
-    const userId = localStorage.getItem("userId");
     if (userId) {
       saveUserData(userId, { projects: updatedProjects, characters: {} });
     }
@@ -124,7 +143,6 @@ export default function ProjectManagementPage() {
     });
     setProjects(updatedProjects);
 
-    const userId = localStorage.getItem("userId");
     if (userId) {
       await saveUserData(userId, { projects: updatedProjects, characters: {} });
     }
@@ -156,7 +174,6 @@ export default function ProjectManagementPage() {
       });
       setProjects(updatedProjects);
 
-      const userId = localStorage.getItem("userId");
       if (userId) {
         await saveUserData(userId, { projects: updatedProjects, characters: {} });
       }
@@ -170,12 +187,26 @@ export default function ProjectManagementPage() {
       const updatedProjects = (projects || []).filter((project) => project.id !== projectId);
       setProjects(updatedProjects);
 
-      const userId = localStorage.getItem("userId");
       if (userId) {
         await saveUserData(userId, { projects: updatedProjects, characters: {} });
       }
     }
   };
+
+  // Show loading state while checking authentication
+  if (isLoading || user === undefined) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontSize: '18px'
+      }}>
+        Loading your projects...
+      </div>
+    );
+  }
 
   return (
     <div>

@@ -30,14 +30,24 @@ export function UserProvider({ children }: UserProviderProps) {
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
-        setUser({
+        const userData = {
           id: session.user.id,
           email: session.user.email || "",
           username: session.user.user_metadata?.full_name || session.user.email,
           avatar: session.user.user_metadata?.avatar_url || "/default-avatar.svg"
-        });
+        };
+        setUser(userData);
+
+        // Sync userId to localStorage for compatibility with existing code
+        if (typeof window !== "undefined") {
+          localStorage.setItem("userId", session.user.id);
+        }
       } else {
         setUser(null);
+        // Clear localStorage when user signs out
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("userId");
+        }
       }
     });
 
